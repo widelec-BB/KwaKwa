@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS conversations
+(
+	id INTEGER PRIMARY KEY,
+	pluginId INTEGER NOT NULL,
+	contactId TEXT,
+	contactName TEXT,
+	userId TEXT NOT NULL,
+	flags INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS messages
+(
+	id INTEGER PRIMARY KEY,
+	conversationId INTEGER NOT NULL,
+	contactId TEXT,
+	contactName TEXT,
+	aTimestamp INTEGER NOT NULL,
+	flags INTEGER NOT NULL,
+	content TEXT NOT NULL,
+	FOREIGN KEY(conversationId) REFERENCES conversations(id)
+);
+CREATE INDEX IF NOT EXISTS conversationsIndex ON messages(conversationId);

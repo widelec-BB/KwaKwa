@@ -1,0 +1,620 @@
+@database "kwakwa.guide"
+@author "Filip 'widelec' Maryjañski"
+@remark "Created with Ed"
+@$VER: KwaKwa.guide 1.8 (02.07.2017)
+
+@node main "KwaKwa" "KwaKwa: Indeks"
+@{b}..:: KwaKwa ::..@{ub}
+Wersja: 1.8
+
+Copyright © 2012-2017 Filip "widelec" Maryjañski, BlaBla group
+
+@{"    Wstêp      "   link    "introduction" 0}
+@{"  Wymagania    "   link    "requirements" 0}
+@{"  Instalacja   "   link    "installation" 0}
+@{"  Emotikony    "   link    "emoticons"    0}
+@{"     IPC       "   link    "ipc"    	  0}
+@{"   Tooltypy    "   link    "tooltypes"    0}
+@{"     FAQ       "   link    "faq"          0}
+
+@{"   Historia    "   link    "history"      0}
+@{"   Licencja    "   link    "disclaimer"   0}
+@{"  O programie  "   link    "credits"      0}
+
+@endnode
+
+@node "introduction" "KwaKwa: Wstêp"
+
+@{b}Wstêp:@{ub}
+
+KwaKwa jest prostym komunikatorem internetowym (IM). Umo¿liwia komunikacjê
+u¿ytkowników w czasie rzeczywistym poprzez przesy³anie pomiêdzy nimi wiadomo¶ci
+tekstowych. Od wersji 1.5 program przewiduje do³±czanie obs³ugi ró¿nych
+protoko³ów poprzez system tzw. modu³ów. Ka¿dy modu³ jest dynamicznie ³adowan±
+(przy starcie programu) bibliotek± zwiêkszaj±c± mo¿liwo¶ci programu.
+
+
+@endnode
+
+@node "requirements" "KwaKwa: Wymagania"
+@{b}Wymagania:@{ub}
+
+ o  komputer z zainstalowanym MorphOSem 3.9 lub nowszym
+ o  po³±czenie z internetem;
+ o  biblioteka ezxml.library (V8.7);
+ o  klasa TextEditor.mcc 15.45 [MOS/PPC].
+
+@endnode
+
+@node "installation" "KwaKwa: Instalacja"
+@{b}Instalacja:@{ub}
+
+Rozpakuj archiwum do dowolnego katalogu. Upewnij siê, ¿e w LIBS: masz najnowsz±
+(min. V8.7) bibliotekê @{"ezxml.library" system "OpenURL http://morphos-files.net/download/ezxml.library"} oraz w SYS:Classes/MUI masz @{"TextEditor.mcc" system "OpenURL http://sourceforge.net/projects/texteditor-mcc/files/TextEditor.mcc/15.37/"}
+w wersji 15.45.
+
+KwaKwa korzysta z programu @{"Magic Beacon" system "OpenURL http://morphos-files.net/remote/Magic_Beacon"} napisanego przez Guido Mersmanna.
+Obs³ugiwane notyfikacje to:
+o KWAKWA.STATUS - wysy³ana je¶li kto¶ z listy kontaktów zmieni status;
+o KWAKWA.MESSAGE - wysy³ana je¶li otrzymamy now± wiadomo¶æ;
+o KWAKWA.PICTURE - wysy³ana je¶li otrzymamy now± wiadomo¶æ zawieraj±c± obrazek.
+Dziêki wykorzystaniu Magic Beacona mo¿na w prosty sposób zrobiæ ró¿nego rodzaju
+powiadamianie o ww. zdarzeniach np. w formie d¼wiêków czy tzw. dymków.
+Dok³adny opis konfiguracji znajduje siê w dokumentacji Magic Beacona.
+
+@endnode
+
+@node "emoticons" "KwaKwa: Emotikony"
+@{b}Emotikony:@{ub}
+
+KwaKwa obs³uguje emotikony w dowolnych formatach graficznych obs³ugiwanych przez
+Reggae (oprócz emotikon w nawiasach ostrych) oraz w formacie gif (animowane).
+
+Obs³uga emotikon w KwaKwa jest realizowana przez stosunkowo prosty mechanizm.
+Emotikony zosta³y podzielone na dwa rodzaje. Pierwszy z nich s± to tzw. "bu¼ki",
+czyli np. ":-)", ":)", ":P" itd. Ich obs³uga realizowana jest poprzez kod
+wybieraj±cy odpowiednie pliki do za³adowania wg listy znajduj±cej siê
+w preferencjach programu.
+Drugi rodzaj emotikon to emotikony identyfikowane poprzez nazwy zawarte
+w nawiasach ostrych ("<" i ">"), np. "<boks>" czy "<gra>". Tutaj dowolno¶æ jest
+o wiele wiêksza. Za ka¿dym razem kiedy KwaKwa natrafi na ci±g znaków
+ograniczony przez nawiasy ostre sprawdza czy istnieje emotikona o odpowiedniej
+nazwie. Nazwa emotikony jest sk³adana z tekstu zawartego w nawiasach ostrych
+oraz rozszerzenia ".gif", np. w przypadku emotikony "<boks>" KwaKwa bêdzie
+poszukiwaæ pliku "boks.gif". W przypadku braku poszukiwanego pliku zamiast
+emotikony zostanie wstawiony ca³y ci±g znaków (wraz z nawiasami ostrymi).
+Emotikony powinny znajdowaæ siê w katalogu PROGDIR:gfx/emots. Sposób wykrywania
+emotikon w tek¶cie zosta³ napisany z my¶l± o jak najwiêkszej elastyczno¶ci,
+m.in. wykrywa prawid³owo emotikony zawieraj±ce niewielkie "b³êdy" w zapisie,
+np. ":-DDDDD" zostanie odczytane identycznie jak ":-DD"
+(zostanie wstawiona jedna emotikona), jak i równie¿ ci±gi typu "!!!!!!!!!!!!!"
+bêd± zamienione na jedn± emotikonê odpowiadaj±c± "!!".
+
+@endnode
+
+@node "ipc" "KwaKwa: IPC"
+@{b}IPC:@{ub}
+
+Port IPC pozwala m.in. na sterowanie programem poprzez skrypty (zwykle pisane
+w Lua b±d¼ ARexxie). Aktualnie KwaKwa obs³uguje nastêpuj±ce polecenia:
+
+Standardowe polecenia MUI:
+
+Polecenie:            Wzorzec:
+-----------           ---------
+quit                  FORCE/S
+hide
+deactivate
+show
+activate
+info                  ITEM/A
+help                  FILE/A
+
+
+Polecenia KwaKwa:
+
+Polecenie:                             Wzorzec:
+-----------                           ---------
+@{"ChangeStatus" link "ipc.ChangeStatus"}                 STATUSTYPE/A,STATUSDESC/F
+@{"DisconnectDescription" link "ipc.DisconnectDescription"}        DESCRIPTION/F
+@{"WindowControl" link "ipc.WindowControl"}                WINDOW/A,ACTION/A
+@{"ActivateTabByNumber" link "ipc.ActivateTabByNumber"}          TABNUMBER/A
+@{"OpenTabByName" link "ipc.OpenTabByName"}                NAME/F
+@{"InsertMessage" link "ipc.InsertMessage"}                INPUT/A,MESSAGE/F
+@{"Disconnect" link "ipc.Disconnect"}
+@{"Connect" link "ipc.Connect"}
+
+
+W archiwum znajduje siê katalog "scripts" gdzie s± umieszczone przyk³adowe
+skrypty. Ka¿dy napis podawany jako parametr polecenia jest porównywany z
+uwzglêdnieniem ró¿nicy pomiêdzy ma³ymi i wielkimi literami.
+
+@endnode
+
+@node "ipc.ChangeStatus" "KwaKwa: IPC - ChangeStatus"
+@{b}Nazwa@{ub}
+@{fg shine} ChangeStatus
+@{fg text}
+@{b}Wzorzec@{ub}
+ STATUSTYPE/A,STATUSDESC/F
+
+
+@{b}Dzia³anie@{ub}
+ Zmienia aktualny status. Mo¿e zostaæ u¿yte do po³±czenia/roz³±czenia siê.
+
+@{b}Parametry@{ub}
+ STATUSTYPE/A - status do ustawienia, mo¿liwe warto¶ci: 'available', 'away',
+                'invisible', 'unavailable', 'ffc', 'dnd';
+ STATUSDESC/F - opis statusu, mo¿e zostaæ pominiêty.
+
+@{b}Wynik@{ub}
+ 'Wrong status name' - w przypadku b³êdnego rodzaju statusu;
+ 'Failed' - w przypadku b³êdu podczas zmiany;
+ 'OK' - w przypadku powodzenia.
+
+@{b}Przyk³ad@{ub}
+ RandomDesc.lua - prosty skrypt który ustawia losowy status, a jako opis losow±
+                  liniê z pliku podanego jako argument.
+
+@{fg text}
+@endnode
+
+@node "ipc.DisconnectDescription" "KwaKwa: IPC - DisconnectDescription"
+@{b}Nazwa@{ub}
+@{fg shine} DisconnectDescription
+@{fg text}
+@{b}Wzorzec@{ub}
+ DESCRIPTION/F
+
+
+@{b}Dzia³anie@{ub}
+ Koñczy wszystkie po³±czenia ustawiaj±c status "niedostêpny" oraz podany opis.
+
+@{b}Parametry@{ub}
+ DESCRIPTION/F - opis do ustawienia.
+
+@{b}Wynik@{ub}
+ 'Failed' - w przypadku b³êdu podczas zmiany;
+ 'OK' - w przypadku powodzenia.
+
+@{fg text}
+@endnode
+
+@node "ipc.WindowControl" "KwaKwa: IPC - WindowControl"
+@{b}Nazwa@{ub}
+@{fg shine} WindowControl
+@{fg text}
+@{b}Wzorzec@{ub}
+ WINDOW/A,ACTION/A
+
+
+@{b}Dzia³anie@{ub}
+ Pozwala na wykonywanie podstawowych operacji na oknach programu.
+ Dostêpne s± nastêpuj±ce okna:
+  - @{i}@{b}main@{ui}@{ub} - okno g³ówne (z list± kontaktów);
+  - @{i}@{b}preferences@{ui}@{ub} - okno ustawieñ programu;
+  - @{i}@{b}talk@{ui}@{ub} - okno rozmowy;
+  - @{i}@{b}edit contact@{ui}@{ub} - okno edycji danych kontaktu;
+  - @{i}@{b}set status@{ui}@{ub}  - okno ustawiania statusu opisowego;
+  - @{i}@{b}modules log@{ui}@{ub} - okno konsoli modu³ów.
+ Na ka¿dym z okien mo¿na wykonaæ kilka akcji. Mo¿liwe akcje:
+  - @{i}@{b}show@{ui}@{ub} - pokazuje okno;
+  - @{i}@{b}hide@{ui}@{ub} - ukrywa okno;
+  - @{i}@{b}to front@{ui}@{ub} - przenosi wybrane okno na wierzch;
+  - @{i}@{b}to back@{ui}@{ub} - przenosi wybrane okno za inne okna;
+  - @{i}@{b}activate@{ui}@{ub} - oznacza wybrane okno jako aktywne;
+  - @{i}@{b}deactivate@{ui}@{ub} - oznacza wybrane okno jako nieaktywne;
+  - @{i}@{b}screen to front@{ui}@{ub} - prze³±cza na ekran, na którym znajduje
+                      siê wybrane okno;
+  - @{i}@{b}screen to back@{ui}@{ub} - prze³±cza na nastêpny ekran (po tym,
+                     na którym znajduje siê wybrane okno);
+
+@{b}Parametry@{ub}
+ WINDOW/A - okno, na którym bêdzie przeprowadzana akcja;
+ ACTION/A - akcja do przeprowadzenia.
+
+@{b}Wynik@{ub}
+ 'Failed' - w przypadku b³êdu podczas zmiany;
+ 'OK' - w przypadku powodzenia.
+
+@{fg text}
+@endnode
+
+@node "ipc.ActivateTabByNumber" "KwaKwa: IPC - ActivateTabByNumber"
+@{b}Nazwa@{ub}
+@{fg shine} ActivateTabByNumber
+@{fg text}
+@{b}Wzorzec@{ub}
+ TABNUMBER/A
+
+
+@{b}Dzia³anie@{ub}
+ Pozwala aktywowaæ podan± kartê okna rozmowy. Zak³adki s± numerowane od lewej
+ do prawej, zaczynaj±c od 0.
+
+@{b}Parametry@{ub}
+ TABNUMBER/A - zak³adka, na któr± ma zostaæ prze³±czone okno rozmowy.
+
+@{b}Wynik@{ub}
+ 'Failed' - w przypadku b³êdu podczas zmiany;
+ 'OK' - w przypadku powodzenia.
+
+@{fg text}
+@endnode
+
+
+@node "ipc.OpenTabByName" "KwaKwa: IPC - OpenTabByName"
+@{b}Nazwa@{ub}
+@{fg shine} OpenTabByName
+@{fg text}
+@{b}Wzorzec@{ub}
+ NAME/F
+
+
+@{b}Dzia³anie@{ub}
+ Szuka podanej nazwy na li¶cie kontaktów. Je¶li tak± znajdzie to prze³±cza okno
+ rozmowy na zak³adkê rozmowy ze znalezionym kontaktem. Je¶li taka zak³adka nie
+ by³a jeszcze otwarta to tworzy now±.
+
+@{b}Parametry@{ub}
+ NAME/F - nazwa kontaktu, z którym rozmowa ma zostaæ otwarta.
+
+@{b}Wynik@{ub}
+ 'Failed' - w przypadku b³êdu podczas zmiany;
+ 'OK' - w przypadku powodzenia.
+
+@{fg text}
+@endnode
+
+
+@node "ipc.InsertMessage" "KwaKwa: IPC - InsertMessage"
+@{b}Nazwa@{ub}
+@{fg shine} OpenTabByName
+@{fg text}
+@{b}Wzorzec@{ub}
+ INPUT/A,MESSAGE/F
+
+
+@{b}Dzia³anie@{ub}
+ Umiesza podan± tre¶æ wiadomo¶ci w wybranym gadgecie wprowadzania tekstu,
+ w aktualnie aktywnej zak³adce okna rozmowy.
+
+@{b}Parametry@{ub}
+ INPUT/A - pozwala wybraæ gadget wpisywania tekstu, który ma zostaæ u¿yty;
+           mo¿liwe warto¶ci to @{i}@{b}first@{ui}@{ub} i @{i}@{b}second@{ui}@{ub};
+ MESSAGE/F -- tre¶æ wiadomo¶ci.
+
+@{b}Wynik@{ub}
+ 'Failed' - w przypadku b³êdu podczas zmiany;
+ 'OK' - w przypadku powodzenia.
+
+@{fg text}
+@endnode
+
+
+@node "ipc.Disconnect" "KwaKwa: IPC - Disconnect"
+@{b}Nazwa@{ub}
+@{fg shine} Disconnect
+@{fg text}
+
+
+@{b}Dzia³anie@{ub}
+ Ustawia status "niedostêpny" zachowuj±c aktualny opis.
+
+@{b}Wynik@{ub}
+ 'Failed' - w przypadku b³êdu podczas zmiany;
+ 'OK' - w przypadku powodzenia.
+
+@{fg text}
+@endnode
+
+
+@node "ipc.Connect" "KwaKwa: IPC - Connect"
+@{b}Nazwa@{ub}
+@{fg shine} Connect
+@{fg text}
+
+
+@{b}Dzia³anie@{ub}
+ £±czy siê z sieci± ustawiaj±c ostatnio u¿yty opis. Korzysta z ustawieñ
+ u¿ytkownika dotycz±cych automatycznego po³±czenia.
+
+@{b}Wynik@{ub}
+ 'Failed' - w przypadku b³êdu podczas zmiany;
+ 'OK' - w przypadku powodzenia.
+
+@{fg text}
+@endnode
+
+@node "tooltypes" "KwaKwa: Tooltypy"
+
+@{b}Tooltypy:@{ub}
+
+KwaKwa obs³uguje nastêpuj±ce tooltypy:
+
+      Tooltype:                       Argument                                                Opis
+---------------------               ------------          ---------------------------------------------------------------------------------
+ DISABLE_AUTOCONNECT                     -                           wy³±cza automatyczne ³±czenie z sieci± przy starcie programu
+      TIME_FIX                         liczba                     ustawia przesuniêcie czasu wzglêdem czasu UTC (wyra¿one w sekundach)
+   IGNORE_MODULES                      tekst               wy³±cza podane modu³y (mo¿na podaæ listê modu³ów, oddzielaj±c nazwy przecinkiem)
+
+
+@endnode
+
+@node "faq" "KwaKwa: FAQ"
+@{b}FAQ (Frequently Asked Questions):@{ub}
+
+Q: Czy planowane jest wsparcie protoko³u XYZ? (XYZ = Twój ulubiony protokó³)
+A: Od wersji 1.5 istnieje mo¿liwo¶æ do³±czania obs³ugi dodatkowych protoko³ów poprzez umieszczanie odpowiednich
+   modu³ów w podkatalogu @{i}modules@{ui}. Aktualnie nie istniej± ¿adne plany tworzenia nowych modu³ów, lecz w przysz³o¶ci
+   mo¿e to ulec zmianie.
+
+Q: Zainstalowa³em modu³ i teraz mam problemy, co zrobiæ?
+A: System modu³ów ma jako g³ówne za³o¿enie to, ¿e nie bêd± instalowane modu³y, które nie s± u¿ywane. Najlepiej wiêc, skasowaæ
+   wszystkie nieu¿ywane modu³y, pozostawiaj±c tylko te, które s± u¿ywane. Od wersji 1.8 mo¿na te¿ u¿yæ @{"tooltyp IGNORE_MODULES" link tooltypes}
+   do dezaktywacji nieu¿ywanych modu³ów.
+
+Q: Mam problemy z Texteditor.mcc, czy da siê co¶ z tym zrobiæ?
+A: Przede wszystkim nale¿y sprawdziæ wersjê Texteditor.mcc jaka jest zainstalowana w systemie. Powinna to byæ wersja 15.45,
+   z zastrze¿eniem, ¿e dok³adnie ta, nie nowsza lub starsza. Wynika to z tego, ¿e KwaKwa patchuje wewnêtrzne struktury tej klasy,
+   wiêc zmiana wersji mo¿e spowodowaæ problemy.
+
+@endnode
+
+@node "history" "KwaKwa: Historia"
+@{b}Historia zmian:@{ub}
+
+
+@{i}@{b}Wersja 1.8 (02.07.2017):@{ub}@{ui}
+ o dodany przycisk umo¿liwiaj±cy przej¶cie do edycji kontaktu bezpo¶rednio z okna rozmowy (dziêki za obrazek, Recedent!);
+ o poprawiony b³±d mog±cy powodowaæ zawieszenie siê programu przy uruchamianiu;
+ o dodany @{"tooltyp IGNORE_MODULES" link tooltypes};
+ o poprawiona kompatybilono¶æ z emotikonami GG;
+ o dodany mechanizm sprawdzania maksymalnego rozmiaru obrazka, jaki mo¿na przes³aæ przez dany protokó³.
+
+@{i}@{b}Wersja 1.7 (20.12.2016):@{ub}@{ui}
+ o poprawiona obs³uga busy bara podczas po³±czeñ;
+ o zablokowane wysy³anie notyfikacji MagicBeacona, je¶li nie zmieni³ siê ani status, ani opis kontaktu;
+ o poprawiony b³±d braku zamkniêcia ezxml.library;
+@{b} o dodana mo¿liwo¶æ ustawienia jaki obrazek ma byæ pokazany w miejscu emotikony;@{ub}
+ o dodana opcja umo¿liwiaj±ca wy³±czenie emotikon w ostrych nawiasach;
+@{b} o dodana mo¿liwo¶æ ³adowania ostatnich wiadomo¶ci przy otwarciu rozmowy;@{ub}
+@{b} o dodana obs³uga emotikon w formatach innych ni¿ GIF (przez Reggae);@{ub}
+ o poprawiony b³±d powoduj±cy migotanie sbara;
+ o dodane wy¶wietlanie daty w oknie rozmowy;
+ o poprawiona obs³uga requestera po b³êdzie FTP;
+@{b} o dodane dodatkowe ustawienia wygl±du wiadomo¶ci;@{ub}
+ o poprawiony b³±d powoduj±cy problemy z zawijaniem linii w wiadomo¶ciach systemowych;
+@{b} o dodana mo¿liwo¶æ zmiany wy¶wietlania emotikony na tekst (przez dwuklik);@{ub}
+ o dodane informowanie o pustym wpisie w katalogu u¿ytkowników;
+ o zaimplementowany prototyp przegl±darki archiwum;
+@{b} o dodane pogrubianie tytu³u zak³adki, w której s± nieprzeczytane wiadomo¶ci;@{ub}
+ o poprawiony b³±d powoduj±cy niew³a¶ciwe wy¶wietlanie t³a zak³adek przy otwarciu nowej zak³adki "w tle";
+ o dodana obs³uga klawiszy funkcyjnych;
+ o poprawione zapisywanie ostatnio ustawionego statusu;
+@{b} o dodana obs³uga tooltypów DISABLE_AUTOCONNECT i TIME_FIX;@{ub}
+@{b} o dodane sprawdzanie czy jest ju¿ uruchomiona inna kopia programu.@{ub}
+
+@{i}@{b}Wersja 1.6 (07.04.2015):@{ub}@{ui}
+ o dodane zapamiêtywanie opisu z multilogowania jako ostatnio ustawionego;
+ o dodane wczytywanie aktualnie ustawionego opisu do okna ustawiania statusu opisowego (przy otwarciu);
+ o opcja "dodaj do listy" podczas ustawiania opisu jest automatycznie odznaczana;
+ o dodana mo¿liwo¶æ usuniêcia opisu z listy;
+ o dodana mo¿liwo¶æ kopiowania opisu z listy;
+ o dodane wyszukiwanie w opisach;
+ o poprawiona obs³uga zaproszeñ do rozmowy;
+ o poprawiony brak konwersji utf-8 -> system przy pobieraniu informacji o kontakcie;
+ o poprawiony b³±d powoduj±cy niedzia³anie mechanizmu wysy³ania powiadomieñ o pisaniu;
+ o po odebraniu obrazka dwuklik na nim powoduje otworzenie go w domy¶lnej przegl±darce.
+
+@{i}@{b}Wersja 1.5 (30.05.2014):@{ub}@{ui}
+ o dodane wyró¿nianie w menu ScreenBara zak³adek zawieraj±cych nieprzeczytane wiadomo¶ci;
+ o poprawione b³êdy powoduj±ce niestabilno¶æ programu w przypadku odebrania wiadomo¶ci
+   od numeru niebêd±cego na li¶cie kontaktów;
+ o poprawiony b³±d nieprawid³owej zmiany ikony sbara w przypadku odczytania tylko pierwszej
+   nowej wiadomo¶ci z kolejki;
+ o dodane prze³±czanie zak³adek w oknie rozmowy z klawiatury (pierwsze 9 zak³adek,
+   lamiga + numer zak³adki);
+ o dodane od¶wie¿anie listy kontaktów po w³±czeniu/wy³±czeniu wy¶wietlania awatarów;
+@{b} o wyrzucenie zale¿no¶ci od libgadu;@{ub}
+@{b} o zaimplementowana obs³uga modu³ów protoko³ów;@{ub}
+@{b} o w³asna implementacja protoko³u GG w gg.module;@{ub}
+@{b} o usuniêty limit zak³adek w oknie rozmowy;@{ub}
+ o dodany import ustawieñ starszych wersji (import ustawieñ protoko³u GG do gg.module);
+ o zapisywanie listy kontaktów przeniesione z preferencji do katalogu programu;
+ o dodana konsola modu³ów zawieraj±ca informacje o akcjach podejmowanych przez modu³y;
+ o dodany drugi task do obs³ugi MagicBeacona oraz zapytañ HTTP;
+@{b} o dodana mo¿liwo¶æ kopiowania opisów kontaktów z listy oraz kopiowania tre¶ci rozmowy;@{ub}
+ o dodane automatyczne otwieranie g³ównego okna po wybraniu wyszukiwania kontaktu na li¶cie
+   z menu na belce ekranu;
+ o dodane zapamiêtywanie ostatnio ustawionego statusu;
+ o dodana mo¿liwo¶æ automatycznego ³±czenia siê z ustawieniem ostatniego statusu;
+ o dodana mo¿liwo¶æ uruchamiania programu bez otwierania g³ównego okna;
+ o dodana mo¿liwo¶æ ustawienia zachowania programu przy zamykaniu g³ównego okna;
+ o dodana mo¿liwo¶æ automatycznego zamykania g³ównego okna po okre¶lonym czasie nieaktywno¶ci;
+ o poprawione b³êdne wymiarowanie przerw miêdzy wyrazami w oknie rozmowy;
+ o poprawiona stabilno¶æ komunikacji miêdzy programem a ScreenBarem;
+ o dodana mo¿liwo¶æ ustawienia ikonyfikacji jako domy¶lnej akcji po zamkniêciu g³ównego okna;
+@{b} o dodana opcja automatycznej zmiany statusu po okre¶lonym czasie braku aktywno¶ci;@{ub}
+@{b} o dodana obs³uga importu i eksportu listy kontaktów na serwer;@{ub}
+ o dodany skrót klawiaturowy do czyszczenia zawarto¶ci okna rozmowy;
+ o dodana mo¿liwo¶æ ustalenia zachowania automatycznego ³±czenia w przypadku, gdy ostatnim
+   statusem by³o "niedostêpny";
+ o dodana mo¿liwo¶æ ustawienia koloru t³a elementu zaznaczonego na li¶cie kontaktów;
+@{b} o dodana obs³uga przesy³ania obrazków;@{ub}
+ o dodany drugi gadget do wpisywania tre¶ci wiadomo¶ci z mo¿liwo¶ci± ukrycia/pokazania go
+   (skrót klawiaturowy lAmiga + D);
+ o dodane wy¶wietlanie jednostki ("px") przy ustawianiu odleg³o¶ci miêdzy kontaktami;
+ o dodana mo¿liwo¶æ ustalenia maksymalnej szeroko¶ci wy¶wietlanego obrazka (powy¿ej tej szeroko¶ci
+   obrazek zostanie przeskalowany);
+ o dodana mo¿liwo¶æ wybrania czy obrazki maj± zostaæ pokazane w oknie rozmowy bezpo¶rednio
+   czy jako para przycisków zapisz/otwórz;
+ o poprawione requestery ASL tak, ¿eby nie blokowa³y odrysowywania innych okien;
+ o dodane "wklej i potwierd¼" do menu kontekstowego gadgetu do wpisywania tekstu;
+ o dodany busy bar w g³ównym oknie pokazywany podczas nawi±zywania po³±czenia;
+ o dodane zapamiêtywanie ostatnio wybranej lokalizacji w requesterach ASL;
+ o dodane przeliczanie wysoko¶ci listy kontaktów przy usuwaniu i dodwaniu kontaktu [bugtracker ID: 121];
+@{b} o dodane dodatkowe komendy portu IPC (Disconnect, DisconnectDescription i Connect);@{ub}
+ o poprawiony problem powoduj±cy odczyt z adresu 0 w przypadku braku aktywnego elementu i wci¶niêcia "enter";
+ o dodane umieszczanie w aboutboxie numeru rewizji SVN;
+@{b} o dodane nowe komendy IPC: WindowControl, ActivateTabByNumber, OpenTabByName, InsertMessage;@{ub}
+@{b} o dodana obs³uga wysy³ania plików na serwer FTP wraz z automatycznym wysy³aniem linku do rozmówcy;@{ub}
+ o dodana obs³uga zaproszeñ do rozmowy;
+ o dodana mo¿liwo¶æ wy³±czenia przycisku "ukryj" z okna listy kontaktów;
+ o dodana mo¿liwo¶æ otwarcia pliku z zapisem poprzednich rozmów z poziomu listy kontaktów;
+ o dodane oznaczanie jako przeczytanych wiadomo¶ci na które nadesz³a odpowied¼ z innej sesji multilogowania;
+ o dodany pasek narzêdziowy (z graficznymi przyciskami) w oknie rozmowy (dziêki za grafiki, Recedent!);
+ o dodana mo¿liwo¶æ wy³±czenia pokazywania informacji o kontakcie w oknie rozmowy;
+ o poprawiony zapis/eksport listy kontaktów do formatu XML (dodane ³amanie linii i tabulacje).
+
+@{i}@{b}Wersja 1.1 (26.12.2012):@{ub}@{ui}
+ o poprawiony b³±d wywo³uj±cy zawieszenie programu podczas importu listy kontaktów z serwera;
+ o poprawiony b³±d mog±cy powodowaæ z³e dzia³anie programu w przypadku gdy odebrana zosta³a wiadomo¶æ
+   od u¿ytkownika spoza listy kontaktów podczas rozmowy z innym u¿ytkownikiem;
+ o dodane automatyczne do³±czanie rozszerzenia *.xml do nazwy pliku podczas eksportu listy kontaktów;
+ o dodane automatyczne sugerowanie nazwy pliku podczas eksportu listy kontaktów;
+ o dodana mo¿liwo¶æ otwierania okna rozmowy za pomoc± klawiatury;
+ o dodane skróty klawiszowe do pozycji z menu górnego;
+ o poprawiony b³ad powoduj±cy zawieszenie programu na niektórych konfiguracjach podczas korzystania
+   z multilogowania.
+
+@{i}@{b}Wersja 1.0 (15.12.2012):@{ub}@{ui}
+
+ o dodane automatyczne zapisywanie listy opisów po zamkniêciu okna zmiany statusu opisowego;
+@{b} o dodana obs³uga animowanych emotikon zapisanych w formacie gif;@{ub}
+ o poprawiony b³±d braku automatycznego zapisania listy kontaktów po usuniêciu kontaktu [bugtracker ID:122];
+ o poprawiony b³±d dodawania kontaktu "0" w przypadku pozostawienia pustych pól w oknie dodawania
+   nowego kontaktu [bugtracker ID:122];
+ o dodana opcja usuwania duplikatów na li¶cie [bugtracker ID:115];
+ o ulepszone umieszczanie tekstu w oknie rozmowy;
+ o poprawiony b³±d z³ego ustawiania t³a nag³ówka wiadomo¶ci w przypadku wy³±czenia t³a;
+ o poprawki wygl±du gadgetów w oknie ustawieñ;
+ o poprawiony problem braku reakcji sbara na zmianê statusu na niektórych konfiguracjach [bugtracker ID:116].
+
+@{i}@{b}Wersja 0.7 (12.10.2012):@{ub}@{ui}
+
+ o poprawiony b³±d z³ego wy¶wietlania ScreenBara na w±skich belkach;
+ o zmiany ustawieñ wy¶wietlania powoduj± natychmiastow± rekacjê danego gadgetu;
+ o lepsze wykrywanie linków w tek¶cie rozmowy;
+ o dodana obs³uga grafiki informuj±cej o nieprzeczytanej wiadomo¶ci (dziêki za ikonkê, Recedent!);
+ o poprawiony b³±d nieznikania komunikatu o nieprzeczytanej wiadomo¶ci po aktywacji okna rozmowy;
+ o wy¶wietlany w oknie rozmowy i zapisywany w logach czas jest od teraz czasem nadania wiadomo¶ci,
+   a nie odebrania;
+@{b} o dodana obs³uga powiadomieñ o pisaniu;@{ub}
+ o otwarcie okna rozmowy powoduje wy¶wietlenie aktualnej zak³adki tak, aby by³o widaæ ostatni± wiadomo¶æ;
+ o dodana natychmiastowa obs³uga notyfikacji MB (notyfikacje nie czekaj± ju¿ w kolejce);
+ o notyfikacja MB "KWAKWA.MESSAGE" nie jest wysy³ana je¶li pochodzi od aktywnej zak³adki okna rozmowy;
+@{b} o dodana obs³uga statusów "poGGadaj ze mn±" i "nie przeszkadzaæ";@{ub}
+ o poprawiony b³±d powoduj±cy zawieszenie programu przy wy³±czonym ScreenBarze;
+ o dodane informowanie o zmianie statusu rozmówcy w oknie rozmowy;
+ o zmiana nazwy kontaktu powoduje zmianê nazwy pliku z logiem rozmowy;
+ o zmiana danych kontaktu aktualizuje dane w oknie rozmowy;
+@{b} o dodane menu ScreenBara (dostêpne pod prawym przyciskiem myszy) [bugtracker ID:105];@{ub}
+@{b} o dodana w³asna klasa listy kontaktów (wy¶wietlanie opisów pod kontaktem, wyszukiwanie kontaktu)@{ub}
+   @{b}[bugtracker ID:106 ID:107];@{ub}
+ o naprawiony efekt "migotania" tekstu w oknie rozmowy podczas zmiany rozmiaru okna;
+ o dodany port IPC;
+@{b} o dodana obs³uga avatarów;@{ub}
+@{b} o dodana obs³uga multilogowania;@{ub}
+@{b} o dodana mo¿liwo¶æ wys³ania w³asnych danych do katalogu publicznego GG;@{ub}
+@{b} o dodana mo¿liwo¶æ pobrania danych z katalogu publicznego podczas edycji danych kontaktu;@{ub}
+ o dodana mo¿liwo¶æ ponowienia próby po³±czenia kiedy wyst±pi³ b³±d;
+@{b} o dodane automatyczne pobieranie informacji z katalogu publicznego, kiedy rozpoczyna siê@{ub}
+   @{b}rozmowa z numerem spoza listy kontaktów [bugtracker ID:109];@{ub}
+ o poprawki w wygl±dzie GUI;
+@{b} o zmodernizowane okno ustawiania statusu opisowego;@{ub}
+@{b} o dodane wy¶wietlanie nazwy kontaktu oraz jego opisu i awatara w oknie rozmowy;@{ub}
+
+@{i}@{b}Wersja 0.5 (08.07.2012):@{ub}@{ui}
+
+ o pierwsze publiczne wydanie.
+
+@endnode
+
+@node "disclaimer" "KwaKwa: Licencja"
+
+@{b}Licencja:@{ub}
+
+KwaKwa © 2012 - 2017 Filip Maryjañski, BlaBla group.
+
+KwaKwa jest darmowym programem rozpowszechnianym na zasadach licencji MIT.
+Autor i/lub grupa BlaBla nie bior± odpowiedzialno¶ci za dzia³anie i mo¿liwe szkody wynik³e z u¿ywania KwaKwa.
+
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Skrypty z katalogu "scripts" posiadaj± w³asne licencje (szczegó³y w komentarzach ka¿dego skryptu).
+
+Konrad "recedent" Czuba przygotowal ikony oraz inne grafiki oraz udostepnil je na zasadach licencji
+CC BY 4.0. 
+
+KwaKwa u¿ywa kodu biblioteki libnsgif, rozpowszechnianej na zasadach licencji MIT.
+KwaKwa u¿ywa kodu biblioteki lvstring, któr± Grzegorz Kraszewski upubliczni³ na licencji BSD:
+
+lvstring Copyright (c) Grzegorz Kraszewski, All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list
+of conditions and the following disclaimer. Redistributions in binary form must
+reproduce the above copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+@endnode
+
+@node "credits" "KwaKwa: O programie"
+@{b}Programowanie:@{ub}
+Filip "widelec" Maryjañski
+
+@{b}Programowanie dodatkowe:@{ub}
+Tomasz "Kaczu¶" Kaczanowski
+Pawe³ "stefkos" Stefañski
+
+@{b}Ikona:@{ub}
+@{b}Grafika:@{ub}
+Konrad "recedent" Czuba
+
+@{b}Specjalne podziêkowania dla:@{ub}
+Marlena "Kimonko" Moradewicz
+
+@{b}Podziêkowania dla:@{ub}
+Deez^BB
+Drako^BB
+Eastone
+Grxmrx
+JacaDcaps
+Kiero
+Krashan
+Lubmil
+Pampers
+
+@endnode

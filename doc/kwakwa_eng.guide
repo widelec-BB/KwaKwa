@@ -1,0 +1,566 @@
+@database "kwakwa.guide"
+@author "Filip 'widelec' Maryjanski"
+@remark "Created with Ed"
+@$VER: KwaKwa.guide 1.8 (24.06.2017)
+
+@node main "KwaKwa" "KwaKwa: Index"
+@{b}..:: KwaKwa ::..@{ub}
+Version: 1.8
+
+Copyright © 2012-2017 Filip Maryjanski, BlaBla group
+
+@{"  Introduction  "   link    "introduction" 0}
+@{"  Requirements  "   link    "requirements" 0}
+@{"  Installation  "   link    "installation" 0}
+@{"   Emoticons    "   link    "emoticons"    0}
+@{"      IPC       "   link    "ipc"    	  0}
+@{"   Tooltypes    "   link    "tooltypes"    0}
+@{"      FAQ       "   link    "faq"          0}
+
+@{"    History     "   link    "history"      0}
+@{"    Licence     "   link    "disclaimer"   0}
+@{"    Credits     "   link    "credits"      0}
+
+@endnode
+
+@node "introduction" "KwaKwa: Introduction"
+
+@{b}Introduction:@{ub}
+
+This is a simple instant messenger program.
+
+@endnode
+
+@node "requirements" "KwaKwa: Requirements"
+@{b}Requirements:@{ub}
+
+ o any computer with MorphOS 3.9 running on;
+ o Internet connection;
+ o ezxml.library (V8.7);
+ o TextEditor.mcc 15.45 [MOS/PPC].
+
+
+@endnode
+
+@node "installation" "KwaKwa: Installation"
+@{b}Installation:@{ub}
+
+Please unpack archive to any directory you want. Make sure that you have installed @{"ezxml.library" system "OpenURL http://morphos-files.net/download/ezxml.library"}
+(V8.7) and  @{"TextEditor.mcc" system "OpenURL http://sourceforge.net/projects/texteditor-mcc/files/TextEditor.mcc/15.37/"} (V15.45).
+
+KwaKwa cooperate with @{"Magic Beacon" system "OpenURL http://morphos-files.net/remote/Magic_Beacon"} written by Guide Mersmann.
+At the moment KwaKwa sends following notifications:
+o KWAKWA.STATUS - when someone from contacts list changes status;
+o KWAKWA.MESSAGE - when new message arrive;
+o KWAKWA.PICTURE - when new picture message arrive.
+
+@endnode
+
+@node "emoticons" "KwaKwa: Emoticons"
+@{b}Emoticons:@{ub}
+
+For "short" emoticons listed in preferences KwaKwa can use picture in any format supported by Reggae and *.gif.
+For "long" emoticons (text within the angle brackets) can be used only *.gif format.
+
+KwaKwa handles two different emoticons types. First is simple replacing text with appropriate image according to
+list in program preferences. Second is searching for texts within the angle brackets ("<" and ">"). Found text
+will be expanded with ".gif" and used as file name. For example - when KwaKwa found "<lol>" it will search for "lol.gif" file.
+All emoticons should be placed in PROGDIR:gfx/emots.
+Additionally texts like ":-DDDD" or "!!!!!!!!!!!!" will be displayed as @{b}only one@{ub} emoticon (":-DD" and "!!", accordingly).
+
+@endnode
+
+
+@node "ipc" "KwaKwa: IPC"
+@{b}IPC:@{ub}
+
+IPC message port allows to control KwaKwa by other programs or scripts (usually written in Lua or ARexx).
+Supported commands:
+
+Standard MUI commands:
+
+Command:              Template:
+-----------           ---------
+quit                  FORCE/S
+hide
+deactivate
+show
+activate
+info                  ITEM/A
+help                  FILE/A
+
+
+Additional commands:
+
+Command:                              Template:
+-----------                           ---------
+@{"ChangeStatus" link "ipc.ChangeStatus"}                 STATUSTYPE/A,STATUSDESC/F
+@{"DisconnectDescription" link "ipc.DisconnectDescription"}        DESCRIPTION/F
+@{"WindowControl" link "ipc.WindowControl"}                WINDOW/A,ACTION/A
+@{"ActivateTabByNumber" link "ipc.ActivateTabByNumber"}          TABNUMBER/A
+@{"OpenTabByName" link "ipc.OpenTabByName"}                NAME/F
+@{"InsertMessage" link "ipc.InsertMessage"}                INPUT/A,MESSAGE/F
+@{"Disconnect" link "ipc.Disconnect"}
+@{"Connect" link "ipc.Connect"}
+
+
+For examples please look into "scripts" drawer. Please remember that arguments
+are @{b}case sensitive@{ub}.
+
+@endnode
+
+@node "ipc.ChangeStatus" "KwaKwa: IPC - ChangeStatus"
+@{b}Name@{ub}
+@{fg shine} ChangeStatus
+@{fg text}
+@{b}Template@{ub}
+ STATUSTYPE/A,STATUSDESC/F
+
+
+@{b}Functions@{ub}
+ Changes actual status. Can be used for connect/disconnect action.
+
+@{b}Template@{ub}
+ STATUSTYPE/A - status to set, can be: 'available', 'away', 'invisible', 'unavailable', 'ffc', 'dnd';
+ STATUSDESC/F - status description, may be omitted.
+
+@{b}Result@{ub}
+ 'Wrong status name'
+ 'Failed'
+ 'OK'
+
+@{b}Example@{ub}
+ RandomDesc.lua in scripts drawer.
+
+@{fg text}
+@endnode
+
+@node "ipc.DisconnectDescription" "KwaKwa: IPC - DisconnectDescription"
+@{b}Name@{ub}
+@{fg shine} DisconnectDescription
+@{fg text}
+@{b}Template@{ub}
+ DESCRIPTION/F
+
+
+@{b}Function@{ub}
+ Disconnects and sets "unavailable" with given description.
+
+@{b}Arguments@{ub}
+ DESCRIPTION/F - status description.
+
+@{b}Result@{ub}
+ 'Failed'
+ 'OK'
+
+@{fg text}
+@endnode
+
+@node "ipc.WindowControl" "KwaKwa: IPC - WindowControl"
+@{b}Name@{ub}
+@{fg shine} WindowControl
+@{fg text}
+@{b}Template@{ub}
+ WINDOW/A,ACTION/A
+
+
+@{b}Function@{ub}
+ Allows to sending commands to windows:
+  - @{i}@{b}main@{ui}@{ub} - main window (with contacts list);
+  - @{i}@{b}preferences@{ui}@{ub} - preferences window;
+  - @{i}@{b}talk@{ui}@{ub} - talk window;
+  - @{i}@{b}edit contact@{ui}@{ub} - contact's data editing window;
+  - @{i}@{b}set status@{ui}@{ub}  - set status window;
+  - @{i}@{b}modules log@{ui}@{ub} - modules console window.
+ Windows commands:
+  - @{i}@{b}show@{ui}@{ub};
+  - @{i}@{b}hide@{ui}@{ub};
+  - @{i}@{b}to front@{ui}@{ub};
+  - @{i}@{b}to back@{ui}@{ub};
+  - @{i}@{b}activate@{ui}@{ub};
+  - @{i}@{b}deactivate@{ui}@{ub};
+  - @{i}@{b}screen to front@{ui}@{ub};
+  - @{i}@{b}screen to back@{ui}@{ub};
+
+@{b}Template@{ub}
+ WINDOW/A
+ ACTION/A
+
+@{b}Result@{ub}
+ 'Failed'
+ 'OK'
+
+@{fg text}
+@endnode
+
+@node "ipc.ActivateTabByNumber" "KwaKwa: IPC - ActivateTabByNumber"
+@{b}Name@{ub}
+@{fg shine} ActivateTabByNumber
+@{fg text}
+@{b}Template@{ub}
+ TABNUMBER/A
+
+
+@{b}Function@{ub}
+ Allows to change active tab. Tabs are enumerated from 0.
+
+@{b}Template@{ub}
+ TABNUMBER/A
+
+@{b}Result@{ub}
+ 'Failed'
+ 'OK'
+
+@{fg text}
+@endnode
+
+
+@node "ipc.OpenTabByName" "KwaKwa: IPC - OpenTabByName"
+@{b}Name@{ub}
+@{fg shine} OpenTabByName
+@{fg text}
+@{b}Template@{ub}
+ NAME/F
+
+
+@{b}Function@{ub}
+ Searches for given name on contacts list. If found opens proper tab in talk window. If tab is not exists
+ creates new one.
+
+@{b}Template@{ub}
+ NAME/F
+
+@{b}Result@{ub}
+ 'Failed'
+ 'OK'
+
+@{fg text}
+@endnode
+
+
+@node "ipc.InsertMessage" "KwaKwa: IPC - InsertMessage"
+@{b}Name@{ub}
+@{fg shine} OpenTabByName
+@{fg text}
+@{b}Template@{ub}
+ INPUT/A,MESSAGE/F
+
+
+@{b}Function@{ub}
+ Inserts given message in selected input gadget in active talk window tab.
+
+@{b}Template@{ub}
+ INPUT/A - selects input gadget @{b}@{i}first@{ui}@{ub} or @{b}@{i}second@{ui}@{ub}
+ MESSAGE/F
+
+@{b}Result@{ub}
+ 'Failed'
+ 'OK'
+
+@{fg text}
+@endnode
+
+
+@node "ipc.Disconnect" "KwaKwa: IPC - Disconnect"
+@{b}Name@{ub}
+@{fg shine} Disconnect
+@{fg text}
+
+
+@{b}Function@{ub}
+ Set "unavailable" status. Preserves status description.
+
+@{b}Result@{ub}
+ 'Failed'
+ 'OK'
+
+@{fg text}
+@endnode
+
+
+@node "ipc.Connect" "KwaKwa: IPC - Connect"
+@{b}Name@{ub}
+@{fg shine} Connect
+@{fg text}
+
+
+@{b}Function@{ub}
+ Connects all modules. Uses user autoconnecting settings.
+
+@{b}Result@{ub}
+ 'Failed'
+ 'OK'
+
+@{fg text}
+@endnode
+
+@node "tooltypes" "KwaKwa: Tooltypes"
+
+@{b}Tooltypes:@{ub}
+
+KwaKwa supports following tooltypes:
+
+      Tooltype:                       Argument                                             Description
+---------------------               ------------          ---------------------------------------------------------------------------------
+ DISABLE_AUTOCONNECT                     -                                   disable connect to network on program start
+      TIME_FIX                         number                        allow to specify system time difference to UTC (in seconds)
+   IGNORE_MODULES                       text                   disable modules (one can specify comma separated list of modules names)
+
+
+@endnode
+
+@node "faq" "KwaKwa: FAQ"
+@{b}FAQ (Frequently Asked Questions):@{ub}
+
+Q: Whether it is planned to support protocol XXX? (XXX - your favorite one)
+A: Starting with version 1.5 KwaKwa has ability to add new protocols as external modules, but curently there
+   are no plans for creating new modules.
+
+Q: I installed new module and now KwaKwa is crashing. What can I do?
+A: Probably this module is not configured properly, please, configure it. Also, do not install modules
+   you don't want to use. If you really want to have not needed files on your disk, you can use
+   @{"IGNORE_MODULES tooltype" link tooltypes} to disable not needed modules.
+
+Q: I have some problems with Texteditor.mcc, what's wrong with this?
+A: Please notice that KwaKwa requires Texteditor.mcc 15.45, not newer nor older. This requirement is essential, because
+   KwaKwa patches some internal structures of Texteditor.mcc.
+
+@endnode
+
+@node "history" "KwaKwa: History"
+@{b}Changelog:@{ub}
+
+
+@{i}@{b}Version 1.8 (02.07.2017):@{ub}@{ui}
+ o added button for editing contact data from talk window;
+ o fixed bug causing crash at program start in some situations;
+ o added @{"IGNORE_MODULES tooltype" link tooltypes};
+ o improved compatibility with GG emoticons;
+ o added check for maximum picture length when sending picture.
+
+@{i}@{b}Version 1.7 (20.12.2016):@{ub}@{ui}
+ o fixed problems with busy bar;
+ o fixed problems with sending empty MagicBeacon notifications;
+ o fixed closing ezxml.library;
+@{b} o added options to manually set images for emoticons;@{ub}
+ o added option to enable/disable "long" emoticons;
+@{b} o added loading last few messages when new tab is open;@{ub}
+@{b} o added support for emoticons in other image formats than GIF (via Reggae);@{ub}
+ o fixed sbar blinking;
+ o added date to message headline;
+ o fixed requester handling after FTP error;
+@{b} o added new preferences in message look section;@{ub}
+ o enabled line-wraping for system messages;
+@{b} o added possibility to change image-emoticon to text by double click;@{ub}
+ o added information about empty entry when user's information is fetched from module;
+ o added prototype of messages history window;
+@{b} o added bolding tab title when new message is received;@{ub}
+ o fixed display errors after opening new tab in background;
+ o added support for FX keys;
+ o fixed problems with saving last status;
+@{b} o added DISABLE_AUTOCONNECT and TIME_FIX tooltypes;@{ub}
+@{b} o added checking at start if there is another copy running.@{ub}
+
+@{i}@{b}Version 1.6 (07.04.2015):@{ub}@{ui}
+ o fixed problems with saving multilogon status description;
+ o status window will always show actual status description;
+ o added searching in status descriptions list;
+ o added deleting status descriptions from list;
+ o added copying status description from list;
+ o fixed problems with invitations to chat;
+ o fixed wrong charset when fetching contact data;
+ o fixed bug preventing KwaKwa from sending typing notifications;
+ o after picture is received, double click on it will open it in default application.
+
+@{i}@{b}Version 1.5 (30.05.2014):@{ub}@{ui}
+ o added bolding tab name in ScreenBar menu when tab contains unreaded messages;
+ o fixed problems with stability when recive message from someone out of contacts list;
+ o fixed changing ScreenBar icon when unread messages arrive;
+ o added ability to switch tabs in talk window by pressing lAmiga + number of tab
+   (first 9 tabs are supported)
+ o added redrawing contacts list when switching avatars on/off;
+@{b} o removed libgadu dependency;@{ub}
+@{b} o added support for external protocols modules;@{ub}
+@{b} o added own implementation of GG protocol in gg.module;@{ub}
+@{b} o removed number of talk window's tabs limit;@{ub}
+ o added automatic import settings from old versions;
+ o moved saving contacts list from mui preferences to own file;
+ o added modules console;
+ o added second task for handling HTTP and MagicBeacon;
+@{b} o added copy function to contacts list (contact's status description) and talk window;@{ub}
+ o added auto-opening main window when one selects "find contact" from menu;
+ o added storing last status with description on program exit;
+ o added ability to autoconnect with last used status and description;
+ o added ability to run program without opening main window;
+ o added ability to presonalize program behavior when closing main window;
+ o added ability to closing main window after some time of inactivity.
+ o fixed wrong space size in talk window;
+ o improved stability when comunication between ScreenBar and KwaKwa is performed;
+ o added posibilty to set iconification as default behavior on closing main window;
+@{b} o added autoaway;@{ub}
+@{b} o added posibility to export/import contacts list to/from server;@{ub}
+ o added clear backlog hotkey;
+ o added ability to customize behavior on autoconnect when last status was "inactive";
+ o added ability to choose custom color for background of selected element in contacts list;
+@{b} o added posibility to send images;@{ub}
+ o added "double mode" (lAmiga + D) in talk window;
+ o added showing unit ("px") when changing space between contacts in list;
+ o added posibility to customize maximum width of picture in talk window (pictures wider than setting
+   will be automaticaly scaled);
+ o added posibility to choose between showing recived pictures in talk window or as only "save/open" buttons;
+ o fixed ASL requesters (will not longer preserve app from redrawing other windows);
+ o added "paste and ackonwledge" option to context menu of input gadget in talk window;
+ o added busy bar when application is connecting;
+ o added preserving last selected directory in ASL requesters;
+ o fixed problems with contacts list height when contacts were added or removed [bugtracker's ID: 121];
+@{b} o added new commands to IPC port (Disconnect, DisconnectDescription i Connect);@{ub}
+ o fixed memory error when one push "return" without selecting active element in contacts list;
+ o SVN revision number included in about window;
+@{b} o added new commands to IPC port: WindowControl, ActivateTabByNumber, OpenTabByName, InsertMessage;@{ub}
+@{b} o added ability to send file to FTP server with automatically pushing link to interlocutor;@{ub}
+ o added support for invites;
+ o added posibility to hide "hide" button from contacts list window;
+ o added "open log file" in contacts list context menu;
+ o added marking as readed messages to which came reply from multilogon session;
+ o added toolbar to talkwindow with graphical buttons (thanks, Recedent!);
+ o added posibility to turn off contact's informations block in talk window;
+ o fixed XML when storing/exporting contacts list.
+
+@{i}@{b}Version 1.1 (26.12.2012):@{ub}@{ui}
+ o fixed bug causing crash when importing contacts list from server;
+ o fixed bug which may cause crash when message to another than actual tab was recived;
+ o added name autosugestion for exported contacts list file;
+ o added posiblity to open talk window without using mouse;
+ o added hotkeys to menu entries;
+ o fixed bug causing crash when multiloging was used.
+
+@{i}@{b}Version 1.0 (15.12.2012):@{ub}@{ui}
+
+ o added autosave status description list after closing status description window;
+@{b} o added support for emoticons in *.gif format;@{ub}
+ o fixed lack of autosaving contacts list after deleting contact [bugtracker ID:122];
+ o fixed error when fields in adding new contact window were empty [bugtracker ID:122];
+ o added "remove duplicates" from contacts list option [bugtracker ID:115];
+ o better tekst handling in talk window;
+ o fixed bug with graphics glitches when headline background was off;
+ o fixed some minor bugs in preferences window (lack of frames etc.);
+ o fixed ScreenBar image changes [bugtracker ID:116].
+
+@{i}@{b}Version 0.7 (12.10.2012):@{ub}@{ui}
+
+ o fixed problems with ScreenBar draw on tight bars;
+ o added autoreacting on prefereces changes;
+ o improved handling of URLs in messages;
+ o added picture indication unread messages (thanks, Recedent!);
+ o fixed handling unread messages;
+ o switch to showing time of message sending rather than receiving;
+@{b} o added support for typing notifications;@{ub}
+ o talk window after opening will show last message rather than first;
+ o fixed MB notifications handling;
+@{b} o added support for DnD and FCC statuses;@{ub}
+ o fixed error causing crash when one turn off ScreenBar;
+ o added notifing about status changes in talk window;
+ o added renaming log file name when contacts name is changed;
+ o added refreshing contact's data in contact's info block in talkwindow when data is changed;
+@{b} o added ScreenBar menu (right mouse button) [bugtracker ID:105];@{ub}
+@{b} o added custom class for contacts list [bugtracker ID:106 ID:107];@{ub}
+ o fixed text flickering when talkwindow was resized;
+ o added IPC port;
+@{b} o added avatars support;@{ub}
+@{b} o added multilogon support;@{ub}
+@{b} o added ability to fetch contacts data from pubdir;@{ub}
+ o added posibility to retry connection;
+@{b} o added autofetch of contacts data when someone unknown send message [bugtracker ID:109];@{ub}
+ o minor fixes in GUI look;
+@{b} o new status description window;@{ub}
+@{b} o added showing contact's data in talkwindow;@{ub}
+
+@{i}@{b}Version 0.5 (08.07.2012):@{ub}@{ui}
+
+ o first public release.
+
+@endnode
+
+@node "disclaimer" "KwaKwa: License"
+
+@{b}License:@{ub}
+
+KwaKwa © 2012 - 2018 Filip Maryjanski, BlaBla group.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+All scripts from "scipts" drawer have their own licences as described in their comments.
+
+Icons and all graphics were created by Konrad "recedent" Czuba and are available under
+the terms of CC BY 4.0 licence.
+
+KwaKwa uses libnsgif library available under the terms of MIT licence.
+KwaKwa uses some code from lvstring library which Grzegorz Kraszewski made available on BSD license:
+
+lvstring Copyright (c) Grzegorz Kraszewski, All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list
+of conditions and the following disclaimer. Redistributions in binary form must
+reproduce the above copyright notice, this list of conditions and the following
+disclaimer in the documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+@endnode
+
+@node "credits" "KwaKwa: Credits"
+@{b}Programming:@{ub}
+Filip "widelec" Maryjanski
+
+@{b}Additional programming:@{ub}
+Tomasz "Kaczus" Kaczanowski
+Pawel "stefkos" Stefanski
+
+@{b}Icon:@{ub}
+@{b}Graphics:@{ub}
+Konrad "recedent" Czuba
+
+@{b}Special thanks for:@{ub}
+Marlena "Kimonko" Moradewicz
+
+@{b}Thanks for:@{ub}
+Deez^BB
+Drako^BB
+Eastone
+Grxmrx
+JacaDcaps
+Kiero
+Krashan
+Lubmil
+Pampers
+
+@endnode
+

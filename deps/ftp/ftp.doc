@@ -1,0 +1,952 @@
+TABLE OF CONTENTS
+
+ftp.library/
+
+ftp.library/FTPConnect
+
+   NAME
+    FTPConnect --
+
+   SYNOPSIS
+    FTPConnect( hostname, port number, taglist )
+    struct FTPHandler *FTPConnect( CONST STRPTR, int, struct TagItem *);
+
+   FUNCTION
+    Create FTP connection to host
+
+   INPUTS
+    hostname - internet address / host ip
+    port - internet port number
+    taglist - pointer to list of tags:
+     FTP_CTAG_LOGMSG - pointer to log message port. Everytime ftp will do
+      important action it will be passed to logport through LogMsg.
+     FTP_CTAG_TIMEOUT - number of seconds to wait till connection will be
+      done. If time will pass error will be returned.
+
+   RESULT
+    pointer to new created FTPHandler structure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPClose()
+
+ftp.library/FTPClose
+
+   NAME
+    FTPClose --
+
+   SYNOPSIS
+    FTPClose( ftpHandler )
+    void FTPClose( struct FTPHandler * )
+
+   FUNCTION
+    Frees ftp handler structure allocated by FTPConnect();
+
+   INPUTS
+    ftpHandler - handler structure
+
+   RESULT
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+    FTPConnect()
+
+ftp.library/FTPGetLastMessage
+
+   NAME
+    FTPGetLastMessage --
+
+   SYNOPSIS
+    FTPGetLastMessage( ftpHandler )
+    STRPTR FTPGetLastMessage( struct FTPHandler * )
+
+   FUNCTION
+    Return last message from server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+
+   RESULT
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+ftp.library/FTPGet( struct FTPHandler *ftpHandler, struct TagItem *taglist )
+
+   NAME
+    FTPGet --
+
+   SYNOPSIS
+    FTPGet( ftpHandler, taglist )
+    LONG FTPGet( struct FTPHandler *, struct TagItem * )
+
+   FUNCTION
+    Get connection attributes via taglist
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    taglist - list of attributes:
+     FTP_TAG_CONNMODE - FTP connection mode FTPLIB_PASSIVE or FTPLIB_PORT
+     FTP_TAG_IDLETIME - idle time
+     FTP_TAG_TRANSFER_INFO_HOOK - pointer to callback hook (called everytime when
+      part of data was send/received)
+     FTP_TAG_REFRESHEVERY - call hook every n-time buffer is filled (16284 bytes)
+     FTP_TAG_GROUP_CLASS - pointer to mui ftp group class (obsolete for other applications)
+     FTP_TAG_LOGPORT - pointer to log message port, ftp log messages will be send there
+     FTP_TAG_ABORT - attribute set to 1 or TRUE will break sending/receiving process
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPSet
+
+ftp.library/FTPSet( struct FTPHandler *ftpHandler, struct TagItem *taglist )
+
+   NAME
+    FTPSet --
+
+   SYNOPSIS
+    FTPSet( ftpHandler, taglist )
+    LONG FTPSet( struct FTPHandler *, struct TagItem * )
+
+   FUNCTION
+    Set connection attributes via taglist
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    taglist - list of attributes:
+     FTP_TAG_CONNMODE - FTP connection mode FTPLIB_PASSIVE or FTPLIB_PORT
+     FTP_TAG_IDLETIME - idle time
+     FTP_TAG_TRANSFER_INFO_HOOK - pointer to callback hook (called everytime when
+      part of data was send/received)
+     FTP_TAG_REFRESHEVERY - call hook every n-time buffer is filled (16284 bytes)
+     FTP_TAG_GROUP_CLASS - pointer to mui ftp group class (obsolete for other applications)
+     FTP_TAG_LOGPORT - pointer to log message port, ftp log messages will be send there
+     FTP_TAG_ABORT - attribute set to 1 or TRUE will break sending/receiving process
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPGet
+
+
+ftp.library/FTPLogin
+
+   NAME
+    FTPLogin --
+
+   SYNOPSIS
+    FTPLogin( ftpHandler, username, password )
+    STRPTR FTPLogin( struct FTPHandler *, CONST STRPTR, CONST STRPTR )
+
+   FUNCTION
+    Login to server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+
+   RESULT
+    int value:
+     0 - not connected
+     1 - connected
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+ftp.library/FTPAccess
+
+   NAME
+    FTPAccess --
+
+   SYNOPSIS
+    FTPLogin( ftpHandler, ftpHandler2, path, type, mode, start position )
+    STRPTR FTPLogin( struct FTPHandler *, struct FTPHandler **, CONST STRPTR, LONG, LONG, UQUAD )
+
+   FUNCTION
+    Mostly used to check access to path. Rquired to use when resuming file transfer (startPos).
+    In passive mode set it will return back pointer to new allocated FTPHandler passed through
+    second argument.
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    ftpHandler2 - Pointer to place where lib will create new Handler
+    path - path to file or directory
+    type - will
+     FTPLIB_LIST command list will be send
+     FTPLIB_DIR command dir will be send
+     FTPLIB_FILE_READ
+     FTPLIB_FILE_WRITE
+
+			dir = FTPLIB_WRITE;
+    mode - ftp mode, two only avaiable: FTPLIB_PORT, FTPLIB_PASSIVE
+    start position - start read or write file from this value
+
+   RESULT
+    int value:
+     0 - no access to path
+     1 - access to path granted
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+ftp.library/FTPRead
+
+   NAME
+    FTPRead --
+
+   SYNOPSIS
+    FTPRead( ftpHandler, buf, max )
+    int FTPRead( struct FTPHandler *, APTR, LONG )
+
+   FUNCTION
+    Read given number of bytes from server into buffer.
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    buf - pointer to buffer where data will be stored
+    max - maximum number of bytes to read
+
+   RESULT
+    number of bytes readed
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+ftp.library/FTPWrite
+
+   NAME
+    FTPWrite --
+
+   SYNOPSIS
+    FTPWrite( ftpHandler, buf, len )
+    int FTPWrite( struct FTPHandler *, APTR, LONG )
+
+   FUNCTION
+    Upload data to server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    buf - pointer to buffer from where data will be readed
+    len - number of bytes written to server
+
+   RESULT
+    Number of written bytes
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+ftp.library/FTPClose
+
+   NAME
+    FTPClose --
+
+   SYNOPSIS
+    FTPClose( ftpHandler )
+    LONG FTPClose( struct FTPHandler * )
+
+   FUNCTION
+    Close FTP connection and free allocated resources.
+
+   INPUTS
+    ftpHandler - FTP connection structure
+
+   RESULT
+    1 - structure was succesfully closed
+    0 - structure was already closed or passed one was not in correct state
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPConnect()
+
+ftp.library/FTPSite
+
+   NAME
+    FTPSite --
+
+   SYNOPSIS
+    FTPSite( ftpHandler, cmd )
+    STRPTR FTPSite( struct FTPHandler *, CONST STRPTR )
+
+   FUNCTION
+    Send special FTP command to server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    cmd - special FTP command (http://incubator.terra-intl.com/projects/ftpserver/site_cmd.html)
+
+   RESULT
+    1 - command successfull, check results in Response field
+    0 - command failed
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+ftp.library/FTPSysType
+
+   NAME
+    FTPSysType --
+
+   SYNOPSIS
+    FTPSysType( ftpHandler, buf, max )
+    STRPTR FTPSysType( struct FTPHandler *, STRPTR, LONG )
+
+   FUNCTION
+    Returns a word identifying the system, the word "Type:" and the default transfer type
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    buf - pointer to buffer where information from server will be stored
+    max - size of buffer where data will be stored
+
+   RESULT
+    1 - operation completed with success
+    0 - function failed
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+ftp.library/FTPMakeDir
+
+   NAME
+    FTPMakeDir --
+
+   SYNOPSIS
+    FTPMakeDir( ftpHandler, path )
+    LONG FTPMakeDir( struct FTPHandler *, CONST STRPTR )
+
+   FUNCTION
+    Create directory on FTP server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    path - full path to directory to be created
+
+   RESULT
+    1 - directory created
+    0 - operation failed
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+LONG FTPChdir( struct FTPHandler *nControl, CONST STRPTR path );
+
+ftp.library/FTPChdir
+
+   NAME
+    FTPChdir --
+
+   SYNOPSIS
+    FTPChdir( ftpHandler, path )
+    LONG FTPChdir( struct FTPHandler *, CONST STRPTR )
+
+   FUNCTION
+    Change path on FTP server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    path - full path to new directory
+
+   RESULT
+    1 - current directory changed
+    0 - operation fail
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPDir()
+
+
+LONG FTPCDUp( struct FTPHandler *nControl );
+
+ftp.library/FTPCDUp
+
+   NAME
+    FTPCDUp --
+
+   SYNOPSIS
+    FTPCDUp( ftpHandler )
+    LONG FTPCDUp( struct FTPHandler * )
+
+   FUNCTION
+    Change current FTP path to parent one
+
+   INPUTS
+    ftpHandler - FTP connection structure
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+LONG FTPDeleteDir( struct FTPHandler *nControl, CONST STRPTR path );
+
+ftp.library/FTPDeleteDir
+
+   NAME
+    FTPDeleteDir --
+
+   SYNOPSIS
+    FTPDeleteDir( ftpHandler, path )
+    LONG FTPDeleteDir( struct FTPHandler *, STRPTR )
+
+   FUNCTION
+    Delete directory on FTP server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    path - full path to directory which will be deleted
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+LONG FTPGetPath( struct FTPHandler *nControl, STRPTR path, LONG max );
+
+ftp.library/FTPGetPath
+
+   NAME
+    FTPGetPath --
+
+   SYNOPSIS
+    FTPGetPath( ftpHandler, path, max )
+    STRPTR FTPGetLastMessage( struct FTPHandler *, STRPTR, LONG )
+
+   FUNCTION
+    Get current remote path from server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    path - pointer to buffer where information from server will be stored
+    max - size of buffer where data will be stored
+
+   RESULT
+    pointer to path when success
+    NULL when problem will appear
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+struct RemoteFile *FTPList( struct FTPHandler *nControl, CONST STRPTR path );
+
+ftp.library/FTPList
+
+   NAME
+    FTPList --
+
+   SYNOPSIS
+    FTPList( ftpHandler, path )
+    struct RemoteFile * FTPList( struct FTPHandler *, CONST STRPTR )
+
+   FUNCTION
+    Run LIST command on FTP server and return linked list of remoted files.
+    Some fields in RemoteFile structure could be empty, but function is faster
+    then FTPDir.
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    path - full path to directory to be listed
+
+   RESULT
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPDir
+
+
+
+struct RemoteFile *FTPDir( struct FTPHandler *nControl, CONST STRPTR path );
+
+ftp.library/FTPDir
+
+   NAME
+    FTPDir --
+
+   SYNOPSIS
+    FTPDir( ftpHandler, path )
+    struct RemoteFile *FTPDir( struct FTPHandler *, CONST STRPTR )
+
+   FUNCTION
+    Run DIR command on FTP server and return linked list of remoted files
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    path - full path to directory to be listed
+
+   RESULT
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPList
+
+
+LONG FTPSize( struct FTPHandler *nControl, CONST STRPTR fName, UQUAD *size );
+
+ftp.library/FTPSize
+
+   NAME
+    FTPSize --
+
+   SYNOPSIS
+    FTPSize( ftpHandler, fName, size )
+    LONG FTPSize( struct FTPHandler *, CONST STRPTR, UQUAD )
+
+   FUNCTION
+    Function return size of file targeted by fName into size pointer.
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    fName - full path to file
+    size - pointer to UQUAD variable where size will be stored
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+LONG FTPModDate( struct FTPHandler *nControl, CONST STRPTR path, STRPTR dt, LONG max );
+
+ftp.library/FTPModDate
+
+   NAME
+    FTPModDate --
+
+   SYNOPSIS
+    FTPModDate( ftpHandler, path, dt, max )
+    LONG FTPModDate( struct FTPHandler *, CONS STRPTR, STRPTR, LONG )
+
+   FUNCTION
+    Determine date modification of file on FTP server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    path - full path to file on FTP server
+    dt - pointer to char buffer where modification date will be stored
+    max - maximum size of chars to be returned
+
+   RESULT
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+LONG FTPReceive( struct FTPHandler *nControl, CONST STRPTR dstFile, STRPTR srcFile, UBYTE mode, UQUAD startPos );
+
+ftp.library/FTPReceive
+
+   NAME
+    FTPReceive --
+
+   SYNOPSIS
+    FTPReceive( ftpHandler, dstFile, srcFile, mode, startPos )
+    STRPTR FTPReceive( struct FTPHandler *, CONST STRPTR, STRPTR, UBYTE, UQUAD )
+
+   FUNCTION
+    Get or resume receiving file from FTP server.
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    dstFile - full path to destination file on local machine
+    srcFile - full path to source file avaiable on FTP server
+    mode - receive file in mode FTPLIB_BINARY or FTPLIB_ASCII
+    startPos - if value is bigger then 0 then funcion is trying to resume transfer from this byte
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPSend
+
+
+
+LONG FTPSend( struct FTPHandler *nControl, CONST STRPTR srcFile, CONST STRPTR dstFile, UBYTE mode, UQUAD startPos );
+
+ftp.library/FTPSend
+
+   NAME
+    FTPSend --
+
+   SYNOPSIS
+    FTPSend( ftpHandler, srcFile, dstFile, mode, startPos )
+    LONG FTPSend( struct FTPHandler *, CONST STRPTR, CONST STRPTR, UBYTE, UQUAD )
+
+   FUNCTION
+    Send or resume sending file to FTP server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    srcFile - full path to source file on local machine
+    dstFile - full path to destination file on FTP machine
+    mode - receive file in mode FTPLIB_BINARY or FTPLIB_ASCII
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+    FTPReceive
+
+
+
+LONG FTPRename( struct FTPHandler *nControl, CONST STRPTR src, CONST STRPTR dst );
+
+ftp.library/FTPRename
+
+   NAME
+    FTPRename --
+
+   SYNOPSIS
+    FTPRename( ftpHandler, src, dst )
+    LONG FTPRename( struct FTPHandler *, CONST STRPTR, CONST STRPTR )
+
+   FUNCTION
+    Rename file avaiable on FTP server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    src - original file name with full path
+    dst - new file name with full path
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+LONG FTPDeleteFile( struct FTPHandler *nControl, CONST STRPTR fnm );
+
+ftp.library/FTPDeleteFile
+
+   NAME
+    FTPDeleteFile --
+
+   SYNOPSIS
+    FTPDeleteFile( ftpHandler, fnm )
+    LONG FTPDeleteFile( struct FTPHandler *, CONST STRPTR )
+
+   FUNCTION
+    Delete file on FTP server
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    path - full path to file which will be deleted
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+
+
+LONG FTPQuit( struct FTPHandler *nControl);
+
+ftp.library/FTPQuit
+
+   NAME
+    FTPQuit --
+
+   SYNOPSIS
+    FTPQuit( ftpHandler )
+    LONG FTPQuit( struct FTPHandler * )
+
+   FUNCTION
+    Send QUIT message to server and close socket connection
+
+   INPUTS
+    ftpHandler - FTP connection structure
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+LONG FTPNoop( struct FTPHandler *ftpCtrl );
+
+ftp.library/FTPNoop
+
+   NAME
+    FTPNoop --
+
+   SYNOPSIS
+    FTPNoop( ftpHandler )
+    LONG FTPNoop( struct FTPHandler * )
+
+   FUNCTION
+    Send empty (NOOP) message to server. Sending this message from time to time will keep connection alive
+
+   INPUTS
+    ftpHandler - FTP connection structure
+
+   RESULT
+    1 - success
+    0 - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+STRPTR FTPHelp( struct FTPHandler *ftpCtrl , STRPTR ret );
+
+ftp.library/FTPHelp
+
+   NAME
+    FTPHelp --
+
+   SYNOPSIS
+    FTPHelp( ftpHandler, ret )
+    STRPTR FTPHelp( struct FTPHandler *, STRPTR )
+
+   FUNCTION
+    Return help information from FTP server about command passed in ret variable.
+    Response will be stored in ftpCtrl->Response and pointer to it will be returned
+
+   INPUTS
+    ftpHandler - FTP connection structure
+    ret - pointer to string with command
+
+   RESULT
+    not NULL - success with response as STRPTR
+    NULL - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+STRPTR FTPFeat( struct FTPHandler *ftpCtrl );
+
+ftp.library/FTPFeat
+
+   NAME
+    FTPGetFeat --
+
+   SYNOPSIS
+    FTPFeat( ftpHandler )
+    STRPTR FTPFeat( struct FTPHandler * )
+
+   FUNCTION
+    Get information from FTP server about feautures.
+
+   INPUTS
+    ftpHandler - FTP connection structure
+
+   RESULT
+    not NULL - success with response as STRPTR
+    NULL - failure
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+
+
+void FTPDeleteFileList( struct RemoteFile **f );
+
+ftp.library/FTPDeleteFileList
+
+   NAME
+    FTPDeleteFileList --
+
+   SYNOPSIS
+    FTPDeleteFileList( f )
+    void FTPDeleteFileList( struct RemoteFile )
+
+   FUNCTION
+    Deallocate memory allocated by FTPDir or FTPList.
+
+   INPUTS
+    f - pointer to pointer of first allocated element in linked list. On the end function set f pointer
+        as NULL
+
+   RESULT
+
+   NOTES
+
+   EXAMPLE
+
+   BUGS
+
+   SEE ALSO
+
+

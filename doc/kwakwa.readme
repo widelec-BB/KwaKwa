@@ -1,0 +1,16 @@
+Short:          Instant messager for MorphOS
+Author:         Filip "widelec" Maryjanski
+Type:           network/chat
+Version:        1.8
+Architecture:   ppc-morphos
+
+
+This is a simple instant messenger program.
+
+What do you need:
+----------------
+
+ -	any computer with MorphOS 3.9 running on;
+ -	Internet connection;
+ -	ezxml.library (V8.7);
+ -	TextEditor.mcc 15.45 [MOS/PPC].
