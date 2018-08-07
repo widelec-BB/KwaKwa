@@ -254,12 +254,25 @@ strip:
 	@$(TARGET_DONE)
 
 clean:
+ifeq ($(OS),MorphOS)
+	@-rm -rf translations.h $(OUTDIR)catalogs
+endif
 	@-make clean -C $(DEPSDIR)libnsgif >$(NIL)
 	@-rm $(PROJECT) >$(NIL)
 	@-rm $(OBJDIR)*.c.o >$(NIL)
 	@$(TARGET_DONE)
 
-dist: all
+translations.h:
+ifeq ($(OS),MorphOS)
+	MakeDir ALL $(OUTDIR)catalogs/polski
+	SimpleCat locale/kwakwa.cs
+else
+	@$(NOTMORPHOS)
+endif
+
+locale: translations.h
+
+dist: all locale
 ifeq ($(OS),MorphOS)
 # delete old archive and directory
 	@rm -rf RAM:$(OUTFILE) RAM:$(OUTFILE).lha
@@ -304,10 +317,12 @@ else
 	@$(NOTMORPHOS)
 endif
 
-RELEASE: all
+RELEASE: all locale
 	@$(TARGET_DONE)
 
 DEBUG: COMPILE += -D__DEBUG__ -D__DEBUG_SQL_
 DEBUG: LIBS += -ldebug
 DEBUG: all
 	@$(TARGET_DONE)
+
+.PHONY: locale
