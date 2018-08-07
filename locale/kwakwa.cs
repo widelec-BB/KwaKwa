@@ -3,8 +3,8 @@
 ## Codeset english 0
 ## Codeset polski 0
 ## SimpleCatConfig CharsPerLine 200
-## TARGET C english "Dev:C/soft/kwakwa/src/translations.h" NoCode
-## TARGET CATALOG polski "Dev:C/soft/kwakwa/src/bin/Catalogs/polski" Optimize
+## TARGET C english "translations.h" NoCode
+## TARGET CATALOG polski "bin/catalogs/polski" Optimize
 MSG_OPEN_LIBRARY_FAILED
 Cannot open %s!
 Nie mog³em otworzyæ %s!
