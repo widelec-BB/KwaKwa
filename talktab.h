@@ -39,6 +39,7 @@ void DeleteTalkTabClass(void);
 #define TTBM_InitConversation        0xBEDA0011
 #define TTBM_AddToHistory            0xBEDA0012
 #define TTBM_EditContact             0xBEDA0013
+#define TTBM_ToggleDouble            0xBEDA0014
 
 
 /* gadgets */

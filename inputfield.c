@@ -17,6 +17,9 @@
 #include "support.h"
 #include "inputfield.h"
 #include "devices/rawkeycodes.h"
+#include "talkwindow.h"
+#include "talktab.h"
+#include "virtualtext.h"
 
 struct MUI_CustomClass *InputFieldClass;
 static IPTR InputFieldDispatcher(VOID);
@@ -33,16 +36,11 @@ const struct EmulLibEntry InputFieldGate = {TRAP_LIB, 0, (VOID(*)(VOID))InputFie
 struct IFP_ContextMenu {ULONG MethodID; LONG mouse_x; LONG mouse_y;};
 struct IFP_LoadTxtFile {ULONG MethodID; STRPTR path;};
 
-struct EditorData
-{
-	UBYTE dummy[1192];
-	struct MUI_EventHandlerNode ehnode;
-};
-
 struct InputFieldData
 {
 	BOOL send_after_return;
 	struct MUI_EventHandlerNode handler;
+	Object *talk_tab;
 };
 
 struct MUI_CustomClass *CreateInputFieldClass(VOID)
@@ -92,6 +90,11 @@ static IPTR InputFieldSet(Class *cl, Object *obj, struct opSet *msg)
 				d->send_after_return = (BOOL)tag->ti_Data;
 				tagcount++;
 			break;
+
+			case IFA_TalkTab:
+				d->talk_tab = (Object*)tag->ti_Data;
+				tagcount++;
+			break;
 		}
 	}
 
@@ -119,7 +122,6 @@ static IPTR InputFieldGet(Class *cl, Object *obj, struct opGet *msg)
 static IPTR InputFieldSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
 {
 	struct InputFieldData *d = INST_DATA(cl, obj);
-	struct EditorData *ed = INST_DATA(InputFieldClass->mcc_Super, obj);
 	IPTR result = (IPTR)DoSuperMethodA(cl, obj, msg);
 	ENTER();
 
@@ -131,7 +133,6 @@ static IPTR InputFieldSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
 		d->handler.ehn_Priority = 1;
 		d->handler.ehn_Flags = MUI_EHF_GUIMODE;
 		DoMethod(_win(obj), MUIM_Window_AddEventHandler, (IPTR)&d->handler);
-		DoMethod(_win(obj), MUIM_Window_RemEventHandler, (IPTR)&ed->ehnode);
 	}
 
 	LEAVE();
@@ -141,10 +142,8 @@ static IPTR InputFieldSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
 static IPTR InputFieldCleanup(Class *cl, Object *obj, struct MUIP_Cleanup *msg)
 {
 	struct InputFieldData *d = INST_DATA(cl, obj);
-	struct EditorData *ed = INST_DATA(InputFieldClass->mcc_Super, obj);
 
 	DoMethod(_win(obj), MUIM_Window_RemEventHandler, (IPTR)&d->handler);
-	DoMethod(_win(obj), MUIM_Window_AddEventHandler, (IPTR)&ed->ehnode);
 
 	return (DoSuperMethodA(cl, obj, msg));
 }
@@ -167,24 +166,33 @@ static IPTR InputFieldHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEven
 			}
 
 			if(msg->imsg->Code == RAWKEY_KP_ENTER)
-				msg->imsg->Code = RAWKEY_RETURN;
-
-			if(_between(RAWKEY_NM_WHEEL_UP, msg->imsg->Code, RAWKEY_NM_BUTTON_FOURTH))
-				return 0;
+			{
+				DoMethod(obj, MUIM_TextEditor_InsertText, "\n", MUIV_TextEditor_InsertText_Cursor);
+				return MUI_EventHandlerRC_Eat;
+			}
 
 			if(msg->imsg->Qualifier & AMIGALEFT)
 			{
 				if(msg->imsg->Code >= RAWKEY_1 && msg->imsg->Code <= RAWKEY_9)
-					return 0;
+				{
+					DoMethod(_win(obj), TKWM_OpenOnTabById, msg->imsg->Code - RAWKEY_1);
+					return MUI_EventHandlerRC_Eat;
+				}
 
-				if(msg->imsg->Code == RAWKEY_Z)
-					return 0;
+				if(d->talk_tab)
+				{
+					if(msg->imsg->Code == RAWKEY_Z)
+					{
+						DoMethod(findobj(USD_TALKTAB_VIRTUALTEXT, d->talk_tab), VTM_Clear);
+						return MUI_EventHandlerRC_Eat;
+					}
 
-				if(msg->imsg->Code == RAWKEY_D)
-					return 0;
-
-				if(msg->imsg->Code == RAWKEY_SPACE)
-					msg->imsg->Code = RAWKEY_HELP; /* left Amiga + space emulates help */
+					if(msg->imsg->Code == RAWKEY_D)
+					{
+						DoMethod(d->talk_tab, TTBM_ToggleDouble);
+						return MUI_EventHandlerRC_Eat;
+					}
+				}
 			}
 			if(msg->imsg->Qualifier & AMIGARIGHT)
 			{
@@ -228,7 +236,7 @@ static IPTR InputFieldHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEven
 		}
 	}
 
-	return (IPTR)DoSuperMethodA(cl, obj, msg);
+	return (IPTR)0;
 }
 
 static IPTR InputFieldContextMenu(Class *cl, Object *obj, struct IFP_ContextMenu *msg)
