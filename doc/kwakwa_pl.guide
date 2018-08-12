@@ -42,7 +42,7 @@ protoko³ów poprzez system tzw. modu³ów. Ka¿dy modu³ jest dynamicznie ³adowan±
  o  komputer z zainstalowanym MorphOSem 3.9 lub nowszym
  o  po³±czenie z internetem;
  o  biblioteka ezxml.library (V8.7);
- o  klasa TextEditor.mcc 15.45 [MOS/PPC].
+ o  klasa TextEditor.mcc 15.50 [MOS/PPC].
 
 @endnode
 
@@ -50,8 +50,8 @@ protoko³ów poprzez system tzw. modu³ów. Ka¿dy modu³ jest dynamicznie ³adowan±
 @{b}Instalacja:@{ub}
 
 Rozpakuj archiwum do dowolnego katalogu. Upewnij siê, ¿e w LIBS: masz najnowsz±
-(min. V8.7) bibliotekê @{"ezxml.library" system "OpenURL http://morphos-files.net/download/ezxml.library"} oraz w SYS:Classes/MUI masz @{"TextEditor.mcc" system "OpenURL http://sourceforge.net/projects/texteditor-mcc/files/TextEditor.mcc/15.37/"}
-w wersji 15.45.
+(min. V8.7) bibliotekê @{"ezxml.library" system "OpenURL http://morphos-files.net/download/ezxml.library"} oraz w SYS:Classes/MUI masz @{"TextEditor.mcc" system "OpenURL https://github.com/amiga-mui/texteditor/releases"}
+w wersji 15.50 lub nowszej.
 
 KwaKwa korzysta z programu @{"Magic Beacon" system "OpenURL http://morphos-files.net/remote/Magic_Beacon"} napisanego przez Guido Mersmanna.
 Obs³ugiwane notyfikacje to:
@@ -354,10 +354,9 @@ A: System modu³ów ma jako g³ówne za³o¿enie to, ¿e nie bêd± instalowane modu³y, k
    wszystkie nieu¿ywane modu³y, pozostawiaj±c tylko te, które s± u¿ywane. Od wersji 1.8 mo¿na te¿ u¿yæ @{"tooltyp IGNORE_MODULES" link tooltypes}
    do dezaktywacji nieu¿ywanych modu³ów.
 
-Q: Mam problemy z Texteditor.mcc, czy da siê co¶ z tym zrobiæ?
-A: Przede wszystkim nale¿y sprawdziæ wersjê Texteditor.mcc jaka jest zainstalowana w systemie. Powinna to byæ wersja 15.45,
-   z zastrze¿eniem, ¿e dok³adnie ta, nie nowsza lub starsza. Wynika to z tego, ¿e KwaKwa patchuje wewnêtrzne struktury tej klasy,
-   wiêc zmiana wersji mo¿e spowodowaæ problemy.
+Q: Czy mogê zaaktualizowaæ TextEditor.mcc?
+A: Tak. Kod który u¿ywa³ wewnêtrznych struktur TextEditor.mcc zosta³ usuniêty, wiêc teraz aktualizacja TextEditor.mcc nie powinna wp³ywaæ
+   na dzia³anie KwaKwa.
 
 @endnode
 
