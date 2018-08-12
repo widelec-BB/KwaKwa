@@ -56,9 +56,9 @@ struct TalkTabData
 	struct ContactEntry *contact; /* pointer to local copy, not to entry from list -> needs update */
 	BPTR log_fh;
 	struct MUI_InputHandlerNode ihnode;
-	struct MUI_EventHandlerNode handler;
 	BOOL ihnode_added;
 	QUAD conversation_id;
+	BOOL double_hidden;
 
 	struct ClockData last_message_cd;
 };
@@ -123,14 +123,8 @@ static VOID TalkTabNotifications(Class *cl, Object *obj)
 	DoMethod(d->open_log_but, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1,
 	 TTBM_OpenLogFile);
 
-	DoMethod(d->double_but, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, d->sec_input, 3,
-	 MUIM_Set, MUIA_ShowMe, MUIV_TriggerValue);
-
-	DoMethod(d->double_but, MUIM_Notify, MUIA_Selected, FALSE, MUIV_Notify_Self, 3,
-	 MUIM_Set, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/double.mbr]");
-
-	DoMethod(d->double_but, MUIM_Notify, MUIA_Selected, TRUE, MUIV_Notify_Self, 3,
-	 MUIM_Set, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/doublei.mbr]");
+	DoMethod(d->double_but, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1,
+	 TTBM_ToggleDouble);
 
 	DoMethod(d->edit_contact_button, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1, TTBM_EditContact);
 }
@@ -192,7 +186,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 				MUIA_Text_PreParse, "\33c",
 				MUIA_Frame, MUIV_Frame_ImageButton,
 				MUIA_Background, MUII_ImageButtonBack,
-				MUIA_InputMode, MUIV_InputMode_Toggle,
+				MUIA_InputMode, MUIV_InputMode_RelVerify,
 				MUIA_CycleChain, TRUE,
 				MUIA_HorizWeight, 0,
 				MUIA_ShortHelp, GetString(MSG_TALKTAB_BUTTON_DOUBLE),
@@ -255,9 +249,13 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 		d->double_but = double_button;
 		d->edit_contact_button = edit_contact_button;
 		d->conversation_id = -1;
+		d->double_hidden = TRUE;
 
 		set(toolbar, MUIA_ShowMe, xget(prefs_object(USD_PREFS_TW_TOOLBAR_ONOFF), MUIA_Selected));
 		set(info_block, MUIA_ShowMe, xget(prefs_object(USD_PREFS_TW_CONTACTINFOBLOCK_ONOFF), MUIA_Selected));
+
+		set(d->input, IFA_TalkTab, obj);
+		set(d->sec_input, IFA_TalkTab, obj);
 
 		DoMethod(prefs_object(USD_PREFS_TW_TOOLBAR_ONOFF), MUIM_Notify, MUIA_Selected, MUIV_EveryTime, toolbar, 3,
 		 MUIM_Set, MUIA_ShowMe, MUIV_TriggerValue);
@@ -276,29 +274,9 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 	return (IPTR)NULL;
 }
 
-static IPTR TalkTabSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
-{
-	struct TalkTabData *d = INST_DATA(cl, obj);
-	IPTR result = (IPTR)DoSuperMethodA(cl, obj, msg);
-
-	if(result)
-	{
-		d->handler.ehn_Class = cl;
-		d->handler.ehn_Object = obj;
-		d->handler.ehn_Events = IDCMP_RAWKEY;
-		d->handler.ehn_Priority = 1;
-		d->handler.ehn_Flags = MUI_EHF_GUIMODE;
-		DoMethod(_win(obj), MUIM_Window_AddEventHandler, &d->handler);
-	}
-
-	return result;
-}
-
 static IPTR TalkTabCleanup(Class *cl, Object *obj, struct MUIP_Cleanup *msg)
 {
 	struct TalkTabData *d = INST_DATA(cl, obj);
-
-	DoMethod(_win(obj), MUIM_Window_RemEventHandler, &d->handler);
 
 	if(d->ihnode_added)
 		DoMethod(_app(obj), MUIM_Application_RemInputHandler, &d->ihnode);
@@ -331,39 +309,6 @@ static IPTR TalkTabGet(Class *cl, Object *obj, struct opGet *msg)
 	}
 
 	return rv;
-}
-
-static IPTR TalkTabHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEvent *msg)
-{
-	struct TalkTabData *d = INST_DATA(cl, obj);
-	struct IntuiMessage *imsg = msg->imsg;
-	IPTR result = 0;
-
-	if(imsg != NULL)
-	{
-		if(imsg->Class == IDCMP_RAWKEY)
-		{
-			if(imsg->Qualifier & AMIGALEFT)
-			{
-				if(imsg->Code >= RAWKEY_1 && imsg->Code <= RAWKEY_9)
-				{
-					DoMethod(_win(obj), TKWM_OpenOnTabById, imsg->Code - RAWKEY_1);
-					return (result | MUI_EventHandlerRC_Eat);
-				}
-				if(imsg->Code == RAWKEY_Z)
-				{
-					DoMethod(d->txt, VTM_Clear);
-					return (result | MUI_EventHandlerRC_Eat);
-				}
-				if(imsg->Code == RAWKEY_D)
-				{
-					set(d->double_but, MUIA_Selected, !xget(d->sec_input, MUIA_ShowMe));
-					return (result | MUI_EventHandlerRC_Eat);
-				}
-			}
-		}
-	}
-	return result;
 }
 
 static IPTR TalkTabInit(Class *cl, Object *obj, struct TTBP_Init *msg)
@@ -1034,6 +979,34 @@ static IPTR TalkTabEditContact(Class *cl, Object *obj)
 	return 0;
 }
 
+static IPTR TalkTabToggleDouble(Class *cl, Object *obj)
+{
+	struct TalkTabData *d = INST_DATA(cl, obj);
+
+	if(d->double_hidden)
+	{
+		set(d->sec_input, MUIA_ShowMe, TRUE);
+
+		SetAttrs(d->double_but,
+			MUIA_Selected, TRUE,
+			MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/doublei.mbr]",
+		TAG_END);
+	}
+	else
+	{
+		set(d->sec_input, MUIA_ShowMe, FALSE);
+
+		SetAttrs(d->double_but,
+			MUIA_Selected, FALSE,
+			MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/double.mbr]",
+		TAG_END);
+	}
+
+	d->double_hidden = !d->double_hidden;
+
+	return 0;
+}
+
 static IPTR TalkTabDispatcher(VOID)
 {
 	Class *cl = (Class*)REG_A0;
@@ -1045,9 +1018,7 @@ static IPTR TalkTabDispatcher(VOID)
 		case OM_NEW: return (TalkTabNew(cl, obj, (struct opSet*)msg));
 		case OM_DISPOSE:  return (TalkTabDispose(cl, obj, msg));
 		case OM_GET: return (TalkTabGet(cl, obj, (struct opGet*)msg));
-		case MUIM_Setup: return(TalkTabSetup(cl, obj, (struct MUIP_Setup*)msg));
 		case MUIM_Cleanup: return(TalkTabCleanup(cl, obj, (struct MUIP_Cleanup*)msg));
-		case MUIM_HandleEvent: return(TalkTabHandleEvent(cl, obj, (struct MUIP_HandleEvent*)msg));
 		case TTBM_Init: return (TalkTabInit(cl, obj, (struct TTBP_Init*)msg));
 		case TTBM_PutMessage: return (TalkTabPutMessage(cl, obj, (struct TTBP_PutMessage*)msg));
 		case TTBM_SendMessage: return (TalkTabSendMessage(cl, obj, (struct TTBP_SendMessage*)msg));
@@ -1068,6 +1039,7 @@ static IPTR TalkTabDispatcher(VOID)
 		case TTBM_InsertLastMessages: return(TalkTabInsertLastMessages(cl, obj));
 		case TTBM_InsertOldMessage: return(TalkTabInsertOldMessage(cl, obj, (struct TTBP_InsertOldMessage*)msg));
 		case TTBM_EditContact: return (TalkTabEditContact(cl, obj));
+		case TTBM_ToggleDouble: return (TalkTabToggleDouble(cl, obj));
 		default: return (DoSuperMethodA(cl, obj, msg));
 	}
 }

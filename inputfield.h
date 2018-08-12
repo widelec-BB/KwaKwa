@@ -21,6 +21,7 @@ void DeleteInputFieldClass(void);
 /* tags */
 #define IFA_SendAfterReturn    0xCEDB0000
 #define IFA_Acknowledge        0xCEDB0001
+#define IFA_TalkTab            0xCEDB0002
 
 /* methods */
 #define IFM_ContextMenu        0xCEDB1000
