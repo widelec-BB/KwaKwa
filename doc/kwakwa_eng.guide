@@ -37,7 +37,7 @@ This is a simple instant messenger program.
  o any computer with MorphOS 3.9 running on;
  o Internet connection;
  o ezxml.library (V8.7);
- o TextEditor.mcc 15.45 [MOS/PPC].
+ o TextEditor.mcc 15.50 [MOS/PPC].
 
 
 @endnode
@@ -46,7 +46,7 @@ This is a simple instant messenger program.
 @{b}Installation:@{ub}
 
 Please unpack archive to any directory you want. Make sure that you have installed @{"ezxml.library" system "OpenURL http://morphos-files.net/download/ezxml.library"}
-(V8.7) and  @{"TextEditor.mcc" system "OpenURL http://sourceforge.net/projects/texteditor-mcc/files/TextEditor.mcc/15.37/"} (V15.45).
+(V8.7) and  @{"TextEditor.mcc" system "OpenURL https://github.com/amiga-mui/texteditor/releases"} (V15.50).
 
 KwaKwa cooperate with @{"Magic Beacon" system "OpenURL http://morphos-files.net/remote/Magic_Beacon"} written by Guide Mersmann.
 At the moment KwaKwa sends following notifications:
@@ -321,9 +321,8 @@ A: Probably this module is not configured properly, please, configure it. Also, 
    you don't want to use. If you really want to have not needed files on your disk, you can use
    @{"IGNORE_MODULES tooltype" link tooltypes} to disable not needed modules.
 
-Q: I have some problems with Texteditor.mcc, what's wrong with this?
-A: Please notice that KwaKwa requires Texteditor.mcc 15.45, not newer nor older. This requirement is essential, because
-   KwaKwa patches some internal structures of Texteditor.mcc.
+Q: Can I update TextEditor.mcc?
+A: Yes, now you can, as the code which was messing with internal structures of TextEditor.mcc has been removed.
 
 @endnode
 
