@@ -26,11 +26,11 @@
 #define APP_DATE           __AMIGADATE__
 #define APP_AUTHOR         "Filip \"widelec\" Maryjañski"
 #define APP_NAME           "KwaKwa"
-#define APP_CYEARS         "2012 - 2018"
+#define APP_CYEARS         "2012 - 2022"
 #define APP_BASE           "KWAKWA"
 #define APP_DESC           GetString(MSG_APPLICATION_DESCRIPTION)
 #define APP_VER_MAJOR      1
-#define APP_VER_MINOR      8
+#define APP_VER_MINOR      9
 #define APP_VER_NO         MACRO_TO_STRING(APP_VER_MAJOR)"."MACRO_TO_STRING(APP_VER_MINOR)
 #define APP_VER            "$VER: " APP_NAME " " APP_VER_NO " " APP_DATE " © " APP_CYEARS " BlaBla group"
 #define APP_SCREEN_TITLE   APP_NAME " " APP_VER_NO " " APP_DATE
