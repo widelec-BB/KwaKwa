@@ -1,13 +1,13 @@
 @database "kwakwa.guide"
 @author "Filip 'widelec' Maryjañski"
 @remark "Created with Ed"
-@$VER: KwaKwa.guide 1.8 (02.07.2017)
+@$VER: KwaKwa.guide 1.9 (10.03.2022)
 
 @node main "KwaKwa" "KwaKwa: Indeks"
 @{b}..:: KwaKwa ::..@{ub}
-Wersja: 1.8
+Wersja: 1.9
 
-Copyright © 2012-2017 Filip "widelec" Maryjañski, BlaBla group
+Copyright © 2012-2022 Filip "widelec" Maryjañski, BlaBla group
 
 @{"    Wstêp      "   link    "introduction" 0}
 @{"  Wymagania    "   link    "requirements" 0}
@@ -42,7 +42,7 @@ protoko³ów poprzez system tzw. modu³ów. Ka¿dy modu³ jest dynamicznie ³adowan±
  o  komputer z zainstalowanym MorphOSem 3.9 lub nowszym
  o  po³±czenie z internetem;
  o  biblioteka ezxml.library (V8.7);
- o  klasa TextEditor.mcc 15.50 [MOS/PPC].
+ o  klasa TextEditor.mcc 15.56 [MOS/PPC].
 
 @endnode
 
@@ -51,9 +51,9 @@ protoko³ów poprzez system tzw. modu³ów. Ka¿dy modu³ jest dynamicznie ³adowan±
 
 Rozpakuj archiwum do dowolnego katalogu. Upewnij siê, ¿e w LIBS: masz najnowsz±
 (min. V8.7) bibliotekê @{"ezxml.library" system "OpenURL http://morphos-files.net/download/ezxml.library"} oraz w SYS:Classes/MUI masz @{"TextEditor.mcc" system "OpenURL https://github.com/amiga-mui/texteditor/releases"}
-w wersji 15.50 lub nowszej.
+w wersji 15.56 lub nowszej.
 
-KwaKwa korzysta z programu @{"Magic Beacon" system "OpenURL http://morphos-files.net/remote/Magic_Beacon"} napisanego przez Guido Mersmanna.
+KwaKwa wykorzystuje system notifikacji dostêpny w MorphOS-ie od wersji 3.16 (MagicBeacon).
 Obs³ugiwane notyfikacje to:
 o KWAKWA.STATUS - wysy³ana je¶li kto¶ z listy kontaktów zmieni status;
 o KWAKWA.MESSAGE - wysy³ana je¶li otrzymamy now± wiadomo¶æ;
@@ -363,6 +363,9 @@ A: Tak. Kod który u¿ywa³ wewnêtrznych struktur TextEditor.mcc zosta³ usuniêty, w
 @node "history" "KwaKwa: Historia"
 @{b}Historia zmian:@{ub}
 
+@{i}@{b}Wersja 1.9 (11.03.2022):@{ub}@{ui}
+ o wykorzystanie GCC 11 do budowania;
+ o zamiana starego SDK MagicBeacona na magicbeacon.library.
 
 @{i}@{b}Wersja 1.8 (02.07.2017):@{ub}@{ui}
  o dodany przycisk umo¿liwiaj±cy przej¶cie do edycji kontaktu bezpo¶rednio z okna rozmowy (dziêki za obrazek, Recedent!);
@@ -534,7 +537,7 @@ A: Tak. Kod który u¿ywa³ wewnêtrznych struktur TextEditor.mcc zosta³ usuniêty, w
 
 @{b}Licencja:@{ub}
 
-KwaKwa © 2012 - 2017 Filip Maryjañski, BlaBla group.
+KwaKwa © 2012 - 2022 Filip Maryjañski, BlaBla group.
 
 KwaKwa jest darmowym programem rozpowszechnianym na zasadach licencji MIT.
 Autor i/lub grupa BlaBla nie bior± odpowiedzialno¶ci za dzia³anie i mo¿liwe szkody wynik³e z u¿ywania KwaKwa.

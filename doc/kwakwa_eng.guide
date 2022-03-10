@@ -1,13 +1,13 @@
 @database "kwakwa.guide"
 @author "Filip 'widelec' Maryjanski"
 @remark "Created with Ed"
-@$VER: KwaKwa.guide 1.8 (24.06.2017)
+@$VER: KwaKwa.guide 1.9 (10.03.2022)
 
 @node main "KwaKwa" "KwaKwa: Index"
 @{b}..:: KwaKwa ::..@{ub}
-Version: 1.8
+Version: 1.9
 
-Copyright © 2012-2017 Filip Maryjanski, BlaBla group
+Copyright © 2012-2022 Filip Maryjanski, BlaBla group
 
 @{"  Introduction  "   link    "introduction" 0}
 @{"  Requirements  "   link    "requirements" 0}
@@ -34,10 +34,10 @@ This is a simple instant messenger program.
 @node "requirements" "KwaKwa: Requirements"
 @{b}Requirements:@{ub}
 
- o any computer with MorphOS 3.9 running on;
+ o any computer with MorphOS 3.16 running on;
  o Internet connection;
  o ezxml.library (V8.7);
- o TextEditor.mcc 15.50 [MOS/PPC].
+ o TextEditor.mcc 15.56 [MOS/PPC].
 
 
 @endnode
@@ -46,9 +46,9 @@ This is a simple instant messenger program.
 @{b}Installation:@{ub}
 
 Please unpack archive to any directory you want. Make sure that you have installed @{"ezxml.library" system "OpenURL http://morphos-files.net/download/ezxml.library"}
-(V8.7) and  @{"TextEditor.mcc" system "OpenURL https://github.com/amiga-mui/texteditor/releases"} (V15.50).
+(V8.7) and  @{"TextEditor.mcc" system "OpenURL https://github.com/amiga-mui/texteditor/releases"} (V15.56).
 
-KwaKwa cooperate with @{"Magic Beacon" system "OpenURL http://morphos-files.net/remote/Magic_Beacon"} written by Guide Mersmann.
+KwaKwa uses native MorphOS notification system (MagicBeacon).
 At the moment KwaKwa sends following notifications:
 o KWAKWA.STATUS - when someone from contacts list changes status;
 o KWAKWA.MESSAGE - when new message arrive;
@@ -329,6 +329,9 @@ A: Yes, now you can, as the code which was messing with internal structures of T
 @node "history" "KwaKwa: History"
 @{b}Changelog:@{ub}
 
+@{i}@{b}Version 1.9 (11.03.2022):@{ub}@{ui}
+ o build with GCC 11;
+ o replaced old MagicBeacon SDK with magicbeacon.library.
 
 @{i}@{b}Version 1.8 (02.07.2017):@{ub}@{ui}
  o added button for editing contact data from talk window;
@@ -484,7 +487,7 @@ A: Yes, now you can, as the code which was messing with internal structures of T
 
 @{b}License:@{ub}
 
-KwaKwa © 2012 - 2018 Filip Maryjanski, BlaBla group.
+KwaKwa © 2012 - 2022 Filip Maryjanski, BlaBla group.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
