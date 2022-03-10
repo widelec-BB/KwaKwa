@@ -29,7 +29,7 @@ CWARNS = -Wall -Wno-pointer-sign
 CDEFS  = -D__AMIGADATE__=\"\($(shell date "+%d.%m.%Y")\)\" -DAROS_ALMOST_COMPATIBLE -D__MORPHOS_SHAREDLIBS
 # -D__SVNVERSION__=\"\$(shell svnversion)\"
 CFLAGS = -O3 -noixemul
-CLIBS  = -I$(DEPSDIR)libnsgif -I$(DEPSDIR)ftp
+CLIBS  = -I$(DEPSDIR)libnsgif -I$(DEPSDIR)ftp -I$(DEPSDIR)magicbeacon
 
 COMPILE = $(CC) $(TARGET) $(CWARNS) $(CDEFS) $(CFLAGS) $(CLIBS)
 
