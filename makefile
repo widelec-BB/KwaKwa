@@ -24,7 +24,7 @@ DEPSDIR = deps/
 PROJECT = $(OUTDIR)$(OUTFILE)
 
 # COMPILER #
-CC = ppc-morphos-gcc
+CC = ppc-morphos-gcc-11
 CWARNS = -Wall -Wno-pointer-sign
 CDEFS  = -D__AMIGADATE__=\"\($(shell date "+%d.%m.%Y")\)\" -DAROS_ALMOST_COMPATIBLE -D__MORPHOS_SHAREDLIBS
 # -D__SVNVERSION__=\"\$(shell svnversion)\"
@@ -34,7 +34,7 @@ CLIBS  = -I$(DEPSDIR)libnsgif -I$(DEPSDIR)ftp
 COMPILE = $(CC) $(TARGET) $(CWARNS) $(CDEFS) $(CFLAGS) $(CLIBS)
 
 # LINKER #
-LD = ppc-morphos-gcc
+LD = ppc-morphos-gcc-11
 
 LWARNS =
 LDEFS  =
