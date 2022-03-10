@@ -108,10 +108,10 @@ struct InsertLinkParms
 #define APPA_Description                     0x6EDA1002
 
 /* magic beacon notifications names */
-#define BEACON_MESSAGE "KWAKWA.MESSAGE"
-#define BEACON_STATUS "KWAKWA.STATUS"
-#define BEACON_PICTURE "KWAKWA.PICTURE"
-#define BEACON_INVITE "KWAKWA.INVITE"
+#define BEACON_MESSAGE "MESSAGE"
+#define BEACON_STATUS "STATUS"
+#define BEACON_PICTURE "PICTURE"
+#define BEACON_INVITE "INVITE"
 
 /* history database flags - conversations table */
 #define HISTORY_CONVERSATIONS_NORMAL      (0)

@@ -13,6 +13,9 @@
 #include <dos/dostags.h>
 #include <libvstring.h>
 #define __NOLIBBASE__
+#define USE_INLINE_STDARG
+#include <proto/magicbeacon.h>
+#undef USE_INLINE_STDARG
 #include <proto/dos.h>
 #include "support.h"
 #include "globaldefines.h"
@@ -27,13 +30,15 @@
 struct SlaveProcData
 {
 	struct Library *DOSBase;
+	struct Library *MagicBeaconBase;
 
 	struct MsgPort *slave_port;
-	struct MsgPort *beacon_port;
 
 	struct MsgPort *get_port;
 	struct MsgPort *post_port;
 	struct MsgPort *ftp_port;
+
+	APTR magic_beacon;
 
 	ULONG notifications_no;
 	ULONG gets_no;
@@ -42,21 +47,22 @@ struct SlaveProcData
 };
 
 #define DOSBase d->DOSBase
+#define MagicBeaconBase d->MagicBeaconBase
 
 VOID DoBeaconOrder(struct SlaveProcData *d, struct MagicBeaconNotificationMessage *mbnm)
 {
-	struct MsgPort *dst_port;
+	IPTR err = MagicBeacon_BeaconSendTags(d->magic_beacon,
+		MAGICBEACON_NOTIFICATIONNAME, (IPTR)mbnm->mbnm_NotificationName,
+		MAGICBEACON_MESSAGE, (IPTR)mbnm->mbnm_NotificationMessage,
+		MAGICBEACON_USERDATA, (IPTR)mbnm->mbnm_UserData,
+		MAGICBEACON_WAITFORRESULT, mbnm->mbnm_WaitForResult,
+	TAG_END);
 
-	mbnm->mbnm_ReplyPort = d->beacon_port;
-	mbnm->mbnm_Length = MBNM_MESSAGESIZE;
+	if (mbnm->mbnm_WaitForResult != TRUE || err != MAGICBEACON_ERROR_NOERROR)
+		ReplyMsg((struct Message*)mbnm->mbnm_UserData);
 
-	Forbid();
-	if((dst_port = FindPort(MBNP_NAME)))
-	{
-		PutMsg(dst_port, (struct Message*)mbnm);
-		d->notifications_no++;
-	}
-	Permit();
+	if (err != MAGICBEACON_ERROR_NOERROR)
+		tprintf("magicbeacon retured error: %d\n", err);
 }
 
 
@@ -134,10 +140,10 @@ VOID DoFtpPutOrder(struct SlaveProcData *d, struct FTPPut *fp)
 VOID SlaveProcMainLoop(struct SlaveProcData *d)
 {
 	ULONG order_mask = (1UL << d->slave_port->mp_SigBit);
-	ULONG beacon_mask = (1UL << d->beacon_port->mp_SigBit);
 	ULONG get_mask = (1UL << d->get_port->mp_SigBit);
 	ULONG post_mask = (1UL << d->get_port->mp_SigBit);
 	ULONG ftp_mask = (1UL << d->ftp_port->mp_SigBit);
+	ULONG beacon_mask = MagicBeacon_GetAttr(d->magic_beacon, NULL, MAGICBEACON_APPLICATIONSIGNALMASK);
 	ULONG signals;
 	BOOL running = TRUE;
 
@@ -174,17 +180,6 @@ VOID SlaveProcMainLoop(struct SlaveProcData *d)
 			}
 		}
 
-		if(signals & beacon_mask)
-		{
-			struct MagicBeaconNotificationMessage *mbnm;
-
-			while((mbnm = (struct MagicBeaconNotificationMessage*)GetMsg(d->beacon_port)))
-			{
-				d->notifications_no--;
-				ReplyMsg((struct Message*)mbnm->mbnm_UserData);
-			}
-		}
-
 		if(signals & get_mask)
 		{
 			struct HttpGet *hg;
@@ -218,6 +213,21 @@ VOID SlaveProcMainLoop(struct SlaveProcData *d)
 			}
 		}
 
+		if(signals & beacon_mask)
+		{
+			APTR beacon = MagicBeacon_BeaconObtain(d->magic_beacon);
+			if (beacon)
+			{
+				struct Order *ord;
+
+				ord = (struct Order*)MagicBeacon_GetAttr(d->magic_beacon, beacon, MAGICBEACON_USERDATA);
+				ord->ob_Beacon.mbnm_Result = MagicBeacon_GetAttr(d->magic_beacon, beacon, MAGICBEACON_RESULT) == NOTIFICATIONRESULT_CONFIRMED ? 1 : 0;
+
+				ReplyMsg((struct Message*)ord);
+				MagicBeacon_BeaconDispose(d->magic_beacon, beacon);
+			}
+		}
+
 		if(signals & SIGBREAKF_CTRL_C)
 		{
 			tprintf("recived CTRL_C!\n");
@@ -234,78 +244,72 @@ VOID SlaveProcStart(VOID)
 
 	if((DOSBase = OpenLibrary("dos.library", 0)))
 	{
-		if(NewGetTaskAttrs(NULL, &d->slave_port, sizeof(struct MsgPort *), TASKINFOTYPE_TASKMSGPORT, TAG_DONE) && d->slave_port)
+		if((MagicBeaconBase = OpenLibrary("magicbeacon.library", 1)))
 		{
-			if((d->beacon_port = CreateMsgPort()))
+			d->magic_beacon = MagicBeacon_ApplicationRegisterTags(
+				MAGICBEACON_APPLICATIONNAME, (IPTR)APP_BASE,
+				MAGICBEACON_APPLICATIONSIGNALNUMBER, -1,
+			TAG_DONE);
+			if (d->magic_beacon)
 			{
-				if((d->get_port = CreateMsgPort()))
+				if(NewGetTaskAttrs(NULL, &d->slave_port, sizeof(struct MsgPort *), TASKINFOTYPE_TASKMSGPORT, TAG_DONE) && d->slave_port)
 				{
-					if((d->post_port = CreateMsgPort()))
+					if((d->get_port = CreateMsgPort()))
 					{
-						if((d->ftp_port = CreateMsgPort()))
+						if((d->post_port = CreateMsgPort()))
 						{
-							SlaveProcMainLoop(d);
-
-							/* cleanup -> don't close slave task before all request will be done */
-
-							while(d->notifications_no)
+							if((d->ftp_port = CreateMsgPort()))
 							{
-								struct MagicBeaconNotificationMessage *mbnm;
+								SlaveProcMainLoop(d);
 
-								WaitPort(d->beacon_port);
-								while((mbnm = (struct MagicBeaconNotificationMessage*)GetMsg(d->beacon_port)))
+								while(d->posts_no)
 								{
-									d->notifications_no--;
-									ReplyMsg((struct Message*)mbnm->mbnm_UserData);
+									struct HttpPost *hp;
+
+									WaitPort(d->post_port);
+
+									while((hp = (struct HttpPost*)GetMsg(d->post_port)))
+									{
+										d->posts_no--;
+										ReplyMsg((struct Message*)hp->hp_Order);
+									}
 								}
-							}
 
-							while(d->posts_no)
-							{
-								struct HttpPost *hp;
-
-								WaitPort(d->post_port);
-
-								while((hp = (struct HttpPost*)GetMsg(d->post_port)))
+								while(d->gets_no)
 								{
-									d->posts_no--;
-									ReplyMsg((struct Message*)hp->hp_Order);
+									struct HttpGet *hg;
+
+									WaitPort(d->get_port);
+
+									while((hg = (struct HttpGet*)GetMsg(d->get_port)))
+									{
+										d->gets_no--;
+										ReplyMsg((struct Message*)hg->hg_Order);
+									}
 								}
-							}
 
-							while(d->gets_no)
-							{
-								struct HttpGet *hg;
-
-								WaitPort(d->get_port);
-
-								while((hg = (struct HttpGet*)GetMsg(d->get_port)))
+								while(d->ftp_no)
 								{
-									d->gets_no--;
-									ReplyMsg((struct Message*)hg->hg_Order);
+									struct FTPPut *ftpp;
+
+									WaitPort(d->ftp_port);
+
+									while((ftpp = (struct FTPPut*)GetMsg(d->ftp_port)))
+									{
+										d->ftp_no--;
+										ReplyMsg((struct Message*)ftpp->ftpp_Order);
+									}
 								}
+								DeleteMsgPort(d->ftp_port);
 							}
-
-							while(d->ftp_no)
-							{
-								struct FTPPut *ftpp;
-
-								WaitPort(d->ftp_port);
-
-								while((ftpp = (struct FTPPut*)GetMsg(d->ftp_port)))
-								{
-									d->ftp_no--;
-									ReplyMsg((struct Message*)ftpp->ftpp_Order);
-								}
-							}
-							DeleteMsgPort(d->ftp_port);
+							DeleteMsgPort(d->post_port);
 						}
-						DeleteMsgPort(d->post_port);
+						DeleteMsgPort(d->get_port);
 					}
-					DeleteMsgPort(d->get_port);
 				}
-				DeleteMsgPort(d->beacon_port);
+				MagicBeacon_ApplicationUnregister(d->magic_beacon);
 			}
+			CloseLibrary(MagicBeaconBase);
 		}
 		CloseLibrary(DOSBase);
 	}

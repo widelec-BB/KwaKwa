@@ -7,7 +7,7 @@
 #include <proto/exec.h>
 #include <proto/utility.h>
 #include <libvstring.h>
-#include <magicaction/magicbeacon.h>
+#include <libraries/magicbeacon.h>
 
 #include "locale.h"
 

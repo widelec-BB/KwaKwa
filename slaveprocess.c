@@ -198,7 +198,7 @@ static IPTR SlaveProcessSendNotification(Class *cl, Object *obj, struct SPP_Send
 		nord->ob_Type = ORDER_TYPE_BEACON;
 		nord->ob_Beacon.mbnm_NotificationName = StrNewPublic(msg->notification_name);
 		nord->ob_Beacon.mbnm_NotificationMessage = StrNewPublic(msg->message);
-		nord->ob_Beacon.mbnm_NotificationMode = msg->wait_for_result ? NOTIFICATIONMODE_GETRESULT : NOTIFICATIONMODE_QUICK;
+		nord->ob_Beacon.mbnm_WaitForResult = msg->wait_for_result ? TRUE : FALSE;
 		nord->ob_Beacon.mbnm_UserData = nord;
 		nord->ob_Object = msg->obj;
 		nord->ob_MethodID = msg->method;
@@ -243,7 +243,7 @@ static IPTR SlaveProcessSignalMethod(Class *cl, Object *obj)
 		{
 			case ORDER_TYPE_BEACON:
 				if(o->ob_Object && o->ob_MethodID)
-					DoMethod(o->ob_Object, o->ob_MethodID, o->ob_Beacon.mbnm_Result, o->ob_UserData);
+					DoMethod(o->ob_Object, o->ob_MethodID, (ULONG)o->ob_Beacon.mbnm_Result, o->ob_UserData);
 				DoMethod(obj, SPM_FreeNotification, &o->ob_Beacon);
 			break;
 

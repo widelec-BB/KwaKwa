@@ -8,7 +8,7 @@
 #define __SLAVE_H__
 
 #include <intuition/classes.h>
-#include <magicaction/magicbeacon.h>
+#include <libraries/magicbeacon.h>
 #include "http.h"
 #include "ftp.h"
 
@@ -16,6 +16,15 @@
 #define ORDER_TYPE_HTTP_GET   0x000001
 #define ORDER_TYPE_HTTP_POST  0x000002
 #define ORDER_TYPE_FTP_PUT    0x000003
+
+struct MagicBeaconNotificationMessage
+{
+	STRPTR mbnm_NotificationName;
+	STRPTR mbnm_NotificationMessage;
+	BOOL mbnm_WaitForResult;
+	BOOL mbnm_Result;
+	APTR mbnm_UserData;
+};
 
 struct Order
 {
