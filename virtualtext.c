@@ -485,7 +485,7 @@ static IPTR VirtualTextDraw(Class *cl, Object *obj, struct MUIP_Draw *msg)
 	ULONG height = xget(obj, MUIA_Height), width = xget(obj, MUIA_Width);
 
 	/* prepare preparses */
-	if(!(d->preparsesDone));
+	if(!(d->preparsesDone))
 		VirtualTextCreatePreparses(cl, obj);
 
 	result = (IPTR) DoSuperMethodA(cl, obj, msg);
