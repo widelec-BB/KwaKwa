@@ -286,6 +286,8 @@ ifeq ($(OS),MorphOS)
 	-@rm -rf RAM:$(OUTFILE)/cache/*
 	-@rm -rf RAM:$(OUTFILE)/gfx/emots/*
 	-@find RAM:$(OUTFILE) -name *.module* -printf "\"%p\"\n" | xargs rm -rf
+# strip executable
+	@strip --strip-unneeded --remove-section .comment RAM:$(OUTFILE)/$(OUTFILE) >NIL:
 # create cache directories
 	-@mkdir RAM:$(OUTFILE)/cache/gui
 # create example desclist.cfg
@@ -295,8 +297,8 @@ ifeq ($(OS),MorphOS)
 # make dir for scripts and copy them
 	-@mkdir RAM:$(OUTFILE)/scripts
 	@copy >NIL: contrib/scripts RAM:$(OUTFILE)/scripts ALL
-# delete svn stuff
-	@find RAM:$(OUTFILE) -name .svn -printf "\"%p\"\n" | xargs rm -rf
+# delete vcs stuff
+	@find RAM:$(OUTFILE) \( -name .svn -o -name .git \) -printf "\"%p\"\n" | xargs rm -rf
 #copy default drawer icon
 	-@cp SYS:Prefs/Presets/Deficons/def_drawer.info RAM:$(OUTFILE).info
 # create archive
