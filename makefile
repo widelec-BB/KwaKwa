@@ -293,7 +293,7 @@ ifeq ($(OS),MorphOS)
 # create example desclist.cfg
 	@echo "KwaKwa rulez!!!\n" >"RAM:$(OUTFILE)/cache/gui/desclist.cfg"
 # copy docs
-	@copy >NIL: doc/kwakwa_eng.guide doc/kwakwa_eng.guide.info doc/kwakwa_pl.guide doc/kwakwa_pl.guide.info doc/kwakwa.readme RAM:$(OUTFILE)/
+	@copy >NIL: LICENSE doc/kwakwa_eng.guide doc/kwakwa_eng.guide.info doc/kwakwa_pl.guide doc/kwakwa_pl.guide.info doc/kwakwa.readme RAM:$(OUTFILE)/
 # make dir for scripts and copy them
 	-@mkdir RAM:$(OUTFILE)/scripts
 	@copy >NIL: contrib/scripts RAM:$(OUTFILE)/scripts ALL
