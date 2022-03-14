@@ -324,6 +324,10 @@ A: Probably this module is not configured properly, please, configure it. Also, 
 Q: Can I update TextEditor.mcc?
 A: Yes, now you can, as the code which was messing with internal structures of TextEditor.mcc has been removed.
 
+Q: Can I get KwaKwa contacts list window when I select KwaKwa in Expose after hidding all windows to screenbar?
+A: Yes. Go to the Expose preferences, setup Action for KwaKwa to "Run Rexx Commands if No Window Found" and set Rexx
+   commands to "WindowControl main show".
+
 @endnode
 
 @node "history" "KwaKwa: History"

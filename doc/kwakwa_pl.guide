@@ -358,6 +358,12 @@ Q: Czy mogê zaaktualizowaæ TextEditor.mcc?
 A: Tak. Kod który u¿ywa³ wewnêtrznych struktur TextEditor.mcc zosta³ usuniêty, wiêc teraz aktualizacja TextEditor.mcc nie powinna wp³ywaæ
    na dzia³anie KwaKwa.
 
+Q: Czy da siê zrobiæ tak, ¿eby okno z list± kontaktów KwaKwa pojawia³o siê po wybraniu KwaKwa z listy Expose nawet je¶li zosta³o ukryte do screenbara?
+A: Tak. Nale¿y wej¶æ w ustawienia Expose (z menu Ambienta na górnej belce wybieramy "Dodatki" i "Exchange", na li¶cie zaznaczamy "Expose" i klikamy
+   przycisk "Poka¿ GUI") i wybraæ KwaKwa z listy, nastêpnie "Action" przestawiæ na "Run Rexx Commands" albo "Run Rexx Commands if No Window Found"
+   (druga opcja sprawi, ¿e okno z list± kontaktów nie bêdzie siê pojawiaæ kiedy jest otwarte okno rozmowy) po czym nacisn±æ przycisk "Edit Commands"
+   i w oknie edytora, które siê pojawi wpisaæ "WindowControl main show".
+
 @endnode
 
 @node "history" "KwaKwa: Historia"
