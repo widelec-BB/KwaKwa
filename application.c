@@ -40,6 +40,7 @@
 #include "historyconversationslist.h"
 #include "historywindow.h"
 #include "historysql.h"
+#include "brokerhook.h"
 
 #include "kwakwa_api/defs.h"
 #include "kwakwa_api/protocol.h"
@@ -331,6 +332,7 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Application_Window, (edit_con_window = NewObject(EditContactWindowClass->mcc_Class, NULL, TAG_END)),
 		MUIA_Application_Window, desc_window,
 		MUIA_Application_Window, (modules_log_window = NewObject(ModulesLogWindowClass->mcc_Class, NULL, TAG_END)),
+		MUIA_Application_BrokerHook, &BrokerHook,
 	TAG_MORE, msg->ops_AttrList);
 
 	if(obj)
@@ -817,12 +819,42 @@ static IPTR ApplicationClipboardEnd(Class *cl, Object *obj)
 static IPTR ApplicationInstallBroker(Class *cl, Object *obj)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
-	CxObj *broker = (CxObj*)xget(obj, MUIA_Application_Broker);
+	CxObj *broker = (CxObj*)xget(obj, MUIA_Application_Broker), *cmd_filter;
+
+	if (!broker)
+		return (IPTR)FALSE;
+
+	if((cmd_filter = CxFilter("")))
+	{
+		struct InputXpression ix =
+		{
+			IX_VERSION,
+			IECLASS_EVENT,
+			CXCMD_APPEAR,
+			CXCMD_APPEAR,
+			0,
+			0,
+			0
+		};
+		struct MsgPort *broker_port = (struct MsgPort*)xget(obj, MUIA_Application_BrokerPort);
+		CxObj *cmd_sender;
+
+		SetFilterIX(cmd_filter, &ix);
+
+		if((cmd_sender = CxSender(broker_port, 0L)))
+		{
+			if(!CxObjError(cmd_filter) && !CxObjError(cmd_sender))
+			{
+				AttachCxObj(cmd_filter, cmd_sender);
+				AttachCxObj(broker, cmd_filter);
+			}
+		}
+	}
 
 	d->broker_start_time = d->broker_act_time = xget(prefs_object(USD_PREFS_PROGRAM_AUTOAWAY_SLIDER), MUIA_Slider_Level);
 	d->broker_status_away = FALSE;
 
-	if(broker && d->broker_signal == -1 && d->broker_start_time)
+	if(d->broker_signal == -1 && d->broker_start_time)
 	{
 		if((d->broker_signal = AllocSignal(-1)) != -1)
 		{
@@ -859,7 +891,9 @@ static IPTR ApplicationInstallBroker(Class *cl, Object *obj)
 
 								return (IPTR)TRUE;
 							}
+							RemoveCxObj(d->mouse_filter);
 						}
+						RemoveCxObj(d->keyboard_filter);
 					}
 					RemoveCxObj(sigobj_mouse);
 				}
