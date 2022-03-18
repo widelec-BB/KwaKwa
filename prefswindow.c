@@ -670,11 +670,11 @@ static inline Object *CreateTalkWindowPrefs(VOID)
 				TAG_END),
 			TAG_END),
 
-			/* addons */
+			/* apperance */
 			MUIA_Group_Child, MUI_NewObject(MUIC_Group,
 				MUIA_Frame, MUIV_Frame_Group,
 				MUIA_Background, MUII_GroupBack,
-				MUIA_FrameTitle, GetString(MSG_PREFS_TALKWINDOW_ADDONS),
+				MUIA_FrameTitle, GetString(MSG_PREFS_TALKWINDOW_APPERANCE),
 				MUIA_Group_Child, MUI_NewObject(MUIC_Group,
 					MUIA_Group_Horiz, TRUE,
 					MUIA_Group_Child, MUI_NewObject(MUIC_Image,
@@ -705,7 +705,22 @@ static inline Object *CreateTalkWindowPrefs(VOID)
 					MUIA_Group_Child, StringLabel(GetString(MSG_PREFS_TALKWINDOW_TOOLBAR_ON_OFF), "\33l"),
 					MUIA_Group_Child, EmptyRectangle(100),
 				TAG_END),
+				MUIA_Group_Child, MUI_NewObject(MUIC_Group,
+					MUIA_Group_Horiz, TRUE,
+					MUIA_Group_Child, StringLabel(GetString(MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE), "\33l"),
+					MUIA_Group_Child, (pic_width_slider = NewObject(MinMaxSliderClass->mcc_Class, NULL,
+						MUIA_ObjectID, USD_PREFS_TW_TOOLBAR_SPACE_SIZE,
+						MUIA_UserData, USD_PREFS_TW_TOOLBAR_SPACE_SIZE,
+						MUIA_Slider_Horiz, TRUE,
+						MUIA_Slider_Level, 0,
+						MUIA_Slider_Max, 100,
+						MUIA_Slider_Min, 0,
+						MMSA_Unit, GetString(MSG_PIXEL_SLIDER_UNIT),
+						MUIA_ShortHelp, GetString(MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP),
+					TAG_END)),
+				TAG_END),
 			TAG_END),
+
 		TAG_END),
 		MUIA_Group_Child, EmptyRectangle(100),
 	TAG_END);

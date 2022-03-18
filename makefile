@@ -262,15 +262,13 @@ endif
 	@-rm $(OBJDIR)*.c.o >$(NIL)
 	@$(TARGET_DONE)
 
-translations.h:
+translations.h: locale/kwakwa.cs
 ifeq ($(OS),MorphOS)
 	MakeDir ALL $(OUTDIR)catalogs/polski
 	SimpleCat locale/kwakwa.cs
 else
 	@$(NOTMORPHOS)
 endif
-
-locale: translations.h
 
 dist: all locale
 ifeq ($(OS),MorphOS)
@@ -326,5 +324,3 @@ DEBUG: COMPILE += -D__DEBUG__ -D__DEBUG_SQL_
 DEBUG: LIBS += -ldebug
 DEBUG: all
 	@$(TARGET_DONE)
-
-.PHONY: locale

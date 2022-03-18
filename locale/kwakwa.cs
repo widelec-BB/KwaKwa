@@ -1,4 +1,4 @@
-## Version $VER: kwakwa.catalog 3.0 (01.07.2017)
+## Version $VER: kwakwa.catalog 4.0 (18.03.2022)
 ## Languages english polski
 ## Codeset english 0
 ## Codeset polski 0
@@ -966,10 +966,6 @@ MSG_PREFS_TALKWINDOW_MAX_WIDTH_UNLIMITED
 Unlimited
 Nieograniczona
 ;
-MSG_PREFS_TALKWINDOW_ADDONS
-Addons
-Dodatki
-;
 MSG_PREFS_TALKWINDOW_CONTACTINFOBLOCK_ON_OFF
 Show contact info
 Pokazuj informacje o kontakcie
@@ -1545,4 +1541,16 @@ Aktualnie jest ju¿ uruchomiona inna kopia programu.
 MSG_KWAKWA_ANOTHER_COPY_RUNNING_BUTTONS
 *_OK
 *_OK
+;
+MSG_PREFS_TALKWINDOW_APPERANCE
+Apperance
+Wygl±d
+;
+MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE
+Space between buttons in toolbar
+Przestrzeñ pomiêdzy przyciskami paska narzêdzi
+;
+MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP
+Allows to set size of space between buttons in Talk Window toolbar.
+Pozwala ustawiæ przestrzeñ (przerwê) pomiêdzy przyciskami paska narzêdzi.
 ;

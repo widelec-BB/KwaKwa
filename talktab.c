@@ -52,7 +52,7 @@ struct TalkTabData
 	Object *txt;
 	Object *input, *sec_input;
 	Object *send_but, *return_check, *lamp;
-	Object *send_pic_but, *clear_txt_but, *open_log_but, *double_but, *edit_contact_button;
+	Object *toolbar, *send_pic_but, *clear_txt_but, *open_log_but, *double_but, *edit_contact_button;
 	struct ContactEntry *contact; /* pointer to local copy, not to entry from list -> needs update */
 	BPTR log_fh;
 	struct MUI_InputHandlerNode ihnode;
@@ -148,7 +148,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 		TAG_END)),
 		MUIA_Group_Child, (toolbar = MUI_NewObject(MUIC_Group,
 			MUIA_Group_Horiz, TRUE,
-			MUIA_Group_HorizSpacing, 0,
+			MUIA_Group_HorizSpacing, xget(prefs_object(USD_PREFS_TW_TOOLBAR_SPACE_SIZE), MUIA_Slider_Level),
 			MUIA_Group_Child, (clear_txt_but = MUI_NewObject(MUIC_Text,
 				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/clean.mbr]",
 				MUIA_Text_PreParse, "\33c",
@@ -242,6 +242,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 		d->send_but = send_but;
 		d->lamp = lamp;
 		d->info_block = info_block;
+		d->toolbar = toolbar;
 		d->send_pic_but = send_pic_but;
 		d->clear_txt_but = clear_txt_but;
 		d->sec_input = sec_input;
@@ -261,6 +262,8 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 		 MUIM_Set, MUIA_ShowMe, MUIV_TriggerValue);
 		DoMethod(prefs_object(USD_PREFS_TW_CONTACTINFOBLOCK_ONOFF), MUIM_Notify, MUIA_Selected, MUIV_EveryTime, info_block, 3,
 		 MUIM_Set, MUIA_ShowMe, MUIV_TriggerValue);
+		DoMethod(prefs_object(USD_PREFS_TW_TOOLBAR_SPACE_SIZE), MUIM_Notify, MUIA_Slider_Level, MUIV_EveryTime, obj, 1,
+		 TTBM_RefreshToolbar);
 
 		d->ihnode.ihn_Object  = obj;
 		d->ihnode.ihn_Millis  = WRITE_LAMP_TIME;
@@ -1007,6 +1010,18 @@ static IPTR TalkTabToggleDouble(Class *cl, Object *obj)
 	return 0;
 }
 
+static IPTR TalkTabRefreshToolbar(Class *cl, Object *obj)
+{
+	struct TalkTabData *d = INST_DATA(cl, obj);
+
+	set(d->toolbar, MUIA_ShowMe, FALSE);
+	set(d->toolbar, MUIA_Group_HorizSpacing, xget(prefs_object(USD_PREFS_TW_TOOLBAR_SPACE_SIZE), MUIA_Slider_Level));
+	if (xget(prefs_object(USD_PREFS_TW_TOOLBAR_ONOFF), MUIA_Selected))
+		set(d->toolbar, MUIA_ShowMe, TRUE);
+
+	return 0;
+}
+
 static IPTR TalkTabDispatcher(VOID)
 {
 	Class *cl = (Class*)REG_A0;
@@ -1040,6 +1055,7 @@ static IPTR TalkTabDispatcher(VOID)
 		case TTBM_InsertOldMessage: return(TalkTabInsertOldMessage(cl, obj, (struct TTBP_InsertOldMessage*)msg));
 		case TTBM_EditContact: return (TalkTabEditContact(cl, obj));
 		case TTBM_ToggleDouble: return (TalkTabToggleDouble(cl, obj));
+		case TTBM_RefreshToolbar: return (TalkTabRefreshToolbar(cl, obj));
 		default: return (DoSuperMethodA(cl, obj, msg));
 	}
 }

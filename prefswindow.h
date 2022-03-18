@@ -81,6 +81,8 @@ extern Object *PreferencesWindow;
 
 #define USD_PREFS_TW_SYSTEMMSG_HEADLINE_REVERSE          0x9EDA1129
 
+#define USD_PREFS_TW_TOOLBAR_SPACE_SIZE                  0x9EDA112A
+
 /* logs prefs */
 #define USD_PREFS_LOGS_ONOFF_CHECK                       0x9EDA1200
 #define USD_PREFS_HISTORY_ONOFF_CHECK                    0x9EDA1201
