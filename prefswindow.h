@@ -83,6 +83,8 @@ extern Object *PreferencesWindow;
 
 #define USD_PREFS_TW_TOOLBAR_SPACE_SIZE                  0x9EDA112A
 
+#define USD_PREFS_TW_TABTITLE_IMAGE_ONOFF                0x9EDA112B
+
 /* logs prefs */
 #define USD_PREFS_LOGS_ONOFF_CHECK                       0x9EDA1200
 #define USD_PREFS_HISTORY_ONOFF_CHECK                    0x9EDA1201

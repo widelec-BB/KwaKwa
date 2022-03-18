@@ -1554,3 +1554,11 @@ MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP
 Allows to set size of space between buttons in Talk Window toolbar.
 Pozwala ustawiæ przestrzeñ (przerwê) pomiêdzy przyciskami paska narzêdzi.
 ;
+MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_HELP
+Allows to turn on/off showing contact status icon on tab title.
+Pozwala na w³±czenie/wy³±czenie pokazywania ikony statusu na panelu tytu³owym karty.
+;
+MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF
+Show status image on tab title
+Pokazuj ikonê statusu na pasku tytu³owym karty
+;

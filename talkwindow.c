@@ -266,7 +266,12 @@ static IPTR TalkWindowCreateNewTab(Class *cl, Object *obj, ULONG pluginid, STRPT
 			strd(entry->nickname), strd(entry->firstname), strd(entry->lastname), strd(entry->groupname), strd(entry->birthyear), strd(entry->city),
 				entry->status, strd(entry->statusdesc), (LONG)entry->gender, entry->unread ? "TRUE" : "FALSE", entry->avatar);
 
-		new_title = NewObject(TabTitleClass->mcc_Class, NULL, MUIA_Text_Contents, ContactName(entry), TAG_END);
+		new_title = NewObject(TabTitleClass->mcc_Class, NULL,
+			TTA_ContactName, ContactName(entry),
+			TTA_Status, entry->status,
+			TTA_Unread, incoming,
+			TTA_ShowStatusImage, xget(prefs_object(USD_PREFS_TW_TABTITLE_IMAGE_ONOFF), MUIA_Selected),
+		TAG_END);
 
 		new_tab = AddTabEntry(cl, obj, entry, new_title, new_group);
 
@@ -283,7 +288,12 @@ static IPTR TalkWindowCreateNewTab(Class *cl, Object *obj, ULONG pluginid, STRPT
 		{
 			ce.entryid = entryid;
 
-			new_title = NewObject(TabTitleClass->mcc_Class, NULL, MUIA_Text_Contents, ce.name, TAG_END);
+			new_title = NewObject(TabTitleClass->mcc_Class, NULL,
+				TTA_ContactName, ce.name,
+				TTA_Status, ce.status,
+				TTA_Unread, incoming,
+				TTA_ShowStatusImage, xget(prefs_object(USD_PREFS_TW_TABTITLE_IMAGE_ONOFF), MUIA_Selected),
+			TAG_END);
 
 			new_tab = AddTabEntry(cl, obj, &ce, new_title, new_group);
 
@@ -630,7 +640,8 @@ static IPTR TalkWindowUpdateTabContact(Class *cl, Object *obj, struct TKWP_Updat
 			tab->entry.status = tab->list_entry->status;
 
 		}
-		set(tab->title, MUIA_Text_Contents, ContactNameLoc(tab->entry));
+		set(tab->title, TTA_ContactName, ContactNameLoc(tab->entry));
+		set(tab->title, TTA_Status, tab->entry.status);
 		DoMethod(tab->tab, TTBM_RedrawInfoBlock);
 	}
 
@@ -860,7 +871,7 @@ static IPTR TalkWindowDispatcher(VOID)
 		case TKWM_UpdateTabContact: return(TalkWindowUpdateTabContact(cl, obj, (struct TKWP_UpdateTabContact*)msg));
 		case TKWM_UpdateTabContactStatus: return(TalkWindowUpdateTabContactStatus(cl, obj, (struct TKWP_UpdateTabContactStatus*)msg));
 		case TKWM_UpdateTabWriteLamp: return(TalkWindowUpdateTabWriteLamp(cl, obj, (struct TKWP_UpdateTabWriteLamp*)msg));
-		case TKWM_AcceptBeacon:	return(TalkWindowAcceptBeacon(cl, obj, (struct TKWP_AcceptBeacon*)msg));
+		case TKWM_AcceptBeacon: return(TalkWindowAcceptBeacon(cl, obj, (struct TKWP_AcceptBeacon*)msg));
 		case TKWM_ShowPicture: return(TalkWindowShowPicture(cl, obj, (struct TKWP_ShowPicture*)msg));
 		case TKWM_GetTab: return(TalkWindowGetTab(cl, obj, (struct TKWP_GetTab*)msg));
 		case TKWM_SendMessage: return(TalkWindowSendMessage(cl, obj, (struct TKWP_SendMessage*)msg));
