@@ -7,6 +7,7 @@
 #include <proto/exec.h>
 #include <proto/graphics.h>
 #include <proto/locale.h>
+#include <devices/rawkeycodes.h>
 #include <mui/Hyperlink_mcc.h>
 #include <libvstring.h>
 
@@ -197,9 +198,9 @@ static IPTR VirtualTextSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
 	{
 		d->ehn.ehn_Class = cl;
 		d->ehn.ehn_Object = obj;
-		d->ehn.ehn_Events = IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE;
-		d->ehn.ehn_Flags = MUI_EHF_GUIMODE;
-		d->ehn.ehn_Priority = 0;
+		d->ehn.ehn_Events = IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY;
+		d->ehn.ehn_Flags = MUI_EHF_PRIORITY; /* not for public use? bite me. needed to override sending event first to active/default gadget */
+		d->ehn.ehn_Priority = 2;
 
 		DoMethod(_win(obj), MUIM_Window_AddEventHandler, &d->ehn);
 	}
@@ -225,6 +226,22 @@ static IPTR VirtualTextHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEve
 	{
 		if(_isinobject(imsg->MouseX, imsg->MouseY))
 		{
+			if(imsg->Class == IDCMP_RAWKEY)
+			{
+				ULONG current_top = xget(obj, MUIA_Virtgroup_Top);
+				if(imsg->Code == RAWKEY_NM_WHEEL_DOWN)
+				{
+					set(obj, MUIA_Virtgroup_Top, current_top + 20);
+					return MUI_EventHandlerRC_Eat;
+				}
+
+				if(imsg->Code == RAWKEY_NM_WHEEL_UP)
+				{
+					set(obj, MUIA_Virtgroup_Top, current_top - 20);
+					return MUI_EventHandlerRC_Eat;
+				}
+			}
+
 			if(imsg->Class == IDCMP_MOUSEBUTTONS)
 			{
 				if(imsg->Code == IECODE_LBUTTON)

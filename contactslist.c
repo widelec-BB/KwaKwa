@@ -1218,6 +1218,8 @@ static IPTR ContactsListSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
 	d->handler.ehn_Class = cl;
 	d->handler.ehn_Object = obj;
 	d->handler.ehn_Events = IDCMP_MOUSEBUTTONS | IDCMP_RAWKEY;
+	d->handler.ehn_Flags = MUI_EHF_GUIMODE;
+	d->handler.ehn_Priority = 0;
 
 	DoMethod(_win(obj), MUIM_Window_AddEventHandler, &d->handler);
 
