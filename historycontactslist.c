@@ -51,6 +51,7 @@ VOID DeleteHistoryContactsListClass(VOID)
 static IPTR HistoryContactsListNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	Object *menu = MUI_NewObject(MUIC_Menustrip,
+		MUIA_Unicode, TRUE,
 		MUIA_Group_Child, MUI_NewObject(MUIC_Menu,
 			MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
 				MUIA_Menuitem_Title, GetString(MSG_HISTORY_CONTACTS_LIST_MENU_REMOVE),
@@ -65,6 +66,7 @@ static IPTR HistoryContactsListNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_List_Title, TRUE,
 		MUIA_List_Format, "",
 		MUIA_ContextMenu, menu,
+		MUIA_Unicode, TRUE,
 	TAG_MORE, msg->ops_AttrList);
 
 	if(obj)
@@ -242,7 +244,7 @@ static IPTR HistoryContactsListRemove(Class *cl, Object *obj, struct HCLP_Remove
 
 		set(_app(obj), MUIA_Application_Sleep, TRUE);
 
-		if(MUI_Request(_app(obj), _win(obj), 0, APP_NAME, GetString(MSG_HISTORY_CONTACTS_LIST_REMOVE_REQ_GADGETS), GetString(MSG_HISTORY_CONTACTS_LIST_REMOVE_REQ_TXT), txt) == 1)
+		if(MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, GetString(MSG_HISTORY_CONTACTS_LIST_REMOVE_REQ_GADGETS), GetString(MSG_HISTORY_CONTACTS_LIST_REMOVE_REQ_TXT), txt) == 1)
 		{
 			DoMethod(_app(obj), APPM_DeleteContactFromHistory, entry->plugin_id, entry->id);
 

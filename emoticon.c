@@ -212,6 +212,7 @@ static IPTR EmoticonNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	obj = (Object*)DoSuperNew((ULONG)cl, (ULONG)obj,
 		MUIA_DoubleBuffer, FALSE, /* virtual text object has own double buffer, so we can't use it here (MUI bug?) */
+		MUIA_Unicode, TRUE,
 	TAG_MORE, (ULONG)msg->ops_AttrList);
 
 	if(obj)

@@ -40,6 +40,7 @@ VOID DeleteTimeSliderClass(VOID)
 static IPTR TimeSliderNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	obj = (Object*)DoSuperNew(cl, obj,
+		MUIA_Unicode, TRUE,
 		MUIA_Slider_Min, 0,
 		MUIA_Slider_Max, 86400,
 	TAG_MORE, (ULONG)msg->ops_AttrList);

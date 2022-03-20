@@ -95,6 +95,17 @@ static IPTR InputFieldSet(Class *cl, Object *obj, struct opSet *msg)
 				d->talk_tab = (Object*)tag->ti_Data;
 				tagcount++;
 			break;
+
+			case IFA_TextContents:
+				{
+					STRPTR converted = Utf8ToSystem((STRPTR)tag->ti_Data);
+					if(converted)
+					{
+						set(obj, MUIA_TextEditor_Contents, converted);
+						StrFree(converted);
+					}
+				}
+			break;
 		}
 	}
 
@@ -335,7 +346,7 @@ static IPTR InputFieldExternalEdit(Class *cl, Object *obj)
 	{
 		STRPTR txt;
 
-		if((txt = (STRPTR)DoMethod(obj, MUIM_TextEditor_ExportText)))
+		if((txt = (STRPTR)DoMethod(obj, IFM_ExportText)))
 		{
 			ULONG len = StrLen(txt);
 
@@ -406,7 +417,7 @@ static IPTR InputFieldLoadTxtFile(Class *cl, Object *obj, struct IFP_LoadTxtFile
 
 			buffer[loaded] = 0x00;
 
-			DoMethod(obj, MUIM_TextEditor_InsertText, (IPTR)buffer);
+			DoMethod(obj, MUIM_TextEditor_InsertText, (IPTR)buffer, MUIV_TextEditor_InsertText_Cursor);
 
 		}while(loaded != 0);
 
@@ -415,6 +426,14 @@ static IPTR InputFieldLoadTxtFile(Class *cl, Object *obj, struct IFP_LoadTxtFile
 	}
 
 	return (IPTR)0;
+}
+
+static IPTR InputFieldExportText(Class *cl, Object *obj)
+{
+	STRPTR sys_text = (STRPTR)DoSuperMethod(cl, obj, MUIM_TextEditor_ExportText);
+	if(sys_text)
+		return (IPTR)SystemToUtf8(sys_text);
+	return (IPTR)NULL;
 }
 
 static IPTR InputFieldDispatcher(VOID)
@@ -435,6 +454,7 @@ static IPTR InputFieldDispatcher(VOID)
 		case IFM_ExternalEdit: return(InputFieldExternalEdit(cl, obj));
 		case IFM_ImportTxtFile: return(InputFieldImportTxtFile(cl, obj));
 		case IFM_LoadTxtFile: return(InputFieldLoadTxtFile(cl, obj, (struct IFP_LoadTxtFile*)msg));
+		case IFM_ExportText: return(InputFieldExportText(cl, obj));
 		default:  return (DoSuperMethodA(cl, obj, msg));
 	}
 }

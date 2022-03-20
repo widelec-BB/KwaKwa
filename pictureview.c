@@ -57,6 +57,7 @@ VOID DeletePictureViewClass(VOID)
 static IPTR PictureViewNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	obj = (Object*)DoSuperNew(cl, obj,
+		MUIA_Unicode, TRUE,
 		MUIA_DoubleBuffer, FALSE, /* virtual text object has own double buffer, so we can't use it here (MUI bug?) */
 	TAG_MORE, (IPTR)msg->ops_AttrList);
 
@@ -69,6 +70,7 @@ static IPTR PictureViewNew(Class *cl, Object *obj, struct opSet *msg)
 		ULONG alpha = 0xFFFFFFFF;
 
 		d->pvd_MenuStrip = MUI_NewObject(MUIC_Menustrip,
+			MUIA_Unicode, TRUE,
 			MUIA_Group_Child, MUI_NewObject(MUIC_Menu,
 				MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
 					MUIA_Menuitem_Title, GetString(MSG_PICTUREVIEW_MENU_SAVEAS),
@@ -271,11 +273,11 @@ static IPTR PictureViewAskMinMax(Class *cl, Object *obj, struct MUIP_AskMinMax *
 		h = d->pvd_Picture->p_Height * ((DOUBLE)w) / ((DOUBLE)d->pvd_Picture->p_Width);
 	}
 
-	msg->MinMaxInfo->MinWidth 	+= w;
+	msg->MinMaxInfo->MinWidth  += w;
 	msg->MinMaxInfo->MinHeight += h;
-	msg->MinMaxInfo->DefWidth 	+= w;
+	msg->MinMaxInfo->DefWidth  += w;
 	msg->MinMaxInfo->DefHeight += h;
-	msg->MinMaxInfo->MaxWidth 	+= w;
+	msg->MinMaxInfo->MaxWidth  += w;
 	msg->MinMaxInfo->MaxHeight += h;
 
 	return result;
@@ -351,7 +353,7 @@ static IPTR PictureViewSavePicture(Class *cl, Object *obj)
 				result = TRUE;
 
 			if(!result)
-				MUI_Request(_app(obj), obj, 0L, APP_NAME, GetString(MSG_SEND_PICTURE_FAIL_BUTTONS), GetString(MSG_SEND_PICTURE_FAIL_MSG));
+				MUI_Request_Unicode(_app(obj), obj, APP_NAME, GetString(MSG_SEND_PICTURE_FAIL_BUTTONS), GetString(MSG_SEND_PICTURE_FAIL_MSG));
 		}
 
 		if(last_path)

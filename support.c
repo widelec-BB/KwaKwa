@@ -30,6 +30,7 @@ extern struct Library *MultimediaBase;
 Object* StringLabel(STRPTR label, STRPTR preparse)
 {
 	Object *obj = MUI_NewObject(MUIC_Text,
+		MUIA_Unicode, TRUE,
 		MUIA_FramePhantomHoriz, TRUE,
 		MUIA_Frame, MUIV_Frame_String,
 		MUIA_Text_PreParse, preparse,
@@ -43,6 +44,7 @@ Object* StringLabel(STRPTR label, STRPTR preparse)
 Object* StringGadget(ULONG id)
 {
 	Object *obj = MUI_NewObject(MUIC_String,
+		MUIA_Unicode, TRUE,
 		MUIA_UserData, id,
 		MUIA_ObjectID, id,
 		MUIA_Frame, MUIV_Frame_String,
@@ -74,6 +76,7 @@ Object* NormalButton(STRPTR label, UBYTE control, LONG objid, ULONG weight)
 	Object *obj;
 
 	obj = MUI_NewObject(MUIC_Text,
+		MUIA_Unicode, TRUE,
 		MUIA_Text_Contents, (ULONG)label,
 		MUIA_Text_PreParse, "\33c",
 		MUIA_Frame, MUIV_Frame_Button,
@@ -410,13 +413,15 @@ STRPTR Utf8ToSystem(STRPTR src)
 	{
 		if((size = GetByteSize(src, -1, MIBENUM_UTF_8, MIBENUM_SYSTEM)) != -1)
 		{
-			STRPTR result = NULL;
+			STRPTR result;
 
 			if((result = AllocVec(size * sizeof(UBYTE), MEMF_ANY)))
 			{
 				if(ConvertTags(src, -1, result, size, MIBENUM_UTF_8, MIBENUM_SYSTEM, TAG_END) != -1)
 					return result;
-				FreeVec(result);
+
+				StrFree(result);
+				result = NULL;
 			}
 		}
 	}
@@ -432,20 +437,21 @@ STRPTR SystemToUtf8(STRPTR src)
 	{
 		if((size = GetByteSize(src, -1, MIBENUM_SYSTEM, MIBENUM_UTF_8)) != -1)
 		{
-			STRPTR result = NULL;
+			STRPTR result;
 
 			if((result = AllocVec(size * sizeof(UBYTE), MEMF_PUBLIC)))
 			{
 				if(ConvertTags(src, -1, result, size, MIBENUM_SYSTEM, MIBENUM_UTF_8, TAG_END) != -1)
 					return result;
-				FreeVec(result);
+
+				StrFree(result);
+				result = NULL;
 			}
 		}
 	}
 
 	return NULL;
 }
-
 
 VOID *MemSet(VOID* ptr, LONG word, LONG size)
 {
@@ -747,4 +753,39 @@ STRPTR GetStatusName(ULONG status)
 		return GetString(MSG_GG_STATUS_INVISIBLE);
 
 	return GetString(MSG_GG_STATUS_UNAVAIL);
+}
+
+LONG MUI_Request_Unicode(Object *app, Object *win, STRPTR title, STRPTR gadgets, STRPTR format, ...)
+{
+	ULONG res = 0;
+	STRPTR sys_title;
+	va_list args;
+
+	va_start(args, format);
+
+	if((sys_title = Utf8ToSystem(title)))
+	{
+		STRPTR sys_gadgets;
+
+		if((sys_gadgets = Utf8ToSystem(gadgets)))
+		{
+			STRPTR unicode_txt = VFmtNew(format, args);
+			if(unicode_txt)
+			{
+				STRPTR sys_txt = Utf8ToSystem(unicode_txt);
+				if(sys_txt)
+				{
+					res = MUI_RequestA(app, win, 0, sys_title, sys_gadgets, sys_txt, NULL);
+					StrFree(sys_txt);
+				}
+				StrFree(unicode_txt);
+			}
+			StrFree(sys_gadgets);
+		}
+		StrFree(sys_title);
+	}
+
+	va_end(args);
+
+	return res;
 }

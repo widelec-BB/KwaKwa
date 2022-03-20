@@ -47,6 +47,7 @@ VOID DeleteSimpleStringListClass(VOID)
 static IPTR SimpleStringListNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	Object *menu = MUI_NewObject(MUIC_Menustrip,
+		MUIA_Unicode, TRUE,
 		MUIA_Group_Child, MUI_NewObject(MUIC_Menu,
 			MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
 				MUIA_Menuitem_Title, GetString(MSG_SIMPLESTRINGLIST_MENU_REMOVE),
@@ -63,6 +64,7 @@ static IPTR SimpleStringListNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Frame, MUIV_Frame_InputList,
 		MUIA_Background, MUII_ListBack,
 		MUIA_ContextMenu, menu,
+		MUIA_Unicode, TRUE,
 		MUIA_List_ConstructHook, MUIV_List_ConstructHook_String,
 		MUIA_List_DestructHook, MUIV_List_DestructHook_String,
 	TAG_MORE, msg->ops_AttrList);
@@ -102,6 +104,8 @@ static IPTR SimpleStringListExport(Class *cl, Object *obj, struct MUIP_Export *m
 		ULONG i;
 		STRPTR entry = NULL;
 
+		FPrintf(fh, "UTF-8\n");
+
 		for(i=0;;i++)
 		{
 			DoMethod(obj, MUIM_List_GetEntry, i, &entry);
@@ -127,6 +131,7 @@ static IPTR SimpleStringListImport(Class *cl, Object *obj, struct MUIP_Import *m
 	if(first == NULL)
 	{
 		BPTR fh;
+		BOOL unicode_enabled = FALSE, charset_check = TRUE;
 
 		if((fh = Open(CACHE_DIR GUI_DIR "desclist.cfg", MODE_OLDFILE)))
 		{
@@ -142,7 +147,27 @@ static IPTR SimpleStringListImport(Class *cl, Object *obj, struct MUIP_Import *m
 					if(ch == (BYTE)'\n' || pos == KWA_STATUS_DESC_MAX_SIZE - 1)
 					{
 						buffer[pos] = 0x00;
-						DoMethod(obj, MUIM_List_InsertSingle, buffer, MUIV_List_Insert_Bottom);
+						if(charset_check)
+						{
+							if(StrEqu(buffer, "UTF-8"))
+							{
+								unicode_enabled = TRUE;
+								pos = 0;
+								continue;
+							}
+							charset_check = FALSE;
+						}
+						if(!unicode_enabled)
+						{
+							STRPTR converted = SystemToUtf8(buffer);
+							if(converted)
+							{
+								DoMethod(obj, MUIM_List_InsertSingle, converted, MUIV_List_Insert_Bottom);
+								StrFree(converted);
+							}
+						}
+						else
+							DoMethod(obj, MUIM_List_InsertSingle, buffer, MUIV_List_Insert_Bottom);
 					}
 				}
 				if(ch == (BYTE)'\n')

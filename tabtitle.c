@@ -112,6 +112,7 @@ static IPTR TabTitleNew(Class *cl, Object *obj, struct opSet *msg)
 				obj = (Object*)DoSuperNew(cl, obj,
 					MUIA_Text_Contents, (IPTR)content,
 					MUIA_Text_PreParse, (IPTR)(unread ? "\33b" : NULL),
+					MUIA_Unicode, TRUE,
 				TAG_MORE, (IPTR)msg->ops_AttrList);
 				FreeVec(content);
 			}
@@ -121,6 +122,7 @@ static IPTR TabTitleNew(Class *cl, Object *obj, struct opSet *msg)
 			obj = (Object*)DoSuperNew(cl, obj,
 				MUIA_Text_Contents, (IPTR)contact_name,
 				MUIA_Text_PreParse, (IPTR)(unread ? "\33b" : NULL),
+				MUIA_Unicode, TRUE,
 			TAG_MORE, (IPTR)msg->ops_AttrList);
 		}
 

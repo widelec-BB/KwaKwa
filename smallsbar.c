@@ -64,6 +64,7 @@ static IPTR SmallSBarNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	ENTER();
 	obj = DoSuperNew(cl, obj,
+		MUIA_Unicode, TRUE,
 		MUIA_InputMode, MUIV_InputMode_RelVerify,
 		MUIA_DoubleBuffer, TRUE,
 	TAG_MORE, msg->ops_AttrList);
@@ -264,6 +265,7 @@ static IPTR SmallSBarShowMenu(Class *cl, Object *obj)
 	Object *status_menu = NULL;
 
 	strip = MUI_NewObject(MUIC_Menustrip,
+		MUIA_Unicode, TRUE,
 		MUIA_Group_Child, (menu = MUI_NewObject(MUIC_Menu,
 
 			MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
@@ -285,6 +287,7 @@ static IPTR SmallSBarShowMenu(Class *cl, Object *obj)
 	DoMethod(menu, OM_ADDMEMBER, tabs_menu);
 
 	status_menu = MUI_NewObject(MUIC_Menuitem,
+		MUIA_Unicode, TRUE,
 		MUIA_Menuitem_Title, GetString(MSG_SBAR_CHANGE_STATUS),
 			MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
 				MUIA_UserData, SBR_MENU_STATUS_AVAILABLE,

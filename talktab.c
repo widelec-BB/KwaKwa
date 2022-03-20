@@ -7,6 +7,7 @@
 #include <proto/exec.h>
 #include <proto/dos.h>
 #include <proto/asl.h>
+#include <proto/charsets.h>
 #include <devices/rawkeycodes.h>
 #include <mui/Lamp_mcc.h>
 #include <libvstring.h>
@@ -153,6 +154,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 			MUIA_Group_Horiz, TRUE,
 			MUIA_Group_HorizSpacing, xget(prefs_object(USD_PREFS_TW_TOOLBAR_SPACE_SIZE), MUIA_Slider_Level),
 			MUIA_Group_Child, (clear_txt_but = MUI_NewObject(MUIC_Text,
+				MUIA_Unicode, TRUE,
 				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/clean.mbr]",
 				MUIA_Text_PreParse, "\33c",
 				MUIA_Frame, MUIV_Frame_ImageButton,
@@ -163,6 +165,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 				MUIA_ShortHelp, GetString(MSG_TALKTAB_BUTTON_CLEAR),
 			TAG_END)),
 			MUIA_Group_Child, (send_pic_but = MUI_NewObject(MUIC_Text,
+				MUIA_Unicode, TRUE,
 				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/sendimage.mbr]",
 				MUIA_Text_PreParse, "\33c",
 				MUIA_Frame, MUIV_Frame_ImageButton,
@@ -174,6 +177,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 				MUIA_UserData, USD_TALKTAB_SEND_PICTURE,
 			TAG_END)),
 			MUIA_Group_Child, (open_log_but = MUI_NewObject(MUIC_Text,
+				MUIA_Unicode, TRUE,
 				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/log.mbr]",
 				MUIA_Text_PreParse, "\33c",
 				MUIA_Frame, MUIV_Frame_ImageButton,
@@ -185,6 +189,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 				MUIA_UserData, USD_TALKTAB_OPEN_LOG,
 			TAG_END)),
 			MUIA_Group_Child, (double_button = MUI_NewObject(MUIC_Text,
+				MUIA_Unicode, TRUE,
 				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/double.mbr]",
 				MUIA_Text_PreParse, "\33c",
 				MUIA_Frame, MUIV_Frame_ImageButton,
@@ -195,6 +200,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 				MUIA_ShortHelp, GetString(MSG_TALKTAB_BUTTON_DOUBLE),
 			TAG_END)),
 			MUIA_Group_Child, (edit_contact_button = MUI_NewObject(MUIC_Text,
+				MUIA_Unicode, TRUE,
 				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/editcon.mbr]",
 				MUIA_Text_PreParse, "\33c",
 				MUIA_Frame, MUIV_Frame_ImageButton,
@@ -216,6 +222,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Group_Child, MUI_NewObject(MUIC_Group,
 			MUIA_Group_Horiz, TRUE,
 			MUIA_Group_Child, (return_check = MUI_NewObject(MUIC_Image,
+				MUIA_Unicode, TRUE,
 				MUIA_ObjectID, USD_TALKTAB_RETURN_CHECK,
 				MUIA_UserData, USD_TALKTAB_RETURN_CHECK,
 				MUIA_Image_Spec, "6:15",
@@ -227,6 +234,7 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 			MUIA_Group_Child, StringLabel(GetString(MSG_TALKTAB_RETURN_CHECK), "\33l"),
 			MUIA_Group_Child, EmptyRectangle(100),
 			MUIA_Group_Child, (lamp = MUI_NewObject(MUIC_Lamp,
+				MUIA_Unicode, TRUE,
 				MUIA_Lamp_Type, MUIV_Lamp_Type_Huge,
 				MUIA_Lamp_Color, MUIV_Lamp_Color_Ok,
 			TAG_END)),
@@ -369,7 +377,7 @@ static IPTR TalkTabSendMessage(Class *cl, Object *obj, struct TTBP_SendMessage *
 	DateStamp(&ds);
 	timestamp = LocalToUTC(ds.ds_Days * 24 * 60 * 60 + ds.ds_Minute * 60 + ds.ds_Tick / TICKS_PER_SECOND, NULL);
 
-	message = msg->message ? StrNew(msg->message) : (STRPTR)DoMethod(msg->input, MUIM_TextEditor_ExportText);
+	message = msg->message ? StrNew(msg->message) : (STRPTR)DoMethod(msg->input, IFM_ExportText);
 
 	if(message)
 	{
@@ -405,7 +413,7 @@ static IPTR TalkTabSendMessage(Class *cl, Object *obj, struct TTBP_SendMessage *
 		FreeVec(message);
 	}
 
-	MUI_Request(_app(obj), _win(obj), 0L, APP_NAME, "*_OK", GetString(MSG_SENDMSG_FAILED), NULL);
+	MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, "*_OK", GetString(MSG_SENDMSG_FAILED));
 	return (IPTR)0;
 }
 
@@ -481,11 +489,11 @@ static IPTR TalkTabShowEnd(Class *cl, Object *obj)
 static IPTR TalkTabSendWriteNotify(Class *cl, Object *obj)
 {
 	struct TalkTabData *d = INST_DATA(cl, obj);
-	STRPTR new_msg = (STRPTR)DoMethod(d->input, MUIM_TextEditor_ExportText);
+	STRPTR new_msg = (STRPTR)DoMethod(d->input, IFM_ExportText);
 
 	if(new_msg != NULL)
 	{
-		ULONG msg_len = StrLen(new_msg);
+		ULONG msg_len = GetLength(new_msg, -1, MIBENUM_UTF_8);
 
 		if(msg_len > 0)
 			DoMethod(_app(obj), APPM_SendTypingNotify, d->contact->pluginid, d->contact->entryid, msg_len);
@@ -690,15 +698,15 @@ static IPTR TalkTabSendPicture(Class *cl, Object *obj)
 						result = TRUE;
 					}
 					else
-						MUI_Request(_app(obj), obj, 0L, APP_NAME, GetString(MSG_SEND_PICTURE_FAIL_BUTTONS), GetString(MSG_SEND_PICTURE_NOTSUPPORTED_MSG), (IPTR)(module_name ? module_name : (STRPTR)"NULL"));
+						MUI_Request_Unicode(_app(obj), obj, APP_NAME, GetString(MSG_SEND_PICTURE_FAIL_BUTTONS), GetString(MSG_SEND_PICTURE_NOTSUPPORTED_MSG), (IPTR)(module_name ? module_name : (STRPTR)"NULL"));
 				}
 				else
-					MUI_Request(_app(obj), obj, 0L, APP_NAME, GetString(MSG_SEND_PICTURE_TOO_BIG_BUTTONS), GetString(MSG_SEND_PICTURE_TOO_BIG_MSG));
+					MUI_Request_Unicode(_app(obj), obj, APP_NAME, GetString(MSG_SEND_PICTURE_TOO_BIG_BUTTONS), GetString(MSG_SEND_PICTURE_TOO_BIG_MSG));
 
 				FreeMem(pic, pic_size);
 			}
 			else
-				MUI_Request(_app(obj), obj, 0L, APP_NAME, GetString(MSG_SEND_PICTURE_FAIL_BUTTONS), GetString(MSG_SEND_PICTURE_FAIL_MSG));
+				MUI_Request_Unicode(_app(obj), obj, APP_NAME, GetString(MSG_SEND_PICTURE_FAIL_BUTTONS), GetString(MSG_SEND_PICTURE_FAIL_MSG));
 		}
 		MUI_FreeAslRequest(freq);
 	}

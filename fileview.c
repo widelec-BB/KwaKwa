@@ -55,6 +55,7 @@ static IPTR FileViewNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Group_Child, (txt = MUI_NewObject(MUIC_Text,
 		TAG_END)),
 		MUIA_Group_Child, (save = MUI_NewObject(MUIC_Text,
+			MUIA_Unicode, TRUE,
 			MUIA_Text_Contents, (IPTR)GetString(MSG_FILEVIEW_BUTTON_SAVE),
 			MUIA_Text_PreParse, (IPTR)"\33c",
 			MUIA_Frame, MUIV_Frame_Button,
@@ -65,6 +66,7 @@ static IPTR FileViewNew(Class *cl, Object *obj, struct opSet *msg)
 			MUIA_Weight, 0,
 		TAG_END)),
 		MUIA_Group_Child, (open = MUI_NewObject(MUIC_Text,
+			MUIA_Unicode, TRUE,
 			MUIA_Text_Contents, (IPTR)GetString(MSG_FILEVIEW_BUTTON_OPEN),
 			MUIA_Text_PreParse, (IPTR)"\33c",
 			MUIA_Frame, MUIV_Frame_Button,
@@ -171,7 +173,7 @@ static IPTR FileViewSaveFile(Class *cl, Object *obj)
 				result = TRUE;
 
 			if(!result)
-				MUI_Request(_app(obj), obj, 0L, APP_NAME, GetString(MSG_SEND_PICTURE_FAIL_BUTTONS), GetString(MSG_SEND_PICTURE_FAIL_MSG));
+				MUI_Request_Unicode(_app(obj), obj, APP_NAME, GetString(MSG_SEND_PICTURE_FAIL_BUTTONS), GetString(MSG_SEND_PICTURE_FAIL_MSG));
 		}
 		MUI_FreeAslRequest(freq);
 	}

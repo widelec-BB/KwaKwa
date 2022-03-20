@@ -70,6 +70,7 @@ static IPTR ContactInfoBlockNew(Class *cl, Object *obj, struct opSet *msg)
 	obj = DoSuperNew(cl, obj,
 		MUIA_Frame, MUIV_Frame_Group,
 		MUIA_Background, MUII_GroupBack,
+		MUIA_Unicode, TRUE,
 	TAG_MORE, msg->ops_AttrList);
 
 	if(obj)

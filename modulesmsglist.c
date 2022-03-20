@@ -34,6 +34,7 @@ VOID DeleteModulesMsgListClass(VOID)
 static IPTR ModulesMsgListNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	obj = DoSuperNew(cl, obj,
+		MUIA_Unicode, TRUE,
 		MUIA_Frame, MUIV_Frame_ReadList,
 		MUIA_Background, MUII_ReadListBack,
 		MUIA_List_Title, TRUE,

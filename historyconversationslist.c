@@ -52,6 +52,7 @@ VOID DeleteHistoryConversationsListClass(VOID)
 static IPTR HistoryConversationsListNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	Object *menu = MUI_NewObject(MUIC_Menustrip,
+		MUIA_Unicode, TRUE,
 		MUIA_Group_Child, MUI_NewObject(MUIC_Menu,
 			MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
 				MUIA_Menuitem_Title, GetString(MSG_HISTORY_CONTACTS_LIST_MENU_REMOVE),
@@ -61,6 +62,7 @@ static IPTR HistoryConversationsListNew(Class *cl, Object *obj, struct opSet *ms
 	TAG_END);
 
 	obj = DoSuperNew(cl, obj,
+		MUIA_Unicode, TRUE,
 		MUIA_Frame, MUIV_Frame_InputList,
 		MUIA_Background, MUII_ListBack,
 		MUIA_VertWeight, 50,
@@ -219,6 +221,8 @@ static IPTR HistoryConversationsListDisplay(Class *cl, Object *obj, struct MUIP_
 	}
 	else
 	{
+		STRPTR date_str_unicode;
+
 		msg->array[0] = entry->contact_name;
 		msg->array[1] = NULL;
 		msg->array[2] = NULL;
@@ -233,8 +237,13 @@ static IPTR HistoryConversationsListDisplay(Class *cl, Object *obj, struct MUIP_
 		dt.dat_StrTime = NULL;
 		DateToStr(&dt);
 
-		FmtNPut((STRPTR)started, "%ls %02d:%02d:%02d", sizeof(started), dt.dat_StrDate,
+		date_str_unicode = SystemToUtf8(dt.dat_StrDate);
+
+		FmtNPut((STRPTR)started, "%ls %02d:%02d:%02d", sizeof(started), date_str_unicode ? date_str_unicode : (STRPTR)dt.dat_StrDate,
 		 dt.dat_Stamp.ds_Minute / 60, dt.dat_Stamp.ds_Minute % 60, dt.dat_Stamp.ds_Tick / TICKS_PER_SECOND);
+
+		if(date_str_unicode)
+			StrFree(date_str_unicode);
 
 		msg->array[1] = started;
 
@@ -248,8 +257,13 @@ static IPTR HistoryConversationsListDisplay(Class *cl, Object *obj, struct MUIP_
 		dt.dat_StrTime = NULL;
 		DateToStr(&dt);
 
-		FmtNPut((STRPTR)ended, "%ls %02d:%02d:%02d", sizeof(ended), dt.dat_StrDate,
+		date_str_unicode = SystemToUtf8(dt.dat_StrDate);
+
+		FmtNPut((STRPTR)ended, "%ls %02d:%02d:%02d", sizeof(ended), date_str_unicode ? date_str_unicode : (STRPTR)dt.dat_StrDate,
 		 dt.dat_Stamp.ds_Minute / 60, dt.dat_Stamp.ds_Minute % 60, dt.dat_Stamp.ds_Tick / TICKS_PER_SECOND);
+
+		if(date_str_unicode)
+			StrFree(date_str_unicode);
 
 		msg->array[2] = ended;
 	}
@@ -314,7 +328,7 @@ static IPTR HistoryConversationsListRemove(Class *cl, Object *obj, struct HCLP_R
 	{
 		set(_app(obj), MUIA_Application_Sleep, TRUE);
 
-		if(MUI_Request(_app(obj), _win(obj), 0, APP_NAME, GetString(MSG_HISTORY_CONVERSATIONS_LIST_REMOVE_REQ_GADGETS), GetString(MSG_HISTORY_CONVERSATIONS_LIST_REMOVE_REQ_TXT)) == 1)
+		if(MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, GetString(MSG_HISTORY_CONVERSATIONS_LIST_REMOVE_REQ_GADGETS), GetString(MSG_HISTORY_CONVERSATIONS_LIST_REMOVE_REQ_TXT)) == 1)
 		{
 			DoMethod(_app(obj), APPM_DeleteConversationFromHistory, &entry->id);
 

@@ -54,6 +54,7 @@ BOOL CheckForOtherCopy(STRPTR portName, BOOL wake);
 STRPTR *ExplodeString(STRPTR str, UBYTE delimiter, ULONG *entries);
 STRPTR *ExplodeConstString(CONST_STRPTR str, UBYTE delimiter, ULONG *entries);
 STRPTR GetStatusName(ULONG status);
+LONG MUI_Request_Unicode(Object *app, Object *win, STRPTR title, STRPTR gadgets, STRPTR format, ...);
 
 static inline ULONG xget(Object *obj, ULONG att)
 {

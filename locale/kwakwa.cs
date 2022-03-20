@@ -1,4 +1,4 @@
-## Version $VER: kwakwa.catalog 4.1 (27.03.2022)
+## Version $VER: kwakwa.catalog 5.0 (28.03.2022)
 ## Languages english polski
 ## Codeset english 0
 ## Codeset polski 0
@@ -7,7 +7,7 @@
 ## TARGET CATALOG polski "bin/catalogs/polski" Optimize
 MSG_OPEN_LIBRARY_FAILED
 Cannot open %s!
-Nie mog³em otworzyæ %s!
+Nie mogÅ‚em otworzyÄ‡ %s!
 ;
 MSG_APPLICATION_DESCRIPTION
 Instant Messanger
@@ -15,19 +15,19 @@ Komunikator internetowy
 ;
 MSG_CONNECTION_FAILED
 Connection failed!\nHave you entered correct UIN and password?
-B³±d po³±czenia!\nCzy wpisa³e¶ poprawnie numer GG i has³o?
+BÅ‚Ä…d poÅ‚Ä…czenia!\nCzy wpisaÅ‚eÅ› poprawnie numer GG i hasÅ‚o?
 ;
 MSG_CONNECTION_FAILED_GADGETS
 *_Retry|_Prefs
-*_Ponów|_Opcje
+*_PonÃ³w|_Opcje
 ;
 MSG_SENDMSG_FAILED
 Messsage send failed!\nPlease, check connection.
-Wysy³anie nie powiod³o siê!\nSprawd¼ po³±czenie z sieci±.
+WysyÅ‚anie nie powiodÅ‚o siÄ™!\nSprawdÅº poÅ‚Ä…czenie z sieciÄ….
 ;
 MSG_KWAKWA_NOT_CONNECTED_MSG
 KwaKwa works better if you are connected to network.
-KwaKwa dzia³a lepiej je¶li jeste¶ po³±czony.
+KwaKwa dziaÅ‚a lepiej jeÅ›li jesteÅ› poÅ‚Ä…czony.
 ;
 MSG_KWAKWA_NOT_CONNECTED_BUTTONS
 *_OK
@@ -35,7 +35,7 @@ MSG_KWAKWA_NOT_CONNECTED_BUTTONS
 ;
 MSG_KWAKWAEXIT_UNREAD_MSG
 There are unread messages from: %s. Do you really want to quit?
-Masz nieprzeczytane wiadomo¶ci od: %s. Czy na pewno chcesz wyj¶æ?
+Masz nieprzeczytane wiadomoÅ›ci od: %s. Czy na pewno chcesz wyjÅ›Ä‡?
 ;
 MSG_KWAKWAEXIT_UNREAD_BUTTONS
 _Yes|*_No
@@ -55,11 +55,11 @@ O MUI...
 ;
 MSG_MENU_APPMENU_QUIT
 Quit
-Wyj¶cie
+WyjÅ›cie
 ;
 MSG_MENU_LIST_TITLE
 Contacts List
-Lista kontaktów
+Lista kontaktÃ³w
 ;
 MSG_MENU_LIST_ADDENTRY
 Add Entry...
@@ -71,43 +71,43 @@ Wyszukaj kontakt
 ;
 MSG_MENU_LIST_IMPORT_SERVER
 Import List from Server
-Importuj listê z serwera
+Importuj listÄ™ z serwera
 ;
 MSG_MENU_LIST_EXPORT_SERVER
 Export List to Server
-Eksportuj listê na serwer
+Eksportuj listÄ™ na serwer
 ;
 MSG_MENU_LIST_CLEAR
 Clear List
-Wyczy¶æ listê
+WyczyÅ›Ä‡ listÄ™
 ;
 MSG_MENU_LIST_REMOVE_CLONES
 Remove Duplicates
-Usuñ duplikaty
+UsuÅ„ duplikaty
 ;
 MSG_MENU_LIST_IMPORT_FILE
 Import List from File...
-Importuj listê z pliku...
+Importuj listÄ™ z pliku...
 ;
 MSG_MENU_LIST_EXPORT_FILE
 Export List to File...
-Eksportuj listê do pliku...
+Eksportuj listÄ™ do pliku...
 ;
 MSG_MENU_TOOLS_TITLE
 Tools
-Narzêdzia
+NarzÄ™dzia
 ;
 MSG_MENU_TOOLS_MODULES_CONSOLE
 Modules Console...
-Konsola modu³ów...
+Konsola moduÅ‚Ã³w...
 ;
 MSG_MENU_TOOLS_FTP_PUT
 Send via FTP...
-Wy¶lij przez FTP...
+WyÅ›lij przez FTP...
 ;
 MSG_MENU_TOOLS_HISTORY
 Messages History...
-Archiwum wiadomo¶ci...
+Archiwum wiadomoÅ›ci...
 ;
 MSG_MENU_PREFSMENU_TITLE
 Preferences
@@ -127,7 +127,7 @@ KwaKwa
 ;
 MSG_MAINWINDOW_ACT_STATUS_HELP
 Your actual status.
-Twój aktualny status.
+TwÃ³j aktualny status.
 ;
 MSG_SCREENTITLE
 KwaKwa
@@ -147,11 +147,11 @@ Ustawienia zapisu
 ;
 MSG_PREFS_LOGS_ONOFF
 Create Logs
-Zapisuj rozmowy do plików
+Zapisuj rozmowy do plikÃ³w
 ;
 MSG_PREFS_LOGS_ONOFF_HELP
 Turns on/off writing talk transcription to file.\nEffect after reopening every tab in talk window.
-W³±cza/wy³±cza zapisywanie tre¶ci rozmów do plików.\nZmiana wymaga zamkniêcia wszystkich zak³adek w oknie rozmowy.
+WÅ‚Ä…cza/wyÅ‚Ä…cza zapisywanie treÅ›ci rozmÃ³w do plikÃ³w.\nZmiana wymaga zamkniÄ™cia wszystkich zakÅ‚adek w oknie rozmowy.
 ;
 MSG_PREFS_LOGS_HISTORY_ONOFF
 Save Conversations to History Database
@@ -159,35 +159,35 @@ Zapisuj rozmowy do archiwum
 ;
 MSG_PREFS_LOGS_HISTORY_ONOFF_HELP
 Turns on/off writing talk transcription to history database (history.db file).
-W³±cza/wy³±cza zapisywanie rozmów do archiwum (plik history.db).
+WÅ‚Ä…cza/wyÅ‚Ä…cza zapisywanie rozmÃ³w do archiwum (plik history.db).
 ;
 MSG_PREFS_LOGS_HISTORY_CONVERSATION_END_MODE
 Consider Conversation has ended
-Uznaj rozmowê za zakoñczon±
+Uznaj rozmowÄ™ za zakoÅ„czonÄ…
 ;
 MSG_PREFS_LOGS_HISTORY_CONVERSATION_END_MODE_HELP
 Allows to select when conversation should be considered as ended.
-Pozwala wybraæ kiedy rozmowa powinna zostaæ uznana za zakoñczon±.
+Pozwala wybraÄ‡ kiedy rozmowa powinna zostaÄ‡ uznana za zakoÅ„czonÄ….
 ;
 MSG_PREFS_LOGS_HISTORY_CONVERSATION_END_MODE_1
 after tab is closed.
-po zamkniêciu zak³adki.
+po zamkniÄ™ciu zakÅ‚adki.
 ;
 MSG_PREFS_LOGS_HISTORY_CONVERSATION_END_MODE_2
 when last message is older than...
-je¶li od ostatniej wiadomo¶ci minê³o...
+jeÅ›li od ostatniej wiadomoÅ›ci minÄ™Å‚o...
 ;
 MSG_PREFS_LOGS_HISTORY_CONVERSATION_END_MODE_3
 when date has changed.
-je¶li zmieni³a siê data.
+jeÅ›li zmieniÅ‚a siÄ™ data.
 ;
 MSG_PREFS_LOGS_HISTORY_LOAD_OLD
 When new tab is open load messages from last
-Przy otwarciu nowej karty za³aduj wiadomo¶ci z ostatnich
+Przy otwarciu nowej karty zaÅ‚aduj wiadomoÅ›ci z ostatnich
 ;
 MSG_PREFS_LOGS_HISTORY_LOAD_OLD_2
 if there are no such messages load
-je¶li takich nie bêdzie, za³aduj
+jeÅ›li takich nie bÄ™dzie, zaÅ‚aduj
 ;
 MSG_PREFS_LOGS_HISTORY_LOAD_OLD_MIN
 Nothing.
@@ -195,19 +195,19 @@ nic.
 ;
 MSG_PREFS_LOGS_HISTORY_LOAD_OLD_MAX
 Previous conversation.
-poprzedni± rozmowê.
+poprzedniÄ… rozmowÄ™.
 ;
 MSG_PREFS_LOGS_HISTORY_LOAD_OLD_UNIT
 Previous Messages.
-archiwalnych wiadomo¶ci.
+archiwalnych wiadomoÅ›ci.
 ;
 MSG_PREFS_LOGS_HISTORY_SAVE_SYSTEMMSGS
 Save system messages
-Zapisuj wiadomo¶ci systemowe
+Zapisuj wiadomoÅ›ci systemowe
 ;
 MSG_PREFS_LOGS_HISTORY_SAVE_SYSTEMMSGS_HELP
 Allows to turn off saving system messages (for example informations about status chage).
-Pozwala w³±czyæ albo wy³±czyæ zapisywanie wiadomo¶ci systemowych (np. informacji o zmianie statusu).
+Pozwala wÅ‚Ä…czyÄ‡ albo wyÅ‚Ä…czyÄ‡ zapisywanie wiadomoÅ›ci systemowych (np. informacji o zmianie statusu).
 ;
 MSG_PREFS_HISTORY
 History Settings
@@ -215,11 +215,11 @@ Ustawienia archiwum
 ;
 MSG_PREFSWINDOW_CONTACTSLISTPREFS
 Contacts List
-Lista kontaktów
+Lista kontaktÃ³w
 ;
 MSG_PREFS_CONTACTSLIST_DISPLAY
 Display Settings
-Ustawienia wy¶wietlania
+Ustawienia wyÅ›wietlania
 ;
 MSG_PREFS_CONTACTSLIST_DESC_ONOFF
 Show Statuses Descriptions
@@ -227,7 +227,7 @@ Pokazuj opisy
 ;
 MSG_PREFS_CONTACTSLIST_DESC_ONOFF_HELP
 Turns on/off showing statuses descriptions.
-W³±cza/wy³±cza pokazywanie opisów pod kontaktami.
+WÅ‚Ä…cza/wyÅ‚Ä…cza pokazywanie opisÃ³w pod kontaktami.
 ;
 MSG_PREFS_CONTACTSLIST_AVATARS_ONOFF
 Show Contacts Avatars
@@ -235,15 +235,15 @@ Pokazuj awatary
 ;
 MSG_PREFS_CONTACTSLIST_AVATARS_ONOFF_HELP
 Turns on/off showing avatars.
-W³±cza/wy³±cza pokazywanie awatarów.
+WÅ‚Ä…cza/wyÅ‚Ä…cza pokazywanie awatarÃ³w.
 ;
 MSG_PREFS_CONTACTSLIST_SPACEENTRIES
 Space Between Entries:
-Odleg³o¶æ miêdzy kontaktami:
+OdlegÅ‚oÅ›Ä‡ miÄ™dzy kontaktami:
 ;
 MSG_PREFS_CONTACTSLIST_SPACEENTRIES_HELP
 Allow adjust free space between entries in contacts list (in pixels).
-Pozwala dobraæ wielko¶æ odstêpu miêdzy wpisami na li¶cie kontaktów (w pikselach).
+Pozwala dobraÄ‡ wielkoÅ›Ä‡ odstÄ™pu miÄ™dzy wpisami na liÅ›cie kontaktÃ³w (w pikselach).
 ;
 MSG_PREFS_CONTACTSLIST_SPACEENTRIES_NONE
 None
@@ -251,19 +251,19 @@ Brak
 ;
 MSG_PREFS_CONTACTSLIST_AVATARS_SIZE
 Avatars Size:
-Wielko¶æ awatarów:
+WielkoÅ›Ä‡ awatarÃ³w:
 ;
 MSG_PREFS_CONTACTSLIST_AVATARS_SIZE_HELP
 Allow to set how big avatars will be in contacts list.
-Pozwala dostosowaæ wielko¶æ awatarów wy¶wietlanych na li¶cie kontaktów.
+Pozwala dostosowaÄ‡ wielkoÅ›Ä‡ awatarÃ³w wyÅ›wietlanych na liÅ›cie kontaktÃ³w.
 ;
 MSG_PREFS_CONTACTSLIST_SPACENAMEDESC
 Space Between Contact Name and Description:
-Odleg³o¶æ miêdzy nazw± i opisem kontaktu:
+OdlegÅ‚oÅ›Ä‡ miÄ™dzy nazwÄ… i opisem kontaktu:
 ;
 MSG_PREFS_CONTACTSLIST_SPACENAMEDESC_HELP
 Allow adjust free space between contact name and description in contacts list (in pixels).
-Pozwala dobraæ wielko¶æ odstêpu miêdzy nazw± kontaktu a opisem na li¶cie kontaktów (w pikselach).
+Pozwala dobraÄ‡ wielkoÅ›Ä‡ odstÄ™pu miÄ™dzy nazwÄ… kontaktu a opisem na liÅ›cie kontaktÃ³w (w pikselach).
 ;
 MSG_PREFS_CONTACTSLIST_ACTIVEENTRY_COLOR
 Color of active entry:
@@ -271,7 +271,7 @@ Kolor zaznaczonego kontaktu:
 ;
 MSG_PREFS_CONTACTSLIST_ACTIVEENTRY_COLOR_HELP
 Allows to specify which color will be used as background of active (selected) entry.
-Pozwala ustawiæ jaki kolor zostanie u¿yty jako t³o aktywnego (zaznaczonego) elementu.
+Pozwala ustawiÄ‡ jaki kolor zostanie uÅ¼yty jako tÅ‚o aktywnego (zaznaczonego) elementu.
 ;
 MSG_TALKWINDOW_TITLE
 KwaKwa: Conversations
@@ -279,15 +279,15 @@ KwaKwa: Rozmowy
 ;
 MSG_TALKTAB_RETURN_CHECK
 Send After Pressing "Return"
-Wy¶lij po naci¶niêciu "enter"
+WyÅ›lij po naciÅ›niÄ™ciu "enter"
 ;
 MSG_TALKTAB_BUTTON_CLEAR
 Clear
-Wyczy¶æ
+WyczyÅ›Ä‡
 ;
 MSG_TALKTAB_SEND_BUTTON
 Send
-Wy¶lij
+WyÅ›lij
 ;
 MSG_TALKWINDOW_TABS_MENU_TITLE
 Talks...
@@ -295,11 +295,11 @@ Rozmowy...
 ;
 MSG_TALKTAB_STATUS_CHANGE
 changed status to
-zmieni³ status na
+zmieniÅ‚ status na
 ;
 MSG_TALKTAB_BUTTON_SEND_PICTURE
 Send Picture...
-Wy¶lij obrazek...
+WyÅ›lij obrazek...
 ;
 MSG_TALKTAB_BUTTON_SEND_PICTURE_HOTKEY
 \0
@@ -307,7 +307,7 @@ MSG_TALKTAB_BUTTON_SEND_PICTURE_HOTKEY
 ;
 MSG_TALKTAB_BUTTON_OPEN_LOG
 Open Log File...
-Otwórz zapis rozmów...
+OtwÃ³rz zapis rozmÃ³w...
 ;
 MSG_TALKTAB_BUTTON_OPEN_LOG_HOTKEY
 \0
@@ -315,7 +315,7 @@ MSG_TALKTAB_BUTTON_OPEN_LOG_HOTKEY
 ;
 MSG_TALKTAB_BUTTON_DOUBLE
 Double mode
-Tryb podwójny
+Tryb podwÃ³jny
 ;
 MSG_TALKTAB_BUTTON_DOUBLE_HOTKEY
 \0
@@ -327,11 +327,11 @@ Edytuj dane kontaktu...
 ;
 MSG_TALKTAB_PUBDIR_DATA
 Data from users directory:\n
-Dane z katalogu u¿ytkowników:\n
+Dane z katalogu uÅ¼ytkownikÃ³w:\n
 ;
 MSG_TALKTAB_PUBDIR_FIRSTNAME
 First Name:\x20
-Imiê:\x20
+ImiÄ™:\x20
 ;
 MSG_TALKTAB_PUBDIR_LASTNAME
 Last Name:\x20
@@ -343,7 +343,7 @@ Pseudonim:\x20
 ;
 MSG_TALKTAB_PUBDIR_CITY
 City:\x20
-Miejscowo¶æ:\x20
+MiejscowoÅ›Ä‡:\x20
 ;
 MSG_TALKTAB_PUBDIR_BIRTHYEAR
 Birth Year:\x20
@@ -351,7 +351,7 @@ Rok urodzenia:\x20
 ;
 MSG_TALKTAB_PUBDIR_GENDER
 Gender:\x20
-P³eæ:\x20
+PÅ‚eÄ‡:\x20
 ;
 MSG_TALKTAB_PUBDIR_EMPTY
 Empty data.
@@ -359,11 +359,11 @@ Brak danych.
 ;
 MSG_SEND_PICTURE_ASL_TITLE
 Select picture file to send...
-Wybierz plik obrazka do wys³ania...
+Wybierz plik obrazka do wysÅ‚ania...
 ;
 MSG_SEND_PICTURE_ASL_POSITIVE
 Send
-Wy¶lij
+WyÅ›lij
 ;
 MSG_SEND_PICTURE_FAIL_BUTTONS
 *_OK
@@ -371,11 +371,11 @@ MSG_SEND_PICTURE_FAIL_BUTTONS
 ;
 MSG_SEND_PICTURE_FAIL_MSG
 Failed to load file!
-Nie uda³o siê za³adowaæ pliku!
+Nie udaÅ‚o siÄ™ zaÅ‚adowaÄ‡ pliku!
 ;
 MSG_SEND_PICTURE_NOTSUPPORTED_MSG
 %s do not support sending pictures.
-%s nie obs³uguje wysy³ania obrazków.
+%s nie obsÅ‚uguje wysyÅ‚ania obrazkÃ³w.
 ;
 MSG_SEND_PICTURE_TOO_BIG_BUTTONS
 *_OK
@@ -383,31 +383,31 @@ MSG_SEND_PICTURE_TOO_BIG_BUTTONS
 ;
 MSG_SEND_PICTURE_TOO_BIG_MSG
 Selected picture is too big (maximum size is 255 kB).
-Wybrany obrazek jest zbyt du¿y (maksymalny rozmiar to 255 kB).
+Wybrany obrazek jest zbyt duÅ¼y (maksymalny rozmiar to 255 kB).
 ;
 MSG_GG_STATUS_AVAIL
 Available
-Dostêpny
+DostÄ™pny
 ;
 MSG_GG_STATUS_AVAIL_SMALL
 available
-dostêpny
+dostÄ™pny
 ;
 MSG_GG_STATUS_UNAVAIL
 Disconnected
-Niedostêpny
+NiedostÄ™pny
 ;
 MSG_GG_STATUS_UNAVAIL_SMALL
 unavailable
-niedostêpny
+niedostÄ™pny
 ;
 MSG_GG_STATUS_AWAY
 Away
-Zajêty
+ZajÄ™ty
 ;
 MSG_GG_STATUS_AWAY_SMALL
 away
-zajêty
+zajÄ™ty
 ;
 MSG_GG_STATUS_INVISIBLE
 Invisible
@@ -419,19 +419,19 @@ niewidoczny
 ;
 MSG_GG_STATUS_FFC
 Talk With Me
-Pogadaj ze mn±
+Pogadaj ze mnÄ…
 ;
 MSG_GG_STATUS_FFC_SMALL
 talk with me
-pogadaj ze mn±
+pogadaj ze mnÄ…
 ;
 MSG_GG_STATUS_DND
 Do Not Disturb
-Nie przeszkadzaæ
+Nie przeszkadzaÄ‡
 ;
 MSG_GG_STATUS_DND_SMALL
 do not disturb
-nie przeszkadzaæ
+nie przeszkadzaÄ‡
 ;
 MSG_GG_STATUS_BLOCKED
 Blocked
@@ -475,7 +475,7 @@ u
 ;
 MSG_MAINWINDOW_SEARCH_NEXT_BUTTON
 Next
-Nastêpny
+NastÄ™pny
 ;
 MSG_MAINWINDOW_SEARCH_NEXT_BUTTON_HOTKEY
 n
@@ -483,7 +483,7 @@ n
 ;
 MSG_NEW_MESSAGE
 Unread Message!
-Nieprzeczytana wiadomo¶æ!
+Nieprzeczytana wiadomoÅ›Ä‡!
 ;
 MSG_EDITCONTACTWINDOW_TITLE
 KwaKwa: Edit Contact
@@ -503,7 +503,7 @@ Nick:
 ;
 MSG_EDITCONTACTWINDOW_FIRSTNAME
 First Name:
-Imiê:
+ImiÄ™:
 ;
 MSG_EDITCONTACTWINDOW_LASTNAME
 Last Name:
@@ -511,7 +511,7 @@ Nazwisko:
 ;
 MSG_EDITCONTACTWINDOW_GENDER
 Gender:
-P³eæ:
+PÅ‚eÄ‡:
 ;
 MSG_EDITCONTACTWINDOW_BIRTHYEAR
 Birth Year:
@@ -519,7 +519,7 @@ Rok urodzenia:
 ;
 MSG_EDITCONTACTWINDOW_CITY
 City:
-Miejscowo¶æ:
+MiejscowoÅ›Ä‡:
 ;
 MSG_EDITCONTACTWINDOW_PUBDIR_BUTTON
 Fetch from Network
@@ -535,11 +535,11 @@ Edytuj kontakt...
 ;
 MSG_CONTACTLIST_CONTEXTMENU_DELETE
 Delete contact
-Usuñ kontakt
+UsuÅ„ kontakt
 ;
 MSG_CONTACTLIST_CONTEXTMENU_GO_TO_LINK
 Open link from description...
-Otwórz link z opisu...
+OtwÃ³rz link z opisu...
 ;
 MSG_CONTACTLIST_CONTEXTMENU_COPY_DESC
 Copy status description
@@ -547,15 +547,15 @@ Kopiuj opis
 ;
 MSG_CONTACTLIST_CONTEXTMENU_OPEN_TALK
 \33bSend message...
-\33bWy¶lij wiadomo¶æ...
+\33bWyÅ›lij wiadomoÅ›Ä‡...
 ;
 MSG_CONTACTLIST_CONTEXTMENU_SEND_FTP
 Send file via FTP...
-Wy¶lij plik przez FTP...
+WyÅ›lij plik przez FTP...
 ;
 MSG_CONTACTLIST_CONTEXTMENU_OPEN_LOG
 Open log file...
-Otwórz zapis rozmów...
+OtwÃ³rz zapis rozmÃ³w...
 ;
 MSG_CONTACTLIST_DELETE_GADGETS
 _Yes|*_No
@@ -563,15 +563,15 @@ _Tak|*_Nie
 ;
 MSG_CONTACTLIST_DELETE_REQ
 Do you really want to delete %s?
-Czy jeste¶ pewny, ¿e chcesz usun±æ %s z listy kontaktów?
+Czy jesteÅ› pewny, Å¼e chcesz usunÄ…Ä‡ %s z listy kontaktÃ³w?
 ;
 MSG_CONTACTLIST_DELETE_CLONES_REQ
 Do you really want to delete %lu clones?
-Czy jeste¶ pewny, ¿e chcesz usun±æ %lu kontaktów?
+Czy jesteÅ› pewny, Å¼e chcesz usunÄ…Ä‡ %lu kontaktÃ³w?
 ;
 MSG_CONTACTLIST_NO_CLONES
 No dupliates found!
-Nie znaleziono duplikatów!
+Nie znaleziono duplikatÃ³w!
 ;
 MSG_CONTACTLIST_NO_CLONES_GADGETS
 *_OK
@@ -619,7 +619,7 @@ z
 ;
 MSG_PREFSWINDOW_USE
 Use
-U¿yj
+UÅ¼yj
 ;
 MSG_PREFSWINDOW_USE_HOTKEY
 u
@@ -647,15 +647,15 @@ Klawisze funkcyjne
 ;
 MSG_PREFS_PROGRAM_CONNECTION
 Connection
-Ustawienia po³±czenia
+Ustawienia poÅ‚Ä…czenia
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO
 Automaticaly connect when KwaKwa starts.
-Po³±cz automatycznie po uruchomieniu programu.
+PoÅ‚Ä…cz automatycznie po uruchomieniu programu.
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_HELP
 Turns on/off automatic connection.
-W³±cza/wy³±cza automatyczne po³±czenie po uruchomieniu programu.
+WÅ‚Ä…cza/wyÅ‚Ä…cza automatyczne poÅ‚Ä…czenie po uruchomieniu programu.
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_STAT
 Status:
@@ -675,35 +675,35 @@ Wpisany opis zostanie automatycznie ustawiony po uruchomieniu programu.
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_TYPE_CONST
 Use always this same status.
-U¿ywaj zawsze tego samego statusu.
+UÅ¼ywaj zawsze tego samego statusu.
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_TYPE_LAST
 Use last status.
-U¿yj ostatnio ustawionego statusu.
+UÅ¼yj ostatnio ustawionego statusu.
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_TYPE_HELP
 Allow you to specify which status you would have after running KwaKwa.
-Pozwala wybraæ jaki status zostanie ustawiony po uruchomieniu KwaKwa.
+Pozwala wybraÄ‡ jaki status zostanie ustawiony po uruchomieniu KwaKwa.
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_NOTAVAIL
 When last status was "not available":
-Je¶li ostatnim statusem by³o "niedostêpny" to:
+JeÅ›li ostatnim statusem byÅ‚o "niedostÄ™pny" to:
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_NOTAVAIL_HELP
 Allows to choose KwaKwa behavior when last set status was "not available".
-Pozwala wybraæ zachowanie KwaKwa w przypadku gdy ostatnio ustawionym statusem by³o "niedostêpny".
+Pozwala wybraÄ‡ zachowanie KwaKwa w przypadku gdy ostatnio ustawionym statusem byÅ‚o "niedostÄ™pny".
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_NOTAVAIL_OFF
 don't automatically connect.
-nie ³±cz automatycznie.
+nie Å‚Ä…cz automatycznie.
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_NOTAVAIL_AVAIL
 set status to "available".
-ustaw status na "dostêpny".
+ustaw status na "dostÄ™pny".
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_NOTAVAIL_BUSY
 set status to "busy".
-ustaw status na "zajêty".
+ustaw status na "zajÄ™ty".
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_NOTAVAIL_INVISIBLE
 set status to "invisible".
@@ -711,23 +711,23 @@ ustaw status na "niewidoczny".
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_NOTAVAIL_FFC
 set status to "talk with me".
-ustaw status "pogadaj ze mn±".
+ustaw status "pogadaj ze mnÄ…".
 ;
 MSG_PREFS_PROGRAM_CONNECT_AUTO_NOTAVAIL_DND
 set status to "do not disturb".
-ustaw status "nie przeszkadzaæ".
+ustaw status "nie przeszkadzaÄ‡".
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW
 Main Window
-G³ówne okno
+GÅ‚Ã³wne okno
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_CLOSING_LABEL
 When close main window:
-Zamkniêcie g³ównego okna:
+ZamkniÄ™cie gÅ‚Ã³wnego okna:
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_CLOSING_HELP
 Allow you to specify KwaKwa behavior when you closing Main Window.
-Pozwala zmieniæ zachowanie KwaKwa przy zamykaniu g³ównego okna.
+Pozwala zmieniÄ‡ zachowanie KwaKwa przy zamykaniu gÅ‚Ã³wnego okna.
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_CLOSE_QUIT
 quits KwaKwa.
@@ -735,7 +735,7 @@ zamyka KwaKwa.
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_CLOSE_HIDE
 hides Main Window.
-ukrywa g³ówne okno.
+ukrywa gÅ‚Ã³wne okno.
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_CLOSE_ICONIFY
 iconify KwaKwa.
@@ -743,19 +743,19 @@ ikonyfikuje KwaKwa.
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_SHOW
 Show Main Window when KwaKwa starts.
-Pokazuj g³ówne okno przy starcie programu.
+Pokazuj gÅ‚Ã³wne okno przy starcie programu.
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_SHOW_HELP
 Turns on/off showing Main Window when KwaKwa starts.
-W³±cza/wy³±cza automatyczne otwieranie g³ownego okna przy starcie programu.
+WÅ‚Ä…cza/wyÅ‚Ä…cza automatyczne otwieranie gÅ‚ownego okna przy starcie programu.
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_HIDE_TIME_LABEL
 Hide main window when inactive for:
-Ukryj g³ówne okno gdy nieaktywne przez:
+Ukryj gÅ‚Ã³wne okno gdy nieaktywne przez:
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_HIDE_TIME_HELP
 Specify how long Main Window have to be inactive before it will be automaticaly hidden.
-Pozwala ustawiæ po jakim czasie nieaktywno¶ci g³ówne okno zostanie automatycznie ukryte.
+Pozwala ustawiÄ‡ po jakim czasie nieaktywnoÅ›ci gÅ‚Ã³wne okno zostanie automatycznie ukryte.
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_SHOW_HIDE_BUTTON
 Show "hide" button.
@@ -763,7 +763,7 @@ Pokazuj przycisk "ukryj".
 ;
 MSG_PREFS_PROGRAM_MAIN_WINDOW_SHOW_HIDE_BUTTON_HELP
 Turns on/off showing the "hide" button in Main Window.
-W³±cza/wy³±cza pokazywanie przycisku "ukryj" w g³ównym oknie.
+WÅ‚Ä…cza/wyÅ‚Ä…cza pokazywanie przycisku "ukryj" w gÅ‚Ã³wnym oknie.
 ;
 MSG_PREFS_PROGRAM_AUTOAWAY
 Automatic Status Change
@@ -771,11 +771,11 @@ Automatyczna zmiana statusu
 ;
 MSG_PREFS_PROGRAM_AUTOAWAY_SLIDER_LABEL
 Automatically change status after:
-Zmien status po braku aktywno¶ci przez:
+Zmien status po braku aktywnoÅ›ci przez:
 ;
 MSG_PREFS_PROGRAM_AUTOAWAY_SLIDER_HELP
 Specify when KwaKwa should change your status.
-Pozwala wybraæ po jakim czasie braku aktywno¶ci (mysz i klawiatura) status zostanie automatycznie zmieniony.
+Pozwala wybraÄ‡ po jakim czasie braku aktywnoÅ›ci (mysz i klawiatura) status zostanie automatycznie zmieniony.
 ;
 MSG_PREFS_PROGRAM_AUTOAWAY_STAT
 Status:
@@ -783,7 +783,7 @@ Status:
 ;
 MSG_PREFS_PROGRAM_AUTOAWAY_STAT_HELP
 Selected status will be set automatically.
-Wybrany status zostanie automatycznie ustawiony po up³ywie wybranego czasu braku aktywno¶ci.
+Wybrany status zostanie automatycznie ustawiony po upÅ‚ywie wybranego czasu braku aktywnoÅ›ci.
 ;
 MSG_PREFS_PROGRAM_AUTOAWAY_DESC
 Description:
@@ -791,15 +791,15 @@ Opis:
 ;
 MSG_PREFS_PROGRAM_AUTOAWAY_DESC_HELP
 Entered description will be automatically set after selected time of inactivity. If empty actual description will be used.
-Podany opis zostanie ustawiony automatycznie po up³ywie wybranego czasu braku aktywno¶ci. Je¶li pole bêdzie puste zostanie u¿yty aktualny opis.
+Podany opis zostanie ustawiony automatycznie po upÅ‚ywie wybranego czasu braku aktywnoÅ›ci. JeÅ›li pole bÄ™dzie puste zostanie uÅ¼yty aktualny opis.
 ;
 MSG_PREFS_TALKWINDOW_USER
 User Preferences
-Ustawienia u¿ytkownika
+Ustawienia uÅ¼ytkownika
 ;
 MSG_PREFS_TALKWINDOW_USER_USRNAME
 User Name:
-Nazwa u¿ytkownika:
+Nazwa uÅ¼ytkownika:
 ;
 MSG_PREFS_TALKWINDOW_USER_USRNAME_DEAFAULT
 Me
@@ -807,19 +807,19 @@ Ja
 ;
 MSG_PREFS_TALKWINDOW_USER_USRNAME_HELP
 Your name. It will be used everytime when you send message.
-Twoja nazwa u¿ytkownika. Bêdzie u¿yta w oknie rozmowy.
+Twoja nazwa uÅ¼ytkownika. BÄ™dzie uÅ¼yta w oknie rozmowy.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE
 Message Headline
-Nag³ówek wiadomo¶ci
+NagÅ‚Ã³wek wiadomoÅ›ci
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_COLOR
 Message Headline:
-Nag³ówek:
+NagÅ‚Ã³wek:
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_COLOR_HELP
 This color will be used to display messages headline.
-Kolor, który zostanie u¿yty do pokazania nag³ówka wiadomo¶ci.
+Kolor, ktÃ³ry zostanie uÅ¼yty do pokazania nagÅ‚Ã³wka wiadomoÅ›ci.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_BOLD
 Bold
@@ -827,7 +827,7 @@ Pogrubienie
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_BOLD_HELP
 Turns on/off font bolding.
-W³±cza/wy³±cza pogrubienie czcionki.
+WÅ‚Ä…cza/wyÅ‚Ä…cza pogrubienie czcionki.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_ITALICS
 Italics
@@ -835,51 +835,51 @@ Kursywa
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_ITALICS_HELP
 Turns on/off italics.
-W³±cza/wy³±cza kursywê.
+WÅ‚Ä…cza/wyÅ‚Ä…cza kursywÄ™.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_BACKGROUND
 Background
-T³o
+TÅ‚o
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_BACKGROUND_HELP
 Turns on/off background of message headline.
-W³±cza/wy³±cza t³o nag³ówka wiadomo¶ci.
+WÅ‚Ä…cza/wyÅ‚Ä…cza tÅ‚o nagÅ‚Ã³wka wiadomoÅ›ci.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_MAXWIDTH
 Message Headline Will Take Maximum Width
-Nag³ówek wiadomo¶ci zajmuje ca³± szeroko¶æ
+NagÅ‚Ã³wek wiadomoÅ›ci zajmuje caÅ‚Ä… szerokoÅ›Ä‡
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_MAXWIDTH_HELP
 Message headline will take maximum width.
-Nag³ówek wiadomo¶ci zajmuje ca³± szeroko¶æ.
+NagÅ‚Ã³wek wiadomoÅ›ci zajmuje caÅ‚Ä… szerokoÅ›Ä‡.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_REVERSE
 Change header's title with time
-Zamieñ miejscami tytu³ nag³ówka z czasem
+ZamieÅ„ miejscami tytuÅ‚ nagÅ‚Ã³wka z czasem
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_REVERSE_HELP
 If turned on title will be displayed on right, time on left.
-Je¶li ta opcja jest zaznaczona tytu³ bêdzie wy¶wietlany po prawej stronie nag³ówka, za¶ czas po lewej.
+JeÅ›li ta opcja jest zaznaczona tytuÅ‚ bÄ™dzie wyÅ›wietlany po prawej stronie nagÅ‚Ã³wka, zaÅ› czas po lewej.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_ADD_NEWLINE
 Go to next line after inserting message headline
-Przejd¼ do nastêpnej linii po wstawieniu nag³ówka wiadomo¶ci
+PrzejdÅº do nastÄ™pnej linii po wstawieniu nagÅ‚Ã³wka wiadomoÅ›ci
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_ADD_NEWLINE_HELP
 Goes to next line after inserting message headline, so message contents will be placed below headline.
-W³±cza przechodzenie do nastêpnej linii po wstawieniu nag³ówka wiadomo¶ci, dziêki temu tre¶æ wiadomo¶ci bêdzie umieszczona poni¿ej nag³ówka.
+WÅ‚Ä…cza przechodzenie do nastÄ™pnej linii po wstawieniu nagÅ‚Ã³wka wiadomoÅ›ci, dziÄ™ki temu treÅ›Ä‡ wiadomoÅ›ci bÄ™dzie umieszczona poniÅ¼ej nagÅ‚Ã³wka.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG
 System Messages
-Wiadomo¶ci systemowe
+WiadomoÅ›ci systemowe
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_COLOR
 System Message:
-Wiadomo¶æ systemowa:
+WiadomoÅ›Ä‡ systemowa:
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_COLOR_HELP
 This color will be used to display system messages.
-Kolor, który zostanie u¿yty do pokazania wiadomo¶ci systemowych.
+Kolor, ktÃ³ry zostanie uÅ¼yty do pokazania wiadomoÅ›ci systemowych.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_BOLD
 Bold
@@ -887,7 +887,7 @@ Pogrubienie
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_BOLD_HELP
 Turns on/off font bolding.
-W³±cza/wy³±cza pogrubienie czcionki.
+WÅ‚Ä…cza/wyÅ‚Ä…cza pogrubienie czcionki.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_ITALICS
 Italics
@@ -895,39 +895,39 @@ Kursywa
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_ITALICS_HELP
 Turns on/off italics.
-W³±cza/wy³±cza kursywê.
+WÅ‚Ä…cza/wyÅ‚Ä…cza kursywÄ™.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_BACKGROUND
 Headline Background
-T³o nag³ówka
+TÅ‚o nagÅ‚Ã³wka
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_BACKGROUND_HELP
 Turns on/off background of system message headline.
-W³±cza/wy³±cza t³o nag³ówka wiadomo¶ci.
+WÅ‚Ä…cza/wyÅ‚Ä…cza tÅ‚o nagÅ‚Ã³wka wiadomoÅ›ci.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_MAXWIDTH
 Headline Will Take Maximum Width
-Nag³ówek zajmuj± ca³± szeroko¶æ
+NagÅ‚Ã³wek zajmujÄ… caÅ‚Ä… szerokoÅ›Ä‡
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_MAXWIDTH_HELP
 System message will take maximum width.
-Wiadomo¶ci systemowe zajmuj± ca³± szeroko¶æ.
+WiadomoÅ›ci systemowe zajmujÄ… caÅ‚Ä… szerokoÅ›Ä‡.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_ADD_HEADLINE
 Add headline before system messages
-Wstawiaj nag³ówek przed wiadomo¶ciami systemowymi
+Wstawiaj nagÅ‚Ã³wek przed wiadomoÅ›ciami systemowymi
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_ADD_HEADLINE_HELP
 Turns on/off inserting system message headline.
-W³±cza/wy³±cza wstawianie nag³ówka wiadomo¶ci systemowych.
+WÅ‚Ä…cza/wyÅ‚Ä…cza wstawianie nagÅ‚Ã³wka wiadomoÅ›ci systemowych.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_HEADLINE_REVERSE
 Change header's title with time
-Zamieñ miejscami tytu³ nag³ówka z czasem
+ZamieÅ„ miejscami tytuÅ‚ nagÅ‚Ã³wka z czasem
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_HEADLINE_REVERSE_HELP
 Goes to next line after inserting message headline, so message contents will be placed below headline.
-W³±cza przechodzenie do nastêpnej linii po wstawieniu nag³ówka wiadomo¶ci, dziêki temu tre¶æ wiadomo¶ci bêdzie umieszczona poni¿ej nag³ówka.
+WÅ‚Ä…cza przechodzenie do nastÄ™pnej linii po wstawieniu nagÅ‚Ã³wka wiadomoÅ›ci, dziÄ™ki temu treÅ›Ä‡ wiadomoÅ›ci bÄ™dzie umieszczona poniÅ¼ej nagÅ‚Ã³wka.
 ;
 MSG_PREFS_TALKWINDOW_SELECTION_COLOR
 Text Selection Color:
@@ -935,7 +935,7 @@ Kolor zaznaczenia tekstu:
 ;
 MSG_PREFS_TALKWINDOW_SELECTION_COLOR_HELP
 Allows you to define background color of selected text.
-Pozwala wybraæ kolor t³a zaznaczonego tekstu.
+Pozwala wybraÄ‡ kolor tÅ‚a zaznaczonego tekstu.
 ;
 MSG_PREFS_TALKWINDOW_PICTURES_ON_OFF
 Show pictures in talk window
@@ -943,16 +943,16 @@ Pokazuj obrazki w oknie rozmowy
 ;
 MSG_PREFS_TALKWINDOW_PICTURES_ON_OFF_HELP
 Turns on/off showing pictures in talk window. If showing pictures is turned off picture messages will be displayed as save and open buttons.
-W³±cza/wy³±cza pokazywanie obrazków w oknie rozmowy. Je¶li pokazywanie obrazków jest wy³±czone wiadomo¶ci obrazkowe zostan± zast±pione par± przycisków "zapisz" i "otwórz".
+WÅ‚Ä…cza/wyÅ‚Ä…cza pokazywanie obrazkÃ³w w oknie rozmowy. JeÅ›li pokazywanie obrazkÃ³w jest wyÅ‚Ä…czone wiadomoÅ›ci obrazkowe zostanÄ… zastÄ…pione parÄ… przyciskÃ³w "zapisz" i "otwÃ³rz".
 ;
 MSG_PREFS_TALKWINDOW_MAX_WIDTH
 Maxium width of displayed picture:
-Maksymalna szeroko¶æ wy¶wietlanych obrazków:
+Maksymalna szerokoÅ›Ä‡ wyÅ›wietlanych obrazkÃ³w:
 ;
 MSG_PREFS_TALKWINDOW_MAX_WIDTH_HELP
 Allows to specify maximum width of displayed picture. If picture is wider it will be scaled to this size (with preserve of image aspect). If picture is narrower, original size will be preserved.
-Pozwala ustaliæ maksymaln± szeroko¶æ wy¶wietlanego obrazka. Je¶li obrazek bêdzie szerszy od podanej warto¶ci zostanie przeskalowany (z zachowaniem proporcji). W przypadku obrazków o mniejszej \
-szeroko¶ci oryginalny rozmiar pozostanie zachowany.
+Pozwala ustaliÄ‡ maksymalnÄ… szerokoÅ›Ä‡ wyÅ›wietlanego obrazka. JeÅ›li obrazek bÄ™dzie szerszy od podanej wartoÅ›ci zostanie przeskalowany (z zachowaniem proporcji). W przypadku obrazkÃ³w o mniejszej \
+szerokoÅ›ci oryginalny rozmiar pozostanie zachowany.
 ;
 MSG_PREFS_TALKWINDOW_MAX_WIDTH_UNLIMITED
 Unlimited
@@ -964,79 +964,79 @@ Pokazuj informacje o kontakcie
 ;
 MSG_PREFS_TALKWINDOW_CONTACTINFOBLOCK_ON_OFF_HELP
 Allows to turn on/off block with contact info (status, avatar, status description).
-Pozwala na w³±czenie/wy³±czenie pokazywania bloku informacji o kontakcie.
+Pozwala na wÅ‚Ä…czenie/wyÅ‚Ä…czenie pokazywania bloku informacji o kontakcie.
 ;
 MSG_PREFS_TALKWINDOW_TOOLBAR_ON_OFF
 Show toolbar
-Pokazuj pasek narzêdzi
+Pokazuj pasek narzÄ™dzi
 ;
 MSG_PREFS_TALKWINDOW_TOOLBAR_ON_OFF_HELP
 Allows to show/hide buttons toolbar in talk window.
-Pozwala w³±czyæ/wy³±czyæ pokazywanie paska narzêdzi.
+Pozwala wÅ‚Ä…czyÄ‡/wyÅ‚Ä…czyÄ‡ pokazywanie paska narzÄ™dzi.
 ;
 MSG_PREFS_TALKWINDOW_COLORS
 Messages Colors
-Kolory wiadomo¶ci
+Kolory wiadomoÅ›ci
 ;
 MSG_PREFS_TALKWINDOW_MYCOLOR
 My:
-Mój:
+MÃ³j:
 ;
 MSG_PREFS_TALKWINDOW_MYCOLOR_HELP
 This color will be used to display outcomming messages.
-Kolor, który zostanie u¿yty do pokazania wiadomo¶ci wychodz±cych.
+Kolor, ktÃ³ry zostanie uÅ¼yty do pokazania wiadomoÅ›ci wychodzÄ…cych.
 ;
 MSG_PREFS_TALKWINDOW_FRIENDCOLOR
 Friend:
-Rozmówcy:
+RozmÃ³wcy:
 ;
 MSG_PREFS_TALKWINDOW_FRIENDCOLOR_HELP
 This color will be used to display incomming messages.
-Kolor, który zostanie u¿yty do pokazania wiadomo¶ci przychodz±cych.
+Kolor, ktÃ³ry zostanie uÅ¼yty do pokazania wiadomoÅ›ci przychodzÄ…cych.
 ;
 MSG_PREFS_TALKWINDOW_COLORS_OLD
 Archived Messages Colors
-Kolory wiadomo¶ci archiwalnych
+Kolory wiadomoÅ›ci archiwalnych
 ;
 MSG_PREFS_TALKWINDOW_MYCOLOR_OLD
 My:
-Mój:
+MÃ³j:
 ;
 MSG_PREFS_TALKWINDOW_MYCOLOR_OLD_HELP
 This color will be used to display outcomming messages loaded from archive.
-Kolor, który zostanie u¿yty do pokazania wiadomo¶ci wychodz±cych wczytanych z archiwum.
+Kolor, ktÃ³ry zostanie uÅ¼yty do pokazania wiadomoÅ›ci wychodzÄ…cych wczytanych z archiwum.
 ;
 MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD
 Friend:
-Rozmówcy:
+RozmÃ³wcy:
 ;
 MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD_HELP
 This color will be used to display incomming messages loaded from archive.
-Kolor, który zostanie u¿yty do pokazania wiadomo¶ci przychodz±cych wczytanych z archiwum.
+Kolor, ktÃ³ry zostanie uÅ¼yty do pokazania wiadomoÅ›ci przychodzÄ…cych wczytanych z archiwum.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_OLD
 Headline:
-Nag³ówek:
+NagÅ‚Ã³wek:
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_OLD_HELP
 This color will be used to display headlines of messages loaded from archive.
-Kolor, który zostanie u¿yty do pokazania nag³ówków wiadomo¶ci wczytanych z archiwum.
+Kolor, ktÃ³ry zostanie uÅ¼yty do pokazania nagÅ‚Ã³wkÃ³w wiadomoÅ›ci wczytanych z archiwum.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD
 System message:
-Wiadomo¶æ systemowa:
+WiadomoÅ›Ä‡ systemowa:
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD_HELP
 This color will be used to display system messages loaded from archive.
-Kolor, który zostanie u¿yty do pokazania wiadomo¶ci systemowych wczytanych z archiwum.
+Kolor, ktÃ³ry zostanie uÅ¼yty do pokazania wiadomoÅ›ci systemowych wczytanych z archiwum.
 ;
 MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY
 Transparency:
-Przezroczysto¶æ:
+PrzezroczystoÅ›Ä‡:
 ;
 MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY_HELP
 Allows to set text transparency for messages loaded from archive.
-Pozwala ustawiæ przezroczysto¶æ tekstu wiadomo¶ci wczytanych z archiwum.
+Pozwala ustawiÄ‡ przezroczystoÅ›Ä‡ tekstu wiadomoÅ›ci wczytanych z archiwum.
 ;
 MSG_PREFS_EMOTICONS_BASICS
 Basics Settings
@@ -1044,11 +1044,11 @@ Ustawienia podstawowe
 ;
 MSG_PREFS_EMOTICONS_ON_OFF
 Use Animated Emoticons
-W³±cz animowane emotikony
+WÅ‚Ä…cz animowane emotikony
 ;
 MSG_PREFS_EMOTICONS_ON_OFF_HELP
 Turns on/off animated emoticons in Talk Window.
-W³±cza/wy³±cza pokazywanie animowanych emotikon w oknie rozmowy.
+WÅ‚Ä…cza/wyÅ‚Ä…cza pokazywanie animowanych emotikon w oknie rozmowy.
 ;
 MSG_PREFS_EMOTICONS_IMAGES
 Emoticons Images
@@ -1064,11 +1064,11 @@ Wybierz
 ;
 MSG_PREFS_EMOTICONS_LONG_ON_OFF
 Use emoticons in angle brackets
-W³±cz obs³ugê emotikon w nawiasach ostrych
+WÅ‚Ä…cz obsÅ‚ugÄ™ emotikon w nawiasach ostrych
 ;
 MSG_PREFS_EMOTICONS_LONG_ON_OFF_HELP
 Enables use of angle brackets emoticons, for example "<happy>" can be replaced with image loaded from happy.gif.
-W³±cza obs³ugê emotikon w nawiasach ostrych, na przyk³ad <haha> zostanie zast±pione obrazkiem z pliku haha.gif.
+WÅ‚Ä…cza obsÅ‚ugÄ™ emotikon w nawiasach ostrych, na przykÅ‚ad <haha> zostanie zastÄ…pione obrazkiem z pliku haha.gif.
 ;
 MSG_PREFS_EMOTICONS_EXPORT_PATHS
 Export Paths...
@@ -1104,7 +1104,7 @@ Wczytaj
 ;
 MSG_PREFS_EMOTICONS_DEFAULT_PATHS
 Restore Defaults
-Przywróæ domy¶lne
+PrzywrÃ³Ä‡ domyÅ›lne
 ;
 MSG_PREFS_EMOTICONS_DEFAULT_PATHS_HOTKEY
 R
@@ -1112,7 +1112,7 @@ P
 ;
 MSG_PREFS_EMOTICONS_DEFAULT_PATHS_HELP
 Restores default emoticons paths (compatible with Gadu-Gadu 7.0).
-Przywraca domy¶lne ¶cie¿ki do plików emotikon (kompatybilne z zestawem emotikon Gadu-Gadu 7.0).
+Przywraca domyÅ›lne Å›cieÅ¼ki do plikÃ³w emotikon (kompatybilne z zestawem emotikon Gadu-Gadu 7.0).
 ;
 MSG_DESCWINDOW_TITLE
 KwaKwa: Status Description
@@ -1124,15 +1124,15 @@ Dodaj do listy
 ;
 MSG_DESCWINDOW_ADDTOLIST_CHECK_HELP
 Turns on/off automatic adding new statuses to list.
-W³±cza/wy³±cza automatyczne dodawanie statusów do listy.
+WÅ‚Ä…cza/wyÅ‚Ä…cza automatyczne dodawanie statusÃ³w do listy.
 ;
 MSG_DESCWINDOW_SHOWLIST_CHECK
 Show List
-Poka¿ listê
+PokaÅ¼ listÄ™
 ;
 MSG_DESCWINDOW_SEARCH_NEXT
 Next
-Nastêpny
+NastÄ™pny
 ;
 MSG_DESCWINDOW_SEARCH_NEXT_HOTKEY
 N
@@ -1144,27 +1144,27 @@ Podaj opis lub jego fragment do wyszukania.
 ;
 MSG_LOG_OPENED
 Conversation started at:
-Rozmowa rozpoczêta:
+Rozmowa rozpoczÄ™ta:
 ;
 MSG_LOG_CLOSED
 Conversation ended:
-Rozmowa zakoñczona:
+Rozmowa zakoÅ„czona:
 ;
 MSG_SBAR_SHOW_CONTACT_LIST
 Show Contacts List...
-Poka¿ listê kontaktów...
+PokaÅ¼ listÄ™ kontaktÃ³w...
 ;
 MSG_SBAR_HIDE_CONTACT_LIST
 Hide Contacts List
-Ukryj listê kontaktów
+Ukryj listÄ™ kontaktÃ³w
 ;
 MSG_SBAR_CHANGE_STATUS
 Change Status...
-Zmieñ status...
+ZmieÅ„ status...
 ;
 MSG_GENDER_MALE
 Male
-Mê¿czyzna
+MÄ™Å¼czyzna
 ;
 MSG_GENDER_FEMALE
 Female
@@ -1176,7 +1176,7 @@ Nieznana
 ;
 MSG_APPLICATION_NO_PLUGINS_MSG
 No protocols modules found!
-Nie znaleziono wtyczek protoko³ów!
+Nie znaleziono wtyczek protokoÅ‚Ã³w!
 ;
 MSG_APPLICATION_NO_PLUGINS_GADGETS
 *_OK
@@ -1184,79 +1184,79 @@ MSG_APPLICATION_NO_PLUGINS_GADGETS
 ;
 MSG_MODULE_LOG_WINDOW_TITLE
 KwaKwa: Modules Console
-KwaKwa: Konsola modu³ów
+KwaKwa: Konsola moduÅ‚Ã³w
 ;
 MSG_MODULE_ERROR_NOMEM_MSG
 Module %ls reported lack of memory!
-Modu³ %ls zg³osi³ brak pamiêci!
+ModuÅ‚ %ls zgÅ‚osiÅ‚ brak pamiÄ™ci!
 ;
 MSG_MODULE_ERROR_NOMEM_GADGETS
 _Ignore|_Disconnect Module|*_Quit KwaKwa
-_Ignoruj|_Roz³±cz modu³|*_Zamknij KwaKwa
+_Ignoruj|_RozÅ‚Ä…cz moduÅ‚|*_Zamknij KwaKwa
 ;
 MSG_MODULE_ERROR_CONNFAIL_MSG
 Module %ls reported connection error!
-Modu³ %ls zg³osi³ b³±d po³±czenia!
+ModuÅ‚ %ls zgÅ‚osiÅ‚ bÅ‚Ä…d poÅ‚Ä…czenia!
 ;
 MSG_MODULE_ERROR_CONNFAIL_GADGETS
 *_Ignore|_Try Again|_Quit KwaKwa
-*_Ignoruj|_Ponów|_Zamknij KwaKwa
+*_Ignoruj|_PonÃ³w|_Zamknij KwaKwa
 ;
 MSG_MODULE_ERROR_LOGINFAIL_MSG
 Module %ls reported login error!
-Modu³ %ls zg³osi³ b³±d logowania!
+ModuÅ‚ %ls zgÅ‚osiÅ‚ bÅ‚Ä…d logowania!
 ;
 MSG_MODULE_ERROR_LOGINFAIL_GADGETS
 *_Ignore|_Open Preferences|_Quit KwaKwa
-*_Ignoruj|_Otwórz preferencje|_Zamknij KwaKwa
+*_Ignoruj|_OtwÃ³rz preferencje|_Zamknij KwaKwa
 ;
 MSG_MODULE_ERRNO_CONNECTION_FAILED
 Connection failed
-B³±d po³±czenia
+BÅ‚Ä…d poÅ‚Ä…czenia
 ;
 MSG_MODULE_ERRNO_LOGIN_FAILED
 Login failed
-B³±d logowania
+BÅ‚Ä…d logowania
 ;
 MSG_MODULE_ERRNO_NOT_SUPPORTED
 Not supported
-Nie obs³ugiwany
+Nie obsÅ‚ugiwany
 ;
 MSG_MODULE_ERRNO_OUT_OF_MEMORY
 Out of Memory
-Brak pamiêci
+Brak pamiÄ™ci
 ;
 MSG_MODULE_ERRNO_ONLY_MESSAGE
 Custom Message
-W³asna wiadomo¶æ
+WÅ‚asna wiadomoÅ›Ä‡
 ;
 MSG_MODULE_ERROR_NOTSUPP_GADGETS
 *_Ignore|_Open Preferences|_Quit KwaKwa
-*_Ignoruj|_Otwórz preferencje|_Zamknij KwaKwa
+*_Ignoruj|_OtwÃ³rz preferencje|_Zamknij KwaKwa
 ;
 MSG_MODULE_ERROR_NOTSUPP_MSG
 Module %ls reported: %ls is not supported!
-Modu³ %ls zg³osi³, ¿e %ls jest nieobs³ugiwany!
+ModuÅ‚ %ls zgÅ‚osiÅ‚, Å¼e %ls jest nieobsÅ‚ugiwany!
 ;
 MSG_MODULE_MSG_LIST_TITLE_NAME
 Protocol Name
-Nazwa protoko³u
+Nazwa protokoÅ‚u
 ;
 MSG_MODULE_MSG_LIST_TITLE_MSG_TYPE
 Message type
-Typ wiadomo¶ci
+Typ wiadomoÅ›ci
 ;
 MSG_MODULE_MSG_LIST_TITLE_CUSTOM_MSG
 Message Content
-Tre¶æ wiadomo¶ci
+TreÅ›Ä‡ wiadomoÅ›ci
 ;
 MSG_MODULE_LIST_EXPORT_FAIL
 Module %ls cannot export contacts list!
-Modu³ %ls zg³osi³ b³±d eksportu listy kontaktów!
+ModuÅ‚ %ls zgÅ‚osiÅ‚ bÅ‚Ä…d eksportu listy kontaktÃ³w!
 ;
 MSG_MODULE_LIST_EXPORT_FAIL_GADGETS
 *_Ignore|_Open Modules Console
-*_Ignoruj|_Otwórz konsolê modu³ów
+*_Ignoruj|_OtwÃ³rz konsolÄ™ moduÅ‚Ã³w
 ;
 MSG_TIMESLIDER_CLASS_NEVER
 Never.
@@ -1288,15 +1288,15 @@ Wklej
 ;
 MSG_INPUTFIELD_PASTEANDACCEPT
 Paste and Ackonwledge
-Wklej i potwierd¼
+Wklej i potwierdÅº
 ;
 MSG_INPUTFIELD_EXTERNAL_EDIT
 External edit...
-Edycja zewnêtrzna...
+Edycja zewnÄ™trzna...
 ;
 MSG_INPUTFIELD_INSERT_TEXT_FILE_ASL_TITLE
 Select file to insert
-Wybierz, który plik wstawiæ
+Wybierz, ktÃ³ry plik wstawiÄ‡
 ;
 MSG_INPUTFIELD_INSERT_TEXT_FILE_ASL_POSITIVE
 Import
@@ -1308,7 +1308,7 @@ Wstaw plik tekstowy...
 ;
 MSG_INPUTFILED_CLEAR
 Clear
-Wyczy¶æ
+WyczyÅ›Ä‡
 ;
 MSG_PIXEL_SLIDER_UNIT
 px
@@ -1320,7 +1320,7 @@ Zapisz jako...
 ;
 MSG_PICTUREVIEW_MENU_OPEN
 Open...
-Otwórz...
+OtwÃ³rz...
 ;
 MSG_PICTUREVIEW_ASL_SAVEAS_POSITIVE
 Save
@@ -1328,7 +1328,7 @@ Zapisz
 ;
 MSG_PICTUREVIEW_ASL_TITLE
 Select location to save picture...
-Wybierz gdzie zapisaæ obrazek...
+Wybierz gdzie zapisaÄ‡ obrazek...
 ;
 MSG_FILEVIEW_BUTTON_SAVE
 Save as...
@@ -1336,7 +1336,7 @@ Zapisz jako...
 ;
 MSG_FILEVIEW_BUTTON_OPEN
 Open...
-Otwórz...
+OtwÃ³rz...
 ;
 MSG_FILEVIEW_PICTURE_TEXT
 Picture:
@@ -1380,63 +1380,63 @@ Port:
 ;
 MSG_PREFS_FTP_USER
 User:
-U¿ytkownik:
+UÅ¼ytkownik:
 ;
 MSG_PREFS_FTP_PASSWORD
 Password:
-Has³o:
+HasÅ‚o:
 ;
 MSG_PREFS_FTP_PATH
 Path:
-¦cie¿ka:
+ÅšcieÅ¼ka:
 ;
 MSG_FTP_ERROR_GADGETS
 *_OK|_Open Preferences
-*_OK|_Otwórz preferencje
+*_OK|_OtwÃ³rz preferencje
 ;
 MSG_FTP_ERROR_HOST
 Unknown host.
-Z³y adres serwera.
+ZÅ‚y adres serwera.
 ;
 MSG_FTP_ERROR_PORT
 Wrong port.
-Z³y port po³±czenia.
+ZÅ‚y port poÅ‚Ä…czenia.
 ;
 MSG_FTP_ERROR_USER_PASS
 Wrong username or password.
-Z³a nazwa u¿ytkownika lub has³o.
+ZÅ‚a nazwa uÅ¼ytkownika lub hasÅ‚o.
 ;
 MSG_FTP_ERROR_CONNECT
 Failed to connect to FTP server.
-Nie uda³o siê po³±czyæ z serwerem FTP.
+Nie udaÅ‚o siÄ™ poÅ‚Ä…czyÄ‡ z serwerem FTP.
 ;
 MSG_FTP_ERROR_LIBRARY
 Failed to open ftp.library (V52).
-B³±d otwarcia ftp.library (V52).
+BÅ‚Ä…d otwarcia ftp.library (V52).
 ;
 MSG_FTP_ERROR_LOGIN
 Failed to login to FTP server.
-B³±d logowania do serwera FTP.
+BÅ‚Ä…d logowania do serwera FTP.
 ;
 MSG_FTP_ERROR_PASSIVE
 Failed to set passive FTP connection mode.
-B³±d ustawienia trybu pasywnego dla po³±czenia FTP.
+BÅ‚Ä…d ustawienia trybu pasywnego dla poÅ‚Ä…czenia FTP.
 ;
 MSG_FTP_ERROR_SEND
 Failed to send file to FTP server.
-Nie uda³o siê wys³aæ pliku na serwer FTP.
+Nie udaÅ‚o siÄ™ wysÅ‚aÄ‡ pliku na serwer FTP.
 ;
 MSG_FTP_ASL_TITLE
 Select file to send...
-Wybierz plik do wys³ania...
+Wybierz plik do wysÅ‚ania...
 ;
 MSG_FTP_ASL_POSITIVE
 Send
-Wy¶lij
+WyÅ›lij
 ;
 MSG_FTP_NO_ACTIVE_TAB
 Please start the conversation first.
-Najpierw rozpocznij rozmowê.
+Najpierw rozpocznij rozmowÄ™.
 ;
 MSG_FTP_NO_ACTIVE_TAB_GADGETS
 *_OK
@@ -1444,7 +1444,7 @@ MSG_FTP_NO_ACTIVE_TAB_GADGETS
 ;
 MSG_INVITE_TITLE
 This user want to chat with you.\nDo you agree?
-Podany u¿ytkownik chce rozpocz±æ\nz Tob± rozmowê. Czy zgadzasz siê?
+Podany uÅ¼ytkownik chce rozpoczÄ…Ä‡\nz TobÄ… rozmowÄ™. Czy zgadzasz siÄ™?
 ;
 MSG_INVITE_YES
 Yes
@@ -1456,7 +1456,7 @@ Nie
 ;
 MSG_SIMPLESTRINGLIST_MENU_REMOVE
 Remove
-Usuñ
+UsuÅ„
 ;
 MSG_SIMPLESTRINGLIST_MENU_COPY
 Copy
@@ -1468,7 +1468,7 @@ Obrazek:\x20
 ;
 MSG_SQL_ERROR
 KwaKwa: History Database Error!
-KwaKwa: b³±d bazy archiwum!
+KwaKwa: bÅ‚Ä…d bazy archiwum!
 ;
 MSG_SQL_GADGETS
 *_OK
@@ -1476,19 +1476,19 @@ MSG_SQL_GADGETS
 ;
 MSG_SQL_ERROR_MESSAGE
 Failed to add new message to history.
-Wyst±pi³ b³±d podczas dodawania wiadomo¶ci do historii.
+WystÄ…piÅ‚ bÅ‚Ä…d podczas dodawania wiadomoÅ›ci do historii.
 ;
 MSG_SQL_ERROR_CONVERSATION
 Failed to create new conversation in history database.
-Wyst±pi³ b³±d podczas zapisu do historii.
+WystÄ…piÅ‚ bÅ‚Ä…d podczas zapisu do historii.
 ;
 MSG_SYSTEMMSG_HEADLINE_TITLE
 System Message
-Wiadomo¶æ systemowa
+WiadomoÅ›Ä‡ systemowa
 ;
 MSG_HISTORY_WINDOW_TITLE
 KwaKwa: Messages History
-KwaKwa: Archiwum Wiadomo¶ci
+KwaKwa: Archiwum WiadomoÅ›ci
 ;
 MSG_HISTORY_CONVERSATIONS_LIST_TITLE_CONTACT
 Contact
@@ -1496,15 +1496,15 @@ Kontakt
 ;
 MSG_HISTORY_CONVERSATIONS_LIST_TITLE_START_TIME
 Conversation Start
-Data rozpoczêcia
+Data rozpoczÄ™cia
 ;
 MSG_HISTORY_CONVERSATIONS_LIST_TITLE_END_TIME
 Conversation End
-Data zakoñczenia
+Data zakoÅ„czenia
 ;
 MSG_HISTORY_CONVERSATIONS_LIST_REMOVE_REQ_TXT
 Are you sure you want to remove selected conversation?
-Czy jeste¶ pewien, ¿e chcesz usun±æ zaznaczon± rozmowê?
+Czy jesteÅ› pewien, Å¼e chcesz usunÄ…Ä‡ zaznaczonÄ… rozmowÄ™?
 ;
 MSG_HISTORY_CONVERSATIONS_LIST_REMOVE_REQ_GADGETS
 _Yes|*_No
@@ -1520,7 +1520,7 @@ Skasuj
 ;
 MSG_HISTORY_CONTACTS_LIST_REMOVE_REQ_TXT
 Are you sure you want to remove %ls?
-Czy jeste¶ pewien, ¿e chcesz skasowaæ %ls?
+Czy jesteÅ› pewien, Å¼e chcesz skasowaÄ‡ %ls?
 ;
 MSG_HISTORY_CONTACTS_LIST_REMOVE_REQ_GADGETS
 _Yes|*_No
@@ -1528,7 +1528,7 @@ _Tak|*_Nie
 ;
 MSG_KWAKWA_ANOTHER_COPY_RUNNING_MSG
 Sorry, there is another copy running.
-Aktualnie jest ju¿ uruchomiona inna kopia programu.
+Aktualnie jest juÅ¼ uruchomiona inna kopia programu.
 ;
 MSG_KWAKWA_ANOTHER_COPY_RUNNING_BUTTONS
 *_OK
@@ -1536,21 +1536,21 @@ MSG_KWAKWA_ANOTHER_COPY_RUNNING_BUTTONS
 ;
 MSG_PREFS_TALKWINDOW_APPERANCE
 Appearance
-Wygl±d
+WyglÄ…d
 ;
 MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE
 Space between buttons in toolbar
-Przestrzeñ pomiêdzy przyciskami paska narzêdzi
+PrzestrzeÅ„ pomiÄ™dzy przyciskami paska narzÄ™dzi
 ;
 MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP
 Allows to set size of space between buttons in Talk Window toolbar.
-Pozwala ustawiæ przestrzeñ (przerwê) pomiêdzy przyciskami paska narzêdzi.
+Pozwala ustawiÄ‡ przestrzeÅ„ (przerwÄ™) pomiÄ™dzy przyciskami paska narzÄ™dzi.
 ;
 MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_HELP
 Allows to turn on/off showing contact status icon on tab title.
-Pozwala na w³±czenie/wy³±czenie pokazywania ikony statusu na panelu tytu³owym karty.
+Pozwala na wÅ‚Ä…czenie/wyÅ‚Ä…czenie pokazywania ikony statusu na panelu tytuÅ‚owym karty.
 ;
 MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF
 Show status image on tab title
-Pokazuj ikonê statusu na pasku tytu³owym karty
-;
+Pokazuj ikonÄ™ statusu na pasku tytuÅ‚owym karty
+; 

@@ -184,7 +184,7 @@ static inline struct Module* FindModuleById(struct MinList *modules, ULONG id)
 static inline Object *CreateMenuStrip(Object **app_menu, Object **contact_list_menu, Object **prefs_menu, Object **tools_menu)
 {
 	Object *obj = MUI_NewObject(MUIC_Menustrip,
-
+		MUIA_Unicode, TRUE,
 		MUIA_Group_Child, MUI_NewObject(MUIC_Menu,
 			MUIA_Menu_Title, GetString(MSG_MENU_APPMENU_TITLE),
 
@@ -724,7 +724,7 @@ static IPTR ApplicationConfirmQuit(Class *cl, Object *obj)
 	if((unread_list = (STRPTR)DoMethod(findobj(USD_CONTACTS_LIST, d->main_window), CLSM_CheckUnread)) != NULL)
 	{
 		/* we have unread messages, so we ask about exiting */
-		LONG req = MUI_Request(obj, d->main_window, 0L, APP_NAME, GetString(MSG_KWAKWAEXIT_UNREAD_BUTTONS), GetString(MSG_KWAKWAEXIT_UNREAD_MSG), unread_list);
+		LONG req = MUI_Request_Unicode(obj, d->main_window, APP_NAME, GetString(MSG_KWAKWAEXIT_UNREAD_BUTTONS), GetString(MSG_KWAKWAEXIT_UNREAD_MSG), unread_list);
 
 		StrFree(unread_list);
 
@@ -1256,8 +1256,15 @@ static IPTR ApplicationScreenbarUnread(Class *cl, Object *obj)
 static IPTR ApplicationNotifyBeacon(Class *cl, Object *obj, struct APPP_NotifyBeacon *msg)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
+	STRPTR message_sys;
 
-	DoMethod(d->slave_object, SPM_SendNotification, msg->notification_name, msg->message, msg->wait_for_result, msg->obj, msg->method, msg->usr_data);
+	if((message_sys = Utf8ToSystem(msg->message)))
+	{
+		DoMethod(d->slave_object, SPM_SendNotification, msg->notification_name, message_sys, msg->wait_for_result, msg->obj,
+		 msg->method, msg->usr_data);
+
+		StrFree(message_sys);
+	}
 
 	return (IPTR)0;
 }
@@ -1296,7 +1303,7 @@ static IPTR ApplicationFtpPut(Class *cl, Object *obj, struct APPP_FtpPut *msg)
 
 	if(!host || StrLen(host) <= 0)
 	{
-		if(MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_HOST)) == 0)
+		if(MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_HOST)) == 0)
 		{
 			set(prefs_object(USD_PREFS_PAGES_LIST), MUIA_List_Active, 4);
 			set(d->prefs_window, MUIA_Window_Open, TRUE);
@@ -1306,7 +1313,7 @@ static IPTR ApplicationFtpPut(Class *cl, Object *obj, struct APPP_FtpPut *msg)
 
 	if(port <= 0)
 	{
-		if(MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_PORT)) == 0)
+		if(MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_PORT)) == 0)
 		{
 			set(prefs_object(USD_PREFS_PAGES_LIST), MUIA_List_Active, 4);
 			set(d->prefs_window, MUIA_Window_Open, TRUE);
@@ -1326,7 +1333,7 @@ static IPTR ApplicationFtpPut(Class *cl, Object *obj, struct APPP_FtpPut *msg)
 
 		if(!user || !pass)
 		{
-			if(MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_USER_PASS)) == 0)
+			if(MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_USER_PASS)) == 0)
 			{
 				set(prefs_object(USD_PREFS_PAGES_LIST), MUIA_List_Active, 4);
 				set(d->prefs_window, MUIA_Window_Open, TRUE);
@@ -1411,7 +1418,7 @@ static IPTR ApplicationFtpPutActiveTab(Class *cl, Object *obj)
 			DoMethod(obj, APPM_FtpPut, con->pluginid, con->entryid);
 	}
 	else
-		MUI_Request(obj, xget(d->main_window, MUIA_Window_Open) ? d->main_window : NULL, 0, APP_NAME,
+		MUI_Request_Unicode(obj, xget(d->main_window, MUIA_Window_Open) ? d->main_window : NULL, APP_NAME,
 		 GetString(MSG_FTP_NO_ACTIVE_TAB_GADGETS), GetString(MSG_FTP_NO_ACTIVE_TAB));
 
 	return (IPTR)0;
@@ -1433,23 +1440,23 @@ static IPTR ApplicationFtpPutCallback(Class *cl, Object *obj, struct APPP_FtpPut
 	switch(msg->error_code)
 	{
 		case FTP_ERROR_CONNECT:
-			request_return = MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_CONNECT));
+			request_return = MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_CONNECT));
 		break;
 
 		case FTP_ERROR_LIBRARY:
-			request_return = MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_LIBRARY));
+			request_return = MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_LIBRARY));
 		break;
 
 		case FTP_ERROR_LOGIN:
-			request_return = MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_LOGIN));
+			request_return = MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_LOGIN));
 		break;
 
 		case FTP_ERROR_PASSIVE:
-			request_return = MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_PASSIVE));
+			request_return = MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_PASSIVE));
 		break;
 
 		case FTP_ERROR_SEND:
-			request_return = MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_SEND));
+			request_return = MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_FTP_ERROR_GADGETS), GetString(MSG_FTP_ERROR_SEND));
 		break;
 	}
 
@@ -1545,7 +1552,7 @@ static IPTR ApplicationOpenModules(Class *cl, Object *obj)
 		DoMethod(obj, APPM_AddModulesGui);
 	}
 	else
-		MUI_Request(obj, NULL, 0, APP_NAME, GetString(MSG_APPLICATION_NO_PLUGINS_GADGETS), GetString(MSG_APPLICATION_NO_PLUGINS_MSG));
+		MUI_Request_Unicode(obj, NULL, APP_NAME, GetString(MSG_APPLICATION_NO_PLUGINS_GADGETS), GetString(MSG_APPLICATION_NO_PLUGINS_MSG));
 
 	LEAVE();
 	return (IPTR)d->modules_no;
@@ -1677,7 +1684,6 @@ static IPTR ApplicationConnect(Class *cl, Object *obj, struct APPP_Connect *msg)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
 	struct Module *m;
-	STRPTR utf_desc = SystemToUtf8(msg->description);
 	ENTER();
 
 	d->connecting_modules_no = 0;
@@ -1686,16 +1692,13 @@ static IPTR ApplicationConnect(Class *cl, Object *obj, struct APPP_Connect *msg)
 	{
 		if(!MODULE_IS_CONNECTED(m))
 		{
-			DoMethod(m->mod_Object, KWAM_Connect, msg->new_status, utf_desc);
+			DoMethod(m->mod_Object, KWAM_Connect, msg->new_status, msg->description);
 			d->connecting_modules_no++;
 		}
 	}
 
 	if(d->connecting_modules_no)
 		set(findobj(USD_MAIN_WINDOW_BUSY_BAR, d->main_window), MUIA_ShowMe, TRUE);
-
-	if(utf_desc)
-		FreeVec(utf_desc);
 
 	LEAVE();
 	return (IPTR)0;
@@ -1705,19 +1708,15 @@ static IPTR ApplicationDisconnect(Class *cl, Object *obj, struct APPP_Disconnect
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
 	struct Module *m;
-	STRPTR utf_desc = SystemToUtf8(msg->description);
 	ENTER();
 
 	ForeachNode(&d->modules, m)
 	{
-		if(MODULE_IS_CONNECTED(m) && DoMethod(m->mod_Object, KWAM_Disconnect, utf_desc))
+		if(MODULE_IS_CONNECTED(m) && DoMethod(m->mod_Object, KWAM_Disconnect, msg->description))
 		{
 			tprintf("disconnected module %ls\n", m->mod_Name);
 		}
 	}
-
-	if(utf_desc)
-		FreeVec(utf_desc);
 
 	LEAVE();
 	return (IPTR)0;
@@ -1727,12 +1726,9 @@ static IPTR ApplicationChangeStatus(Class *cl, Object *obj, struct APPP_ChangeSt
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
 	IPTR result = 0;
-	STRPTR utf_desc;
 	ENTER();
 
 	d->connecting_modules_no = 0;
-
-	utf_desc = SystemToUtf8(msg->description);
 
 	if(msg->new_status != KWA_STATUS_NOT_AVAIL)
 	{
@@ -1742,11 +1738,11 @@ static IPTR ApplicationChangeStatus(Class *cl, Object *obj, struct APPP_ChangeSt
 		{
 			if(!MODULE_IS_CONNECTED(m))
 			{
-				result = DoMethod(m->mod_Object, KWAM_Connect, msg->new_status, utf_desc);
+				result = DoMethod(m->mod_Object, KWAM_Connect, msg->new_status, msg->description);
 				d->connecting_modules_no++;
 			}
 			else
-				result = DoMethod(m->mod_Object, KWAM_ChangeStatus, msg->new_status, utf_desc);
+				result = DoMethod(m->mod_Object, KWAM_ChangeStatus, msg->new_status, msg->description);
 		}
 	}
 	else
@@ -1754,9 +1750,6 @@ static IPTR ApplicationChangeStatus(Class *cl, Object *obj, struct APPP_ChangeSt
 
 	if(d->connecting_modules_no)
 		set(findobj(USD_MAIN_WINDOW_BUSY_BAR, d->main_window), MUIA_ShowMe, TRUE);
-
-	if(utf_desc)
-		FreeVec(utf_desc);
 
 	DoMethod(obj, APPM_SetLastStatus, msg->new_status, msg->description);
 
@@ -1832,7 +1825,7 @@ static IPTR ApplicationListChangeAck(Class *cl, Object *obj, struct APPP_ListCha
 
 	if(to_update)
 	{
-		STRPTR new_desc = Utf8ToSystem(msg->change->ke_Description);
+		STRPTR new_desc = StrNew(msg->change->ke_Description);
 		BOOL statusChanged = to_update->status != msg->change->ke_NewStatus;
 
 		if(to_update->statusdesc && new_desc && StrEqu(to_update->statusdesc, new_desc))
@@ -1870,18 +1863,9 @@ static IPTR ApplicationListChangeAck(Class *cl, Object *obj, struct APPP_ListCha
 static IPTR ApplicationNewMessageAck(Class *cl, Object *obj, struct APPP_NewMessageAck *msg)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
-	STRPTR sys_txt, sys_id;
 	ENTER();
 
-	if((sys_id = Utf8ToSystem(msg->nmsg->ke_ContactID)))
-	{
-		if((sys_txt = Utf8ToSystem(msg->nmsg->ke_Txt)))
-		{
-			DoMethod(d->talk_window, TKWM_ShowMessage, sys_id, msg->m->mod_ID, sys_txt, msg->nmsg->ke_TimeStamp, msg->nmsg->ke_Flags);
-			FreeVec(sys_txt);
-		}
-		FreeVec(sys_id);
-	}
+	DoMethod(d->talk_window, TKWM_ShowMessage, msg->nmsg->ke_ContactID, msg->m->mod_ID, msg->nmsg->ke_Txt, msg->nmsg->ke_TimeStamp, msg->nmsg->ke_Flags);
 
 	LEAVE();
 	return(IPTR)0;
@@ -1900,19 +1884,7 @@ static IPTR ApplicationSendMessage(Class *cl, Object *obj, struct APPP_SendMessa
 
 		if(m && MODULE_IS_CONNECTED(m))
 		{
-			STRPTR utf8_con_id;
-
-			if((utf8_con_id = SystemToUtf8(msg->contactid)))
-			{
-				STRPTR utf8_msg;
-
-				if((utf8_msg = SystemToUtf8(msg->txt)))
-				{
-					result = (BOOL)DoMethod(m->mod_Object, KWAM_SendMessage, utf8_con_id, utf8_msg);
-					FreeVec(utf8_msg);
-				}
-				FreeVec(utf8_con_id);
-			}
+			result = (BOOL)DoMethod(m->mod_Object, KWAM_SendMessage, msg->contactid, msg->txt);
 		}
 	}
 
@@ -1938,12 +1910,9 @@ static IPTR ApplicationAddNotify(Class *cl, Object *obj, struct APPP_AddNotify *
 
 	if((m = FindModuleById(&d->modules, msg->pluginid)) && MODULE_IS_CONNECTED(m))
 	{
-		if((notify.nle_EntryID = SystemToUtf8(msg->contactid)))
-		{
-			notify.nle_Status = msg->contact_status;
-			DoMethod(m->mod_Object, KWAM_AddNotify, &notify);
-			FreeVec(notify.nle_EntryID);
-		}
+		notify.nle_EntryID = msg->contactid;
+		notify.nle_Status = msg->contact_status;
+		DoMethod(m->mod_Object, KWAM_AddNotify, &notify);
 	}
 
 	return(IPTR)0;
@@ -1958,12 +1927,10 @@ static IPTR ApplicationRemoveNotify(Class *cl, Object *obj, struct APPP_RemoveNo
 
 	if((m = FindModuleById(&d->modules, msg->pluginid)) && MODULE_IS_CONNECTED(m))
 	{
-		if((notify.nle_EntryID = SystemToUtf8(msg->contactid)))
-		{
-			notify.nle_Status = msg->contact_status;
-			DoMethod(m->mod_Object, KWAM_RemoveNotify, &notify);
-			FreeVec(notify.nle_EntryID);
-		}
+		notify.nle_EntryID = msg->contactid;
+		notify.nle_Status = msg->contact_status;
+		DoMethod(m->mod_Object, KWAM_RemoveNotify, &notify);
+		FreeVec(notify.nle_EntryID);
 	}
 
 	LEAVE();
@@ -2019,15 +1986,15 @@ static IPTR ApplicationExportList(Class *cl, Object *obj)
 						break;
 					if(entry->pluginid == m->mod_ID)
 					{
-						array[j].birthyear = SystemToUtf8(entry->birthyear);
-						array[j].city = SystemToUtf8(entry->city);
-						array[j].entryid = SystemToUtf8(entry->entryid);
-						array[j].firstname = SystemToUtf8(entry->firstname);
+						array[j].birthyear = entry->birthyear;
+						array[j].city = entry->city;
+						array[j].entryid = entry->entryid;
+						array[j].firstname = entry->firstname;
 						array[j].gender = entry->gender;
-						array[j].groupname = SystemToUtf8(entry->groupname);
-						array[j].lastname = SystemToUtf8(entry->lastname);
-						array[j].name = SystemToUtf8(entry->name);
-						array[j].nickname = SystemToUtf8(entry->nickname);
+						array[j].groupname = entry->groupname;
+						array[j].lastname = entry->lastname;
+						array[j].name = entry->name;
+						array[j].nickname = entry->nickname;
 						array[j].pluginid = entry->pluginid;
 						array[j].status = 0;
 						array[j].statusdesc = NULL;
@@ -2037,24 +2004,6 @@ static IPTR ApplicationExportList(Class *cl, Object *obj)
 				}
 
 				DoMethod(m->mod_Object, KWAM_ExportList, cons_no, array);
-
-				for(i = 0; i < cons_no; i++)
-				{
-					if(array[i].entryid)
-						FreeVec(array[i].entryid);
-					if(array[i].city)
-						FreeVec(array[i].city);
-					if(array[i].firstname)
-						FreeVec(array[i].firstname);
-					if(array[i].groupname)
-						FreeVec(array[i].groupname);
-					if(array[i].lastname)
-						FreeVec(array[i].lastname);
-					if(array[i].name)
-						FreeVec(array[i].name);
-					if(array[i].nickname)
-						FreeVec(array[i].nickname);
-				}
 
 				FreeMem(array, cons_no * sizeof(struct ContactEntry));
 			}
@@ -2210,7 +2159,7 @@ static IPTR ApplicationErrorNoMem(Class *cl, Object *obj, struct APPP_ErrorNoMem
 	if((BOOL)xget(d->main_window, MUIA_Window_Open))
 		win = d->main_window;
 
-	switch(MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_MODULE_ERROR_NOMEM_GADGETS), GetString(MSG_MODULE_ERROR_NOMEM_MSG), msg->m->mod_Name))
+	switch(MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_MODULE_ERROR_NOMEM_GADGETS), GetString(MSG_MODULE_ERROR_NOMEM_MSG), msg->m->mod_Name))
 	{
 		case 1:
 			return (IPTR)0;
@@ -2238,7 +2187,7 @@ static IPTR ApplicationErrorConnFail(Class *cl, Object *obj, struct APPP_ErrorCo
 	if(!d->connecting_modules_no)
 		set(findobj(USD_MAIN_WINDOW_BUSY_BAR, d->main_window), MUIA_ShowMe, FALSE);
 
-	switch(MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_MODULE_ERROR_CONNFAIL_GADGETS), GetString(MSG_MODULE_ERROR_CONNFAIL_MSG), msg->m->mod_Name))
+	switch(MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_MODULE_ERROR_CONNFAIL_GADGETS), GetString(MSG_MODULE_ERROR_CONNFAIL_MSG), msg->m->mod_Name))
 	{
 		case 1:
 			return (IPTR)0;
@@ -2261,7 +2210,7 @@ static IPTR ApplicationErrorLoginFail(Class *cl, Object *obj, struct APPP_ErrorL
 	if((BOOL)xget(d->main_window, MUIA_Window_Open))
 		win = d->main_window;
 
-	switch(MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_MODULE_ERROR_LOGINFAIL_GADGETS), GetString(MSG_MODULE_ERROR_LOGINFAIL_MSG), msg->m->mod_Name))
+	switch(MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_MODULE_ERROR_LOGINFAIL_GADGETS), GetString(MSG_MODULE_ERROR_LOGINFAIL_MSG), msg->m->mod_Name))
 	{
 		case 1:
 			return (IPTR)0;
@@ -2285,7 +2234,7 @@ static IPTR ApplicationErrorNotSupported(Class *cl, Object *obj, struct APPP_Err
 	if((BOOL)xget(d->main_window, MUIA_Window_Open))
 		win = d->main_window;
 
-	switch(MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_MODULE_ERROR_NOTSUPP_GADGETS), GetString(MSG_MODULE_ERROR_NOTSUPP_MSG),
+	switch(MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_MODULE_ERROR_NOTSUPP_GADGETS), GetString(MSG_MODULE_ERROR_NOTSUPP_MSG),
 	 msg->m->mod_Name, msg->errormsg))
 	{
 		case 1:
@@ -2364,35 +2313,35 @@ static IPTR ApplicationImportListAck(Class *cl, Object *obj, struct APPP_ImportL
 		{
 			struct ContactEntry con = {0};
 
-			if((con.entryid = Utf8ToSystem(msg->event->ke_Contacts[i].entryid)))
+			if((con.entryid = StrNew(msg->event->ke_Contacts[i].entryid)))
 			{
 				con.pluginid = msg->event->ke_Contacts[i].pluginid;
 				con.birthyear = msg->event->ke_Contacts[i].birthyear;
-				con.city = Utf8ToSystem(msg->event->ke_Contacts[i].city);
-				con.firstname = Utf8ToSystem(msg->event->ke_Contacts[i].firstname);
+				con.city = StrNew(msg->event->ke_Contacts[i].city);
+				con.firstname = StrNew(msg->event->ke_Contacts[i].firstname);
 				con.gender = msg->event->ke_Contacts[i].gender;
-				con.groupname = Utf8ToSystem(msg->event->ke_Contacts[i].groupname);
-				con.lastname = Utf8ToSystem(msg->event->ke_Contacts[i].lastname);
-				con.name = Utf8ToSystem(msg->event->ke_Contacts[i].name);
-				con.nickname = Utf8ToSystem(msg->event->ke_Contacts[i].nickname);
+				con.groupname = StrNew(msg->event->ke_Contacts[i].groupname);
+				con.lastname = StrNew(msg->event->ke_Contacts[i].lastname);
+				con.name = StrNew(msg->event->ke_Contacts[i].name);
+				con.nickname = StrNew(msg->event->ke_Contacts[i].nickname);
 
 				DoMethod(con_list, CLSM_InsertSingle, &con, CLSV_Insert_Bottom);
 				DoMethod(obj, APPM_AddNotify, con.pluginid, con.entryid, 0);
 
 				if(con.entryid)
-					FreeVec(con.entryid);
+					StrFree(con.entryid);
 				if(con.city)
-					FreeVec(con.city);
+					StrFree(con.city);
 				if(con.firstname)
-					FreeVec(con.firstname);
+					StrFree(con.firstname);
 				if(con.groupname)
-					FreeVec(con.groupname);
+					StrFree(con.groupname);
 				if(con.lastname)
-					FreeVec(con.lastname);
+					StrFree(con.lastname);
 				if(con.name)
-					FreeVec(con.name);
+					StrFree(con.name);
 				if(con.nickname)
-					FreeVec(con.nickname);
+					StrFree(con.nickname);
 			}
 		}
 	}
@@ -2413,7 +2362,7 @@ static IPTR ApplicationExportListAck(Class *cl, Object *obj, struct APPP_ExportL
 		if((BOOL)xget(d->main_window, MUIA_Window_Open))
 			win = d->main_window;
 
-		switch(MUI_Request(obj, win, 0, APP_NAME, GetString(MSG_MODULE_LIST_EXPORT_FAIL_GADGETS),
+		switch(MUI_Request_Unicode(obj, win, APP_NAME, GetString(MSG_MODULE_LIST_EXPORT_FAIL_GADGETS),
 		 GetString(MSG_MODULE_LIST_EXPORT_FAIL), msg->m->mod_Name))
 		{
 			case 0:
@@ -2512,42 +2461,42 @@ static IPTR ApplicationConvertContactEntry(Class *cl, Object *obj, struct APPP_C
 	{
 		STRPTR t;
 
-		if((t = Utf8ToSystem(c->name)))
+		if((t = StrNew(c->name)))
 		{
 			StrFree(c->name);
 			c->name = t;
 		}
-		if((t = Utf8ToSystem(c->nickname)))
+		if((t = StrNew(c->nickname)))
 		{
 			StrFree(c->nickname);
 			c->nickname = t;
 		}
-		if((t = Utf8ToSystem(c->firstname)))
+		if((t = StrNew(c->firstname)))
 		{
 			StrFree(c->firstname);
 			c->firstname = t;
 		}
-		if((t = Utf8ToSystem(c->lastname)))
+		if((t = StrNew(c->lastname)))
 		{
 			StrFree(c->lastname);
 			c->lastname = t;
 		}
-		if((t = Utf8ToSystem(c->groupname)))
+		if((t = StrNew(c->groupname)))
 		{
 			StrFree(c->groupname);
 			c->groupname = t;
 		}
-		if((t = Utf8ToSystem(c->birthyear)))
+		if((t = StrNew(c->birthyear)))
 		{
 			StrFree(c->birthyear);
 			c->birthyear = t;
 		}
-		if((t = Utf8ToSystem(c->city)))
+		if((t = StrNew(c->city)))
 		{
 			StrFree(c->city);
 			c->city = t;
 		}
-		if((t = Utf8ToSystem(c->statusdesc)))
+		if((t = StrNew(c->statusdesc)))
 		{
 			StrFree(c->statusdesc);
 			c->statusdesc = t;
@@ -2659,7 +2608,7 @@ static IPTR ApplicationOpenHistoryDatabase(Class *cl, Object *obj)
 
 			tprintf("SQLITE ERROR: %ld %ls\n", sql_res, errmsg);
 
-			MUI_RequestA(obj, win, 0, GetString(MSG_SQL_ERROR), GetString(MSG_SQL_GADGETS), errmsg, NULL);
+			MUI_Request_Unicode(obj, win, GetString(MSG_SQL_ERROR), GetString(MSG_SQL_GADGETS), errmsg);
 
 			sqlite3_free(errmsg);
 
@@ -2679,7 +2628,7 @@ static IPTR ApplicationOpenHistoryDatabase(Class *cl, Object *obj)
 
 		tprintf("SQLITE ERROR: [%ld] %ld %ls\n", i, sql_res, sqlite3_errmsg(d->history_database));
 
-		MUI_RequestA(obj, win, 0, GetString(MSG_SQL_ERROR), GetString(MSG_SQL_GADGETS), (STRPTR)sqlite3_errmsg(d->history_database), NULL);
+		MUI_Request_Unicode(obj, win, GetString(MSG_SQL_ERROR), GetString(MSG_SQL_GADGETS), (STRPTR)sqlite3_errmsg(d->history_database));
 
 		sqlite3_close(d->history_database);
 		d->history_database = NULL;
@@ -2767,7 +2716,7 @@ static IPTR ApplicationDoSqlOnHistoryDatabase(Class *cl, Object *obj, struct APP
 
 			tprintf("SQLITE ERROR: %ld %ls\n", sqlres, errmsg);
 
-			MUI_RequestA(obj, win, 0, GetString(MSG_SQL_ERROR), GetString(MSG_SQL_GADGETS), errmsg, NULL);
+			MUI_Request_Unicode(obj, win, GetString(MSG_SQL_ERROR), GetString(MSG_SQL_GADGETS), errmsg);
 
 			sqlite3_free(errmsg);
 		}

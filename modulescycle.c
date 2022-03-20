@@ -77,6 +77,7 @@ static IPTR ModulesCycleNew(Class *cl, Object *obj, struct opSet *msg)
 
 				obj = (Object*)DoSuperNew(cl, (APTR)obj,
 					MUIA_Cycle_Entries, (ULONG)modules_names,
+					MUIA_Unicode, TRUE,
 				TAG_MORE, (ULONG)msg->ops_AttrList);
 
 				if(obj)

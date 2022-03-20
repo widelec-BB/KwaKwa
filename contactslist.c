@@ -204,6 +204,7 @@ static IPTR ContactsListNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Background, MUII_ReadListBack,
 		MUIA_Font, MUIV_Font_List,
 		MUIA_DoubleBuffer, TRUE,
+		MUIA_Unicode, TRUE,
 	TAG_MORE, msg->ops_AttrList);
 
 	if(obj)
@@ -354,17 +355,17 @@ static IPTR ContactsListRemove(Class *cl, Object *obj, struct CLSP_Remove *msg)
 	switch(msg->pos)
 	{
 		case CLSV_Remove_First:
-			if(MUI_Request(_app(obj), _win(obj), 0L, APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_REQ), ContactNameLoc(((struct ListEntry*)(d->data_list.mlh_Head))->data)) == 1)
+			if(MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_REQ), ContactNameLoc(((struct ListEntry*)(d->data_list.mlh_Head))->data)) == 1)
 				entry = (struct ListEntry*) RemHead((struct List*)&d->data_list);
 		break;
 
 		case CLSV_Remove_Last:
-			if(MUI_Request(_app(obj), _win(obj), 0L, APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_REQ), ContactNameLoc(((struct ListEntry*)(d->data_list.mlh_Tail))->data)) == 1)
+			if(MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_REQ), ContactNameLoc(((struct ListEntry*)(d->data_list.mlh_Tail))->data)) == 1)
 				entry = (struct ListEntry*) RemTail((struct List*)&d->data_list);
 		break;
 
 		case CLSV_Remove_Active:
-			if(MUI_Request(_app(obj), _win(obj), 0L, APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_REQ), ContactNameLoc(d->active_entry->data)) == 1)
+			if(MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_REQ), ContactNameLoc(d->active_entry->data)) == 1)
 			{
 				entry = d->active_entry;
 				set(obj, CLSA_Active, entry->node.mln_Succ);
@@ -477,6 +478,9 @@ static ezxml_t ContactsListToEzxml_t(Object *obj)
 	if((list = ezxml_new_d("ContactList")))
 	{
 		ULONG i;
+
+		ezxml_set_attr_d(list, "Encoding", "utf-8");
+
 		for(i = 0;;i++)
 		{
 			ezxml_t entry_xml;
@@ -520,6 +524,12 @@ static ULONG ImportXMLTxt(Object *obj, STRPTR xml)
 		ezxml_t list;
 		if((list = ezxml_parse_str(xml, StrLen(xml))))
 		{
+			STRPTR encoding = (STRPTR)ezxml_attr(list, "Encoding");
+			BOOL convert_to_unicode = TRUE;
+
+			if(encoding && StrEqu(encoding, "utf-8"))
+				convert_to_unicode = FALSE;
+
 			ezxml_t entry_xml;
 			if((entry_xml = ezxml_child(list, "Contact")))
 			{
@@ -537,20 +547,56 @@ static ULONG ImportXMLTxt(Object *obj, STRPTR xml)
 							continue;
 					}
 
-					entry->entryid = ezxml_txt(entry_xml);
-					entry->name = (STRPTR)ezxml_attr(entry_xml, "Name");
-					entry->nickname = (STRPTR)ezxml_attr(entry_xml, "NickName");
-					entry->firstname = (STRPTR)ezxml_attr(entry_xml, "FirstName");
-					entry->lastname = (STRPTR)ezxml_attr(entry_xml, "LastName");
-					entry->groupname = (STRPTR)ezxml_attr(entry_xml, "GroupName");
-					entry->city = (STRPTR)ezxml_attr(entry_xml, "City");
-					entry->birthyear = (STRPTR)ezxml_attr(entry_xml, "Birthyear");
+					entry->status = 0;
 					if(ezxml_attr(entry_xml, "Gender"))
 						entry->gender = *ezxml_attr(entry_xml, "Gender") == '1' ? GENDER_MALE : *ezxml_attr(entry_xml, "Gender") == '2' ? GENDER_FEMALE : GENDER_UNKNOWN;
-					entry->status = 0;
+
+					if(convert_to_unicode)
+					{
+						entry->entryid = SystemToUtf8(ezxml_txt(entry_xml));
+						entry->name = SystemToUtf8((STRPTR)ezxml_attr(entry_xml, "Name"));
+						entry->nickname = SystemToUtf8((STRPTR)ezxml_attr(entry_xml, "NickName"));
+						entry->firstname = SystemToUtf8((STRPTR)ezxml_attr(entry_xml, "FirstName"));
+						entry->lastname = SystemToUtf8((STRPTR)ezxml_attr(entry_xml, "LastName"));
+						entry->groupname = SystemToUtf8((STRPTR)ezxml_attr(entry_xml, "GroupName"));
+						entry->city = SystemToUtf8((STRPTR)ezxml_attr(entry_xml, "City"));
+						entry->birthyear = SystemToUtf8((STRPTR)ezxml_attr(entry_xml, "Birthyear"));
+					}
+					else
+					{
+						entry->entryid = ezxml_txt(entry_xml);
+						entry->name = (STRPTR)ezxml_attr(entry_xml, "Name");
+						entry->nickname = (STRPTR)ezxml_attr(entry_xml, "NickName");
+						entry->firstname = (STRPTR)ezxml_attr(entry_xml, "FirstName");
+						entry->lastname = (STRPTR)ezxml_attr(entry_xml, "LastName");
+						entry->groupname = (STRPTR)ezxml_attr(entry_xml, "GroupName");
+						entry->city = (STRPTR)ezxml_attr(entry_xml, "City");
+						entry->birthyear = (STRPTR)ezxml_attr(entry_xml, "Birthyear");
+					}
 
 					DoMethod(obj, CLSM_InsertSingle, entry, CLSV_Insert_Bottom);
 					DoMethod(_app(obj), APPM_AddNotify, entry->pluginid, entry->entryid, 0);
+
+					if(convert_to_unicode)
+					{
+						if(entry->entryid)
+							FreeVec(entry->entryid);
+						if(entry->name)
+							FreeVec(entry->name);
+						if(entry->nickname)
+							FreeVec(entry->nickname);
+						if(entry->firstname)
+							FreeVec(entry->firstname);
+						if(entry->lastname)
+							FreeVec(entry->lastname);
+						if(entry->groupname)
+							FreeVec(entry->groupname);
+						if(entry->city)
+							FreeVec(entry->city);
+						if(entry->birthyear)
+							FreeVec(entry->birthyear);
+					}
+
 					entries++;
 				}while((entry_xml = ezxml_next(entry_xml)));
 			}
@@ -668,7 +714,7 @@ static IPTR ContactsListExportToFile(Class *cl, Object *obj)
 			ASLFR_DoSaveMode, TRUE,
 			ASLFR_InitialFile, initialfile ? initialfile : (STRPTR)"",
 			ASLFR_InitialDrawer, initialdrawer ? initialdrawer : (STRPTR)"",
-			TAG_END))
+		TAG_END))
 		{
 			UBYTE location[500];
 			BPTR fh;
@@ -1477,6 +1523,7 @@ static IPTR ContactsListDrawContextMenu(Class *cl, Object *obj, struct CLSP_Draw
 		}
 
 		strip = MUI_NewObject(MUIC_Menustrip,
+			MUIA_Unicode, TRUE,
 			MUIA_Group_Child, (menu = MUI_NewObject(MUIC_Menu,
 				MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
 					MUIA_UserData, CONLIST_CMENU_OPEN_TALK,
@@ -1700,7 +1747,7 @@ static IPTR ContactsListRemoveClones(Class *cl, Object *obj)
 		}
 	}
 
-	if(clones_no > 0  && MUI_Request(_app(obj), _win(obj), 0L, APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_CLONES_REQ), clones_no) == 1)
+	if(clones_no > 0  && MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_CLONES_REQ), clones_no) == 1)
 	{
 		do
 		{
@@ -1729,7 +1776,7 @@ static IPTR ContactsListRemoveClones(Class *cl, Object *obj)
 	}
 	else
 	{
-		MUI_Request(_app(obj), _win(obj), 0L, APP_NAME, GetString(MSG_CONTACTLIST_NO_CLONES_GADGETS), GetString(MSG_CONTACTLIST_NO_CLONES), NULL);
+		MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, GetString(MSG_CONTACTLIST_NO_CLONES_GADGETS), GetString(MSG_CONTACTLIST_NO_CLONES), NULL);
 	}
 
 	return (IPTR)1;
@@ -1792,7 +1839,7 @@ static IPTR ContactsListRemoveEntry(Class *cl, Object *obj, struct CLSP_RemoveEn
 
 	if(e)
 	{
-		if(!msg->confirm || MUI_Request(_app(obj), _win(obj), 0L, APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_REQ), ContactNameLoc(((struct ListEntry*)(d->data_list.mlh_Head))->data)) == 1)
+		if(!msg->confirm || MUI_Request_Unicode(_app(obj), _win(obj), APP_NAME, GetString(MSG_CONTACTLIST_DELETE_GADGETS), GetString(MSG_CONTACTLIST_DELETE_REQ), ContactNameLoc(((struct ListEntry*)(d->data_list.mlh_Head))->data)) == 1)
 		{
 			Remove((struct Node*)e);
 

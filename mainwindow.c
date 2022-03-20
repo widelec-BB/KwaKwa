@@ -74,12 +74,26 @@ static IPTR MainWindowNotifications(Class *cl, Object *obj)
 
 static IPTR MainWindowNew(Class *cl, Object *obj, struct opSet *msg)
 {
-	Object *contact_search_string = 	MUI_NewObject(MUIC_Textinput, MUIA_Frame, MUIV_Frame_String, MUIA_Background, MUII_StringBack, MUIA_CycleChain, TRUE, TAG_END);
+	Object *contact_search_string = MUI_NewObject(MUIC_Textinput,
+		MUIA_Unicode, TRUE,
+		MUIA_Frame, MUIV_Frame_String,
+		MUIA_Background, MUII_StringBack,
+		MUIA_CycleChain, TRUE,
+	TAG_END);
 	Object *prop = MUI_NewObject(MUIC_Prop, MUIA_Prop_UseWinBorder, MUIV_Prop_UseWinBorder_Right, TAG_END);
-	Object *contact_list = NewObject(ContactsListClass->mcc_Class, NULL, CLSA_Prop_Gadget, prop, CLSA_Search_String, contact_search_string, MUIA_CycleChain, TRUE, TAG_END);
+	Object *contact_list = NewObject(ContactsListClass->mcc_Class, NULL,
+		CLSA_Prop_Gadget, prop,
+		CLSA_Search_String, contact_search_string,
+		MUIA_CycleChain, TRUE,
+	TAG_END);
 	Object *screenbarize_button = NormalButton(GetString(MSG_MAINWINDOW_HIDE_BUTTON), *(GetString(MSG_MAINWINDOW_HIDE_BUTTON_HOTKEY)), USD_MAIN_WINDOW_SCREENBARIZE_BUTTON, 0);
 	Object *gg_status_menu = NormalButton(GetString(MSG_MAINWINDOW_STATUS_BUTTON), *(GetString(MSG_MAINWINDOW_STATUS_BUTTON_HOTKEY)), USD_MAIN_WINDOW_STATUS_BUTTON, 0);
-	Object *gg_act_status = MUI_NewObject(MUIC_Text, MUIA_Weight, 0, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/unavailable.mbr]", MUIA_ShortHelp, GetString(MSG_MAINWINDOW_ACT_STATUS_HELP), TAG_END);
+	Object *gg_act_status = MUI_NewObject(MUIC_Text,
+		MUIA_Unicode, TRUE,
+		MUIA_Weight, 0,
+		MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/unavailable.mbr]",
+		MUIA_ShortHelp, GetString(MSG_MAINWINDOW_ACT_STATUS_HELP),
+	TAG_END);
 	Object *next_button = NormalButton(GetString(MSG_MAINWINDOW_SEARCH_NEXT_BUTTON), *GetString(MSG_MAINWINDOW_SEARCH_NEXT_BUTTON_HOTKEY), USD_MAIN_WINDOW_SEARCH_NEXT_BUTTON, 0);
 	Object *search_group, *busy_bar;
 
@@ -174,6 +188,7 @@ static IPTR MainWindowShowGGStatusMenu(Class *cl, Object *obj)
 
 
 	strip = MUI_NewObject(MUIC_Menustrip,
+		MUIA_Unicode, TRUE,
 		MUIA_Group_Child, MUI_NewObject(MUIC_Menu,
 
 			MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
@@ -373,4 +388,3 @@ static IPTR MainWindowDispatcher(void)
 		default:  return (DoSuperMethodA(cl, obj, msg));
 	}
 }
-

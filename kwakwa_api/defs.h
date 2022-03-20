@@ -61,7 +61,7 @@
 
 /******KWA_STATUS_#?******/
 
-#define KWA_STATUS_DESC_MAX_SIZE 255
+#define KWA_STATUS_DESC_MAX_SIZE 1024
 
 /****d* defs.h/MSG_FLAG_#?
  *

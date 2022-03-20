@@ -51,66 +51,66 @@ BOOL StartApp(VOID)
 {
 	BYTE error[128];
 
-	if(!(LocaleBase = (APTR) OpenLibrary("locale.library", 0)))
+	if(!(LocaleBase = (APTR) OpenLibrary("locale.library", 53)))
 	{
-		PutStr("Cannot open locale.library!\n");
+		PutStr("Cannot open locale.library (V53)\n");
 		return FALSE;
 	}
-	Locale_Open("kwakwa.catalog", 4, 1);
-	if(!(MUIMasterBase = OpenLibrary("muimaster.library", 20)))
+	Locale_Open("kwakwa.catalog", 5, 0);
+	if(!(MUIMasterBase = OpenLibrary("muimaster.library", 22)))
 	{
-		PutStr("Cannot open muimaster.library (V20)\n");
-		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "muimaster.library (V20)");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		PutStr("Cannot open muimaster.library (V22)\n");
+		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "muimaster.library (V22)");
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
 	if(!(CharsetsBase = OpenLibrary("charsets.library", 53)))
 	{
 		PutStr("Cannot open charsets.library (V53)!\n");
 		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "charsets.library (V53)");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
 	if(!(OpenURLBase = OpenLibrary("openurl.library", 8)))
 	{
 		PutStr("Cannot open openurl.library (V8)!\n");
 		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "openurl.library (V8)");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
 	if(!(EzxmlBase = OpenLibrary("ezxml.library", 8)))
 	{
 		PutStr("Cannot open ezxml.library (V8)!\n");
 		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "ezxml.library (V8)");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
 	if(!(UtilityBase = OpenLibrary("utility.library", 39)))
 	{
 		PutStr("Cannot open utility.library (V39)!\n");
 		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "utility.library (V39)");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
 	if(!(SocketBase = OpenLibrary("bsdsocket.library", 0)))
 	{
 		PutStr("Cannot open bsdsocket.library!");
 		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "bsdsocket.library");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
 	if(!(WorkbenchBase = OpenLibrary("workbench.library", 44)))
 	{
 		PutStr("Cannot open workbench.library (V44)!\n");
 		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "workbench.library (V44)");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
 	if(!(SQLiteBase = OpenLibrary("sqlite.library", 53)))
 	{
 		PutStr("Cannot open sqlite.library (V53)!\n");
 		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "sqlite.library (V53)");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
 	if(!(TextEditorMCC = OpenLibrary("mui/TextEditor.mcc", 15)))

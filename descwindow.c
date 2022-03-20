@@ -56,9 +56,9 @@ void DeleteDescWindowClass(void)
 static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	Object *list = NewObject(SimpleStringListClass->mcc_Class, NULL,
-				MUIA_ObjectID, USD_DESC_LIST,
-				MUIA_UserData, USD_DESC_LIST,
-			TAG_END);
+		MUIA_ObjectID, USD_DESC_LIST,
+		MUIA_UserData, USD_DESC_LIST,
+	TAG_END);
 
 	Object *string, *add_to_list, *show_list, *buttons[6], *search_string, *next_button;
 	Object *list_group;
@@ -73,6 +73,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 			MUIA_Group_Child, (ULONG)(string = NewObject(InputFieldClass->mcc_Class, NULL,
 				MUIA_UserData, USD_DESC_STRING,
 				MUIA_ObjectID, USD_DESC_STRING,
+				MUIA_Unicode, TRUE,
 			TAG_END)),
 			MUIA_Group_Child, MUI_NewObject(MUIC_Group,
 				MUIA_Group_Horiz, TRUE,
@@ -126,6 +127,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 					MUIA_CycleChain, TRUE,
 					MUIA_HorizWeight, 1,
 					MUIA_ShortHelp, GetString(MSG_GG_STATUS_AVAIL),
+					MUIA_Unicode, TRUE,
 				TAG_END)),
 				MUIA_Group_Child, (ULONG) (buttons[1] = MUI_NewObject(MUIC_Text,
 					MUIA_Text_Contents, (ULONG)"\33c\33I[4:PROGDIR:gfx/away.mbr]",
@@ -136,6 +138,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 					MUIA_CycleChain, TRUE,
 					MUIA_HorizWeight, 1,
 					MUIA_ShortHelp, GetString(MSG_GG_STATUS_AWAY),
+					MUIA_Unicode, TRUE,
 				TAG_END)),
 				MUIA_Group_Child, (ULONG) (buttons[2] = MUI_NewObject(MUIC_Text,
 					MUIA_Text_Contents, (ULONG)"\33c\33I[4:PROGDIR:gfx/invisible.mbr]",
@@ -146,6 +149,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 					MUIA_CycleChain, TRUE,
 					MUIA_HorizWeight, 1,
 					MUIA_ShortHelp, GetString(MSG_GG_STATUS_INVISIBLE),
+					MUIA_Unicode, TRUE,
 				TAG_END)),
 				MUIA_Group_Child, (ULONG) (buttons[3] = MUI_NewObject(MUIC_Text,
 					MUIA_Text_Contents, (ULONG)"\33c\33I[4:PROGDIR:gfx/unavailable.mbr]",
@@ -156,6 +160,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 					MUIA_CycleChain, TRUE,
 					MUIA_HorizWeight, 1,
 					MUIA_ShortHelp, GetString(MSG_GG_STATUS_UNAVAIL),
+					MUIA_Unicode, TRUE,
 				TAG_END)),
 				MUIA_Group_Child, (ULONG)EmptyRectangle(5),
 				MUIA_Group_Child, (ULONG) (buttons[4] = MUI_NewObject(MUIC_Text,
@@ -167,6 +172,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 					MUIA_CycleChain, TRUE,
 					MUIA_HorizWeight, 1,
 					MUIA_ShortHelp, GetString(MSG_GG_STATUS_FFC),
+					MUIA_Unicode, TRUE,
 				TAG_END)),
 				MUIA_Group_Child, (ULONG) (buttons[5] = MUI_NewObject(MUIC_Text,
 					MUIA_Text_Contents, (ULONG)"\33c\33I[4:PROGDIR:gfx/dnd.mbr]",
@@ -177,6 +183,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 					MUIA_CycleChain, TRUE,
 					MUIA_HorizWeight, 1,
 					MUIA_ShortHelp, GetString(MSG_GG_STATUS_DND),
+					MUIA_Unicode, TRUE,
 				TAG_END)),
 				MUIA_Group_Child, (ULONG)EmptyRectangle(40),
 			TAG_END),
@@ -245,7 +252,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 static IPTR DescWindowChangeStatus(Class *cl, Object *obj, struct DWP_ChangeDesc *msg)
 {
 	struct DescWindowData *d = INST_DATA(cl, obj);
-	STRPTR desc = (STRPTR) DoMethod(d->string, MUIM_TextEditor_ExportText);
+	STRPTR desc = (STRPTR) DoMethod(d->string, IFM_ExportText);
 	IPTR result = 0;
 
 	if(desc)
@@ -283,7 +290,7 @@ static IPTR DescWindowChangeListActive(Class *cl, Object *obj)
 		}
 	}
 
-	set(d->string, MUIA_TextEditor_Contents, desc);
+	set(d->string, IFA_TextContents, desc);
 
 	if(desc)
 		StrFree(desc);
@@ -294,7 +301,7 @@ static IPTR DescWindowChangeListActive(Class *cl, Object *obj)
 static IPTR DescWindowAddDescToList(Class *cl, Object *obj)
 {
 	struct DescWindowData *d = INST_DATA(cl, obj);
-	STRPTR new_desc = (STRPTR) DoMethod(d->string, MUIM_TextEditor_ExportText), temp_desc;
+	STRPTR new_desc = (STRPTR) DoMethod(d->string, IFM_ExportText), temp_desc;
 	ULONG i;
 
 	if(new_desc)
@@ -331,7 +338,7 @@ static IPTR DescWindowLoadActualDescription(Class *cl, Object *obj)
 {
 	struct DescWindowData *d = INST_DATA(cl, obj);
 
-	set(d->string, MUIA_TextEditor_Contents, xget(_app(obj), APPA_Description));
+	set(d->string, IFA_TextContents, xget(_app(obj), APPA_Description));
 
 	return (IPTR)0;
 }

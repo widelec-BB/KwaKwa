@@ -37,7 +37,9 @@ VOID DeleteMinMaxSliderClass(VOID)
 
 static IPTR MinMaxSliderNew(Class *cl, Object *obj, struct opSet *msg)
 {
-	if((obj = (Object*)DoSuperMethodA(cl, obj, msg)))
+	if((obj = (Object*)DoSuperNew(cl, obj,
+		MUIA_Unicode, TRUE,
+	TAG_MORE, (IPTR)msg->ops_AttrList)))
 	{
 		struct MinMaxSliderData *d = INST_DATA(cl, obj);
 

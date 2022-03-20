@@ -58,8 +58,14 @@ struct MUI_RGBcolor
 
 
 /* macros for creating objects */
-#define normal_text(str, pre) MUI_NewObject(MUIC_Text, MUIA_UserData, VTG_NORMAL_OBJECT, MUIA_Frame, MUIV_Frame_None, MUIA_Weight, 0, \
-MUIA_Text_PreParse, pre, MUIA_Text_Contents, str, TAG_END)
+#define normal_text(str, pre) MUI_NewObject(MUIC_Text, \
+	MUIA_Unicode, TRUE, \
+	MUIA_UserData, VTG_NORMAL_OBJECT, \
+	MUIA_Frame, MUIV_Frame_None, \
+	MUIA_Weight, 0, \
+	MUIA_Text_PreParse, pre, \
+	MUIA_Text_Contents, str, \
+	TAG_END)
 
 struct VTP_AddMessageText {ULONG MethodID; STRPTR message; ULONG type; ULONG flags;};
 struct VTP_AddMessage {ULONG MethodID; STRPTR message; ULONG flags;};
@@ -110,6 +116,7 @@ void DeleteVirtualTextClass(void)
 static IPTR VirtualTextNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	obj = DoSuperNew(cl, obj,
+		MUIA_Unicode, TRUE,
 		MUIA_Group_LayoutHook, &LayoutHook,
 		MUIA_DoubleBuffer, TRUE,
 	TAG_MORE, msg->ops_AttrList);
@@ -613,6 +620,7 @@ static inline Object* ParseSpecialWord(STRPTR word, ULONG type, STRPTR preparse,
 			buffer = FmtNew("http://%s", word);
 
 		result = MUI_NewObject(MUIC_Hyperlink,
+			MUIA_Unicode, TRUE,
 			MUIA_UserData, VTG_NORMAL_OBJECT,
 			MUIA_Weight, 0,
 			MUIA_Text_Contents, word,
@@ -812,10 +820,12 @@ static IPTR VirtualTextAddSystemMessage(Class *cl, Object *obj, struct VTP_AddSy
 			MUIA_Background, ((BOOL)xget(prefs_object(USD_PREFS_TW_SYSTEMMSG_BACKGROUND), MUIA_Selected)) ? MUII_ButtonBack : (ULONG)"",
 			MUIA_Group_Horiz, TRUE,
 			MUIA_Group_Child, MUI_NewObject(MUIC_Text,
+				MUIA_Unicode, TRUE,
 				MUIA_Text_PreParse, (msg->flags & VTV_FromHistory) ? d->preparse_header_l_old : d->preparse_header_l,
 				MUIA_Text_Contents, ((BOOL)xget(prefs_object(USD_PREFS_TW_SYSTEMMSG_HEADLINE_REVERSE), MUIA_Selected)) ? (STRPTR)d->timeBuffer : (STRPTR)GetString(MSG_SYSTEMMSG_HEADLINE_TITLE),
 			TAG_END),
 			MUIA_Group_Child, MUI_NewObject(MUIC_Text,
+				MUIA_Unicode, TRUE,
 				MUIA_Text_PreParse, (msg->flags & VTV_FromHistory) ? d->preparse_header_r_old : d->preparse_header_r,
 				MUIA_Text_Contents, ((BOOL)xget(prefs_object(USD_PREFS_TW_SYSTEMMSG_HEADLINE_REVERSE), MUIA_Selected)) ? (STRPTR)GetString(MSG_SYSTEMMSG_HEADLINE_TITLE) : (STRPTR)d->timeBuffer,
 			TAG_END),
@@ -1101,10 +1111,12 @@ static IPTR VirtualTextAddMessageHeadLine(Class *cl, Object *obj, struct VTP_Add
 		MUIA_Background, ((BOOL)xget(prefs_object(USD_PREFS_TW_HEADLINE_BACKGROUND), MUIA_Selected)) ? MUII_ButtonBack : (ULONG)"",
 		MUIA_Group_Horiz, TRUE,
 		MUIA_Group_Child, MUI_NewObject(MUIC_Text,
+			MUIA_Unicode, TRUE,
 			MUIA_Text_PreParse, (msg->flags & VTV_FromHistory) ? d->preparse_header_l_old : d->preparse_header_l,
 			MUIA_Text_Contents, ((BOOL)xget(prefs_object(USD_PREFS_TW_HEADLINE_REVERSE), MUIA_Selected)) ? (STRPTR)d->timeBuffer : (STRPTR)msg->sender,
 		TAG_END),
 		MUIA_Group_Child, MUI_NewObject(MUIC_Text,
+			MUIA_Unicode, TRUE,
 			MUIA_Text_PreParse, (msg->flags & VTV_FromHistory) ? d->preparse_header_r_old : d->preparse_header_r,
 			MUIA_Text_Contents, ((BOOL)xget(prefs_object(USD_PREFS_TW_HEADLINE_REVERSE), MUIA_Selected)) ? (STRPTR)msg->sender : (STRPTR)d->timeBuffer,
 		TAG_END),
@@ -1165,6 +1177,7 @@ static IPTR VirtualTextFormatTime(Class *cl, Object *obj, struct VTP_FormatTime 
 	struct VirtualTextData *d = INST_DATA(cl, obj);
 	struct DateTime dt;
 	UBYTE day_buffer[128];
+	STRPTR unicode_day;
 
 	if(msg->timestamp == 0)
 		msg->timestamp = ActLocalTime2Amiga();
@@ -1179,8 +1192,18 @@ static IPTR VirtualTextFormatTime(Class *cl, Object *obj, struct VTP_FormatTime 
 	dt.dat_StrTime = NULL;
 	DateToStr(&dt);
 
-	FmtNPut((STRPTR)d->timeBuffer, "[%ls %02d:%02d:%02d]", sizeof(d->timeBuffer), dt.dat_StrDate,
-	 dt.dat_Stamp.ds_Minute / 60, dt.dat_Stamp.ds_Minute % 60, dt.dat_Stamp.ds_Tick / TICKS_PER_SECOND);
+	if((unicode_day = SystemToUtf8(dt.dat_StrDate)))
+	{
+		FmtNPut((STRPTR)d->timeBuffer, "[%ls %02d:%02d:%02d]", sizeof(d->timeBuffer), unicode_day,
+		 dt.dat_Stamp.ds_Minute / 60, dt.dat_Stamp.ds_Minute % 60, dt.dat_Stamp.ds_Tick / TICKS_PER_SECOND);
+
+		StrFree(unicode_day);
+	}
+	else
+	{
+		FmtNPut((STRPTR)d->timeBuffer, "[%02d:%02d:%02d]", sizeof(d->timeBuffer),
+		 dt.dat_Stamp.ds_Minute / 60, dt.dat_Stamp.ds_Minute % 60, dt.dat_Stamp.ds_Tick / TICKS_PER_SECOND);
+	}
 
 	return (IPTR)d->timeBuffer;
 }
