@@ -24,10 +24,6 @@
 
 #include "kwakwa_api/defs.h"
 
-#ifndef MUIA_Title_Sortable
-#define MUIA_Title_Sortable 0x804211f1 /* V20 isg BOOL */ /* private */
-#endif
-
 struct MUI_CustomClass *TalkWindowClass;
 static IPTR TalkWindowDispatcher(VOID);
 const struct EmulLibEntry TalkWindowGate = {TRAP_LIB, 0, (VOID(*)(VOID))TalkWindowDispatcher};
