@@ -274,7 +274,7 @@ Allows to specify which color will be used as background of active (selected) en
 Pozwala ustawiæ jaki kolor zostanie u¿yty jako t³o aktywnego (zaznaczonego) elementu.
 ;
 MSG_TALKWINDOW_TITLE
-KwaKwa
+KwaKwa: Conversations
 KwaKwa: Rozmowy
 ;
 MSG_TALKTAB_RETURN_CHECK
