@@ -382,7 +382,7 @@ static IPTR TalkWindowShowMessage(Class *cl, Object *obj, struct TKWP_ShowMessag
 			switch(msg->flag)
 			{
 				case MSG_FLAG_NORMAL:
-					DoMethod(tab->tab, TTBM_PutMessage, (STRPTR)xget(tab->title, MUIA_Text_Contents), msg->message, msg->timestamp);
+					DoMethod(tab->tab, TTBM_PutMessage, ContactNameLoc(tab->entry), msg->message, msg->timestamp);
 				break;
 
 				case MSG_FLAG_MULTILOGON:
@@ -409,7 +409,7 @@ static IPTR TalkWindowShowMessage(Class *cl, Object *obj, struct TKWP_ShowMessag
 						set(_app(obj), APPA_ScreenbarUnread, TRUE); /* have to be after sort! APPM_ScreenbarUnread rely on sorting... */
 					}
 
-					DoMethod(_app(obj), APPM_NotifyBeacon, BEACON_MESSAGE, xget(tab->title, MUIA_Text_Contents), TRUE, obj, TKWM_AcceptBeacon, tab->tab_unique_id);
+					DoMethod(_app(obj), APPM_NotifyBeacon, BEACON_MESSAGE, ContactNameLoc(tab->entry), TRUE, obj, TKWM_AcceptBeacon, tab->tab_unique_id);
 					set(tab->title, TTA_Unread, TRUE);
 				}
 				else if(tab->list_entry->unread == TRUE) /* after receive multilogon message set unread to false (we read this on other session) */
@@ -575,12 +575,12 @@ static IPTR TalkWindowCreateTabsMenuStrip(Class *cl, Object *obj)
 		while(tab != NULL)
 		{
 			if(tab->entry.unread)
-				FmtNPut(buffer, "\33b%s", sizeof(buffer), xget(tab->title, MUIA_Text_Contents));
+				FmtNPut(buffer, "\33b%s", sizeof(buffer), ContactNameLoc(tab->entry));
 
 			item = MUI_NewObject(MUIC_Menuitem,
 				MUIA_UserData, SBR_MENU_TALK_TAB + tab->tab_id,
 				MUIA_Menuitem_CopyStrings, TRUE,
-				MUIA_Menuitem_Title, tab->entry.unread == TRUE ? (STRPTR)buffer : (STRPTR)xget(tab->title, MUIA_Text_Contents),
+				MUIA_Menuitem_Title, tab->entry.unread == TRUE ? (STRPTR)buffer : ContactNameLoc(tab->entry),
 			TAG_END);
 
 			DoMethod(result, OM_ADDMEMBER, item);
@@ -705,7 +705,7 @@ static IPTR TalkWindowShowPicture(Class *cl, Object *obj, struct TKWP_ShowPictur
 		switch(msg->flag)
 		{
 			case MSG_FLAG_NORMAL:
-				DoMethod(tab->tab, TTBM_PutPicture, xget(tab->title, MUIA_Text_Contents), msg->timestamp, msg->pic, msg->pic_size);
+				DoMethod(tab->tab, TTBM_PutPicture, ContactNameLoc(tab->entry), msg->timestamp, msg->pic, msg->pic_size);
 			break;
 
 			case MSG_FLAG_MULTILOGON:
@@ -728,7 +728,7 @@ static IPTR TalkWindowShowPicture(Class *cl, Object *obj, struct TKWP_ShowPictur
 					set(_app(obj), APPA_ScreenbarUnread, TRUE); /* have to be after sort! APPM_ScreenbarUnread rely on sorting... */
 				}
 
-				DoMethod(_app(obj), APPM_NotifyBeacon, BEACON_PICTURE, xget(tab->title, MUIA_Text_Contents), TRUE, obj, TKWM_AcceptBeacon, tab->tab_unique_id);
+				DoMethod(_app(obj), APPM_NotifyBeacon, BEACON_PICTURE, ContactNameLoc(tab->entry), TRUE, obj, TKWM_AcceptBeacon, tab->tab_unique_id);
 				set(tab->title, TTA_Unread, TRUE);
 			}
 			else if(tab->list_entry->unread == TRUE) /* after receive multilogon message set unread to false (we read this on other session) */
@@ -818,7 +818,7 @@ static IPTR TalkWindowShowInvite(Class *cl, Object *obj, struct TKWP_ShowInvite 
 				set(_app(obj), APPA_ScreenbarUnread, TRUE); /* have to be after sort! APPM_ScreenbarUnread rely on sorting... */
 			}
 
-			DoMethod(_app(obj), APPM_NotifyBeacon, BEACON_INVITE, xget(tab->title, MUIA_Text_Contents), TRUE, obj, TKWM_AcceptBeacon, tab->tab_unique_id);
+			DoMethod(_app(obj), APPM_NotifyBeacon, BEACON_INVITE, ContactNameLoc(tab->entry), TRUE, obj, TKWM_AcceptBeacon, tab->tab_unique_id);
 			set(tab->title, TTA_Unread, TRUE);
 		}
 	}
