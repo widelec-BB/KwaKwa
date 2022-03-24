@@ -282,7 +282,7 @@ static inline Object *CreateProgramPrefs(CONST_STRPTR statuses[6])
 
 static inline Object *CreateTalkWindowPrefs(VOID)
 {
-	Object *result, *pic_width_slider, *pic_width_onoff;
+	Object *result, *pic_width_slider, *pic_width_onoff, *toolbar_onoff, *toolbar_spacer_size;
 	Object *systemmsg_title, *systemmsg_title_bg, *systemmsg_title_width, *systemmsg_title_reverse;
 	Object *systemmsg_title_bg_label, *systemmsg_title_width_label, *systemmsg_title_reverse_label;
 
@@ -707,7 +707,7 @@ static inline Object *CreateTalkWindowPrefs(VOID)
 				TAG_END),
 				MUIA_Group_Child, MUI_NewObject(MUIC_Group,
 					MUIA_Group_Horiz, TRUE,
-					MUIA_Group_Child, MUI_NewObject(MUIC_Image,
+					MUIA_Group_Child, (toolbar_onoff = MUI_NewObject(MUIC_Image,
 						MUIA_ObjectID, USD_PREFS_TW_TOOLBAR_ONOFF,
 						MUIA_UserData, USD_PREFS_TW_TOOLBAR_ONOFF,
 						MUIA_Image_Spec, "6:15",
@@ -716,14 +716,14 @@ static inline Object *CreateTalkWindowPrefs(VOID)
 						MUIA_InputMode, MUIV_InputMode_Toggle,
 						MUIA_CycleChain, TRUE,
 						MUIA_ShortHelp, GetString(MSG_PREFS_TALKWINDOW_TOOLBAR_ON_OFF_HELP),
-					TAG_END),
+					TAG_END)),
 					MUIA_Group_Child, StringLabel(GetString(MSG_PREFS_TALKWINDOW_TOOLBAR_ON_OFF), "\33l"),
 					MUIA_Group_Child, EmptyRectangle(100),
 				TAG_END),
 				MUIA_Group_Child, MUI_NewObject(MUIC_Group,
 					MUIA_Group_Horiz, TRUE,
 					MUIA_Group_Child, StringLabel(GetString(MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE), "\33l"),
-					MUIA_Group_Child, (pic_width_slider = NewObject(MinMaxSliderClass->mcc_Class, NULL,
+					MUIA_Group_Child, (toolbar_spacer_size = NewObject(MinMaxSliderClass->mcc_Class, NULL,
 						MUIA_ObjectID, USD_PREFS_TW_TOOLBAR_SPACE_SIZE,
 						MUIA_UserData, USD_PREFS_TW_TOOLBAR_SPACE_SIZE,
 						MUIA_Slider_Horiz, TRUE,
@@ -741,6 +741,9 @@ static inline Object *CreateTalkWindowPrefs(VOID)
 	TAG_END);
 
 	DoMethod(pic_width_onoff, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, pic_width_slider, 3,
+	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+
+	DoMethod(toolbar_onoff, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, toolbar_spacer_size, 3,
 	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
 
 	DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_bg, 3,
