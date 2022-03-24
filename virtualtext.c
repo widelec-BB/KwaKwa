@@ -85,6 +85,7 @@ struct VirtualTextData
 	ULONG history_alpha;
 	BOOL show_end;
 	BOOL scroll_on_resize;
+	BOOL setup_done;
 
 	struct MUI_EventHandlerNode ehn;
 	Object *mark_start, *mark_stop;
@@ -120,6 +121,7 @@ static IPTR VirtualTextNew(Class *cl, Object *obj, struct opSet *msg)
 		if((d->locale = OpenLocale(NULL)))
 		{
 			d->preparsesDone = FALSE;
+			d->setup_done = FALSE;
 			d->scroll_on_resize = (BOOL)GetTagData(VTA_ScrollOnResize, (ULONG)TRUE, msg->ops_AttrList);
 
 			DoMethod(obj, VTM_ApplyPrefs);
@@ -187,85 +189,6 @@ static IPTR VirtualTextSet(Class *cl, Object *obj, struct opSet *msg)
 
 	tagcount += DoSuperMethodA(cl, obj, (Msg)msg);
 	return tagcount;
-}
-
-static IPTR VirtualTextSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
-{
-	IPTR result = (IPTR)DoSuperMethodA(cl, obj, msg);
-	struct VirtualTextData *d = INST_DATA(cl, obj);
-
-	if(result)
-	{
-		d->ehn.ehn_Class = cl;
-		d->ehn.ehn_Object = obj;
-		d->ehn.ehn_Events = IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY;
-		d->ehn.ehn_Flags = MUI_EHF_PRIORITY; /* not for public use? bite me. needed to override sending event first to active/default gadget */
-		d->ehn.ehn_Priority = 2;
-
-		DoMethod(_win(obj), MUIM_Window_AddEventHandler, &d->ehn);
-	}
-
-	return result;
-}
-
-static IPTR VirtualTextCleanup(Class *cl, Object *obj, struct MUIP_Cleanup *msg)
-{
-	struct VirtualTextData *d = INST_DATA(cl, obj);
-
-	DoMethod(_win(obj), MUIM_Window_RemEventHandler, &d->ehn);
-
-	return DoSuperMethodA(cl, obj, msg);
-}
-
-static IPTR VirtualTextHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEvent *msg)
-{
-	struct VirtualTextData *d = INST_DATA(cl, obj);
-	struct IntuiMessage *imsg = msg->imsg;
-
-	if(imsg)
-	{
-		if(_isinobject(imsg->MouseX, imsg->MouseY))
-		{
-			if(imsg->Class == IDCMP_RAWKEY)
-			{
-				ULONG current_top = xget(obj, MUIA_Virtgroup_Top);
-				if(imsg->Code == RAWKEY_NM_WHEEL_DOWN)
-				{
-					set(obj, MUIA_Virtgroup_Top, current_top + 20);
-					return MUI_EventHandlerRC_Eat;
-				}
-
-				if(imsg->Code == RAWKEY_NM_WHEEL_UP)
-				{
-					set(obj, MUIA_Virtgroup_Top, current_top - 20);
-					return MUI_EventHandlerRC_Eat;
-				}
-			}
-
-			if(imsg->Class == IDCMP_MOUSEBUTTONS)
-			{
-				if(imsg->Code == IECODE_LBUTTON)
-				{
-					d->mark_stop = d->mark_start = NULL;
-					DoMethod(obj, VTM_SelectStart, imsg->MouseX, imsg->MouseY);
-					MUI_Redraw(obj, MADF_DRAWOBJECT);
-				}
-				else
-				{
-					DoMethod(obj, VTM_CopyText);
-					d->mark_stop = d->mark_start = NULL;
-					MUI_Redraw(obj, MADF_DRAWOBJECT);
-				}
-			}
-
-			if(imsg->Class == IDCMP_MOUSEMOVE && d->mark_start)
-			{
-				DoMethod(obj, VTM_SelectStop, imsg->MouseX, imsg->MouseY);
-				MUI_Redraw(obj, MADF_DRAWOBJECT);
-			}
-		}
-	}
-	return 0;
 }
 
 static IPTR VirtualTextCreatePreparses(Class *cl, Object *obj)
@@ -359,6 +282,91 @@ static IPTR VirtualTextCreatePreparses(Class *cl, Object *obj)
 	d->preparsesDone = TRUE;
 
 	return 1;
+}
+
+static IPTR VirtualTextSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
+{
+	IPTR result = (IPTR)DoSuperMethodA(cl, obj, msg);
+	struct VirtualTextData *d = INST_DATA(cl, obj);
+
+	if(result)
+	{
+		d->setup_done = TRUE;
+
+		d->ehn.ehn_Class = cl;
+		d->ehn.ehn_Object = obj;
+		d->ehn.ehn_Events = IDCMP_MOUSEBUTTONS | IDCMP_MOUSEMOVE | IDCMP_RAWKEY;
+		d->ehn.ehn_Flags = MUI_EHF_PRIORITY; /* not for public use? bite me. needed to override sending event first to active/default gadget */
+		d->ehn.ehn_Priority = 2;
+
+		DoMethod(_win(obj), MUIM_Window_AddEventHandler, &d->ehn);
+
+		VirtualTextCreatePreparses(cl, obj);
+	}
+
+	return result;
+}
+
+static IPTR VirtualTextCleanup(Class *cl, Object *obj, struct MUIP_Cleanup *msg)
+{
+	struct VirtualTextData *d = INST_DATA(cl, obj);
+
+	DoMethod(_win(obj), MUIM_Window_RemEventHandler, &d->ehn);
+
+	d->setup_done = FALSE;
+
+	return DoSuperMethodA(cl, obj, msg);
+}
+
+static IPTR VirtualTextHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEvent *msg)
+{
+	struct VirtualTextData *d = INST_DATA(cl, obj);
+	struct IntuiMessage *imsg = msg->imsg;
+
+	if(imsg)
+	{
+		if(_isinobject(imsg->MouseX, imsg->MouseY))
+		{
+			if(imsg->Class == IDCMP_RAWKEY)
+			{
+				ULONG current_top = xget(obj, MUIA_Virtgroup_Top);
+				if(imsg->Code == RAWKEY_NM_WHEEL_DOWN)
+				{
+					set(obj, MUIA_Virtgroup_Top, current_top + 20);
+					return MUI_EventHandlerRC_Eat;
+				}
+
+				if(imsg->Code == RAWKEY_NM_WHEEL_UP)
+				{
+					set(obj, MUIA_Virtgroup_Top, current_top - 20);
+					return MUI_EventHandlerRC_Eat;
+				}
+			}
+
+			if(imsg->Class == IDCMP_MOUSEBUTTONS)
+			{
+				if(imsg->Code == IECODE_LBUTTON)
+				{
+					d->mark_stop = d->mark_start = NULL;
+					DoMethod(obj, VTM_SelectStart, imsg->MouseX, imsg->MouseY);
+					MUI_Redraw(obj, MADF_DRAWOBJECT);
+				}
+				else
+				{
+					DoMethod(obj, VTM_CopyText);
+					d->mark_stop = d->mark_start = NULL;
+					MUI_Redraw(obj, MADF_DRAWOBJECT);
+				}
+			}
+
+			if(imsg->Class == IDCMP_MOUSEMOVE && d->mark_start)
+			{
+				DoMethod(obj, VTM_SelectStop, imsg->MouseX, imsg->MouseY);
+				MUI_Redraw(obj, MADF_DRAWOBJECT);
+			}
+		}
+	}
+	return 0;
 }
 
 static IPTR VirtualTextShowEnd(Class *cl, Object *obj)
@@ -756,6 +764,9 @@ static IPTR VirtualTextApplyPrefs(Class *cl, Object *obj)
 
 	d->history_alpha = (((DOUBLE)(100 - xget(prefs_object(USD_PREFS_OLD_MESSAGES_TRANSPARENCY), MUIA_Slider_Level))) / 100.) * 0xFFFFFFFFUL;
 	d->preparsesDone = FALSE;
+
+	if(d->setup_done)
+		VirtualTextCreatePreparses(cl, obj);
 
 	if(DoSuperMethod(cl, obj, MUIM_Group_InitChange))
 	{
