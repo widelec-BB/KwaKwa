@@ -320,7 +320,8 @@ endif
 
 install:
 ifeq ($(OS),MorphOS)
-	@copy >NIL: bin/kwakwa SYS:Applications/KwaKwa/
+	@copy bin/kwakwa SYS:Applications/KwaKwa/ >NIL:
+	@copy ALL bin/catalogs/ SYS:Applications/KwaKwa/catalogs/ >NIL:
 	@$(TARGET_DONE)
 else
 	@$(NOTMORPHOS)
