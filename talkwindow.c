@@ -69,6 +69,7 @@ struct TalkWindowData
 	struct TabEntry *tabs_list_start;
 	struct TabEntry *tabs_list_end;
 	ULONG tabs_list_entries;
+	UBYTE window_title[512];
 };
 
 struct MUI_CustomClass *CreateTalkWindowClass(VOID)
@@ -510,6 +511,11 @@ static IPTR TalkWindowActivateTab(Class *cl, Object *obj, struct TKWP_ActivateTa
 					set(tab->title, TTA_Unread, FALSE);
 				}
 			}
+		}
+		if(ContactName(tab->list_entry))
+		{
+			FmtNPut(d->window_title, "%s: %s", sizeof(d->window_title) * sizeof(UBYTE), APP_NAME, ContactName(tab->list_entry));
+			set(obj, MUIA_Window_Title, d->window_title);
 		}
 	}
 
