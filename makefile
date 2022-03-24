@@ -244,6 +244,7 @@ $(PROJECT): $(OBJS)
 	@$(TARGET_DONE)
 
 # any other targets
+.PHONY: install
 
 lexer.c: contrib/lexer.l
 	@$(COMPILE_FILE)
@@ -270,7 +271,7 @@ else
 	@$(NOTMORPHOS)
 endif
 
-dist: all locale
+dist: all
 ifeq ($(OS),MorphOS)
 # delete old archive and directory
 	@rm -rf RAM:$(OUTFILE) RAM:$(OUTFILE).lha
@@ -317,7 +318,15 @@ else
 	@$(NOTMORPHOS)
 endif
 
-RELEASE: all locale
+install:
+ifeq ($(OS),MorphOS)
+	@copy >NIL: bin/kwakwa SYS:Applications/KwaKwa/
+	@$(TARGET_DONE)
+else
+	@$(NOTMORPHOS)
+endif
+
+RELEASE: all
 	@$(TARGET_DONE)
 
 DEBUG: COMPILE += -D__DEBUG__ -D__DEBUG_SQL_
