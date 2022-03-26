@@ -906,6 +906,14 @@ static LONG TotalHeight(Class *cl, Object *obj)
 
 	ForeachNode(&d->data_list, act_entry)
 	{
+		LONG avatar_height = 0, avatar_width = 0;
+
+		if(avatars && act_entry->data.avatar)
+		{
+			avatar_height = (act_entry->data.avatar->p_Height > 70 ? 70 : act_entry->data.avatar->p_Height) * AVATAR_RATIO;
+			avatar_width = (act_entry->data.avatar->p_Width > 70 ? 70 : act_entry->data.avatar->p_Width) * AVATAR_RATIO;
+		}
+
 		act_entry->display.virtual_pixel_start = act_height;
 		act_entry->display.pixel_height = 0;
 
@@ -916,14 +924,14 @@ static LONG TotalHeight(Class *cl, Object *obj)
 
 		if(descs && act_entry->data.statusdesc != NULL)
 		{
-			LONG space_for_desc = avatars && act_entry->data.avatar ? _mwidth(obj) - (act_entry->data.avatar->p_Width * AVATAR_RATIO) : _mwidth(obj);
+			LONG space_for_desc = avatar_width > 0 ? _mwidth(obj) - avatar_width : _mwidth(obj);
 
 			act_entry->display.pixel_height += SPACE_BETWEEN_NAME_AND_DESCRIPTION;
 			act_entry->display.pixel_height += StatusDescHeight(obj, act_entry->data.statusdesc, space_for_desc);
 		}
 
-		if(avatars && act_entry->data.avatar && (act_entry->data.avatar->p_Height * AVATAR_RATIO) > act_entry->display.pixel_height) // avatar is bigger than everyting...
-			act_entry->display.pixel_height = (act_entry->data.avatar->p_Height * AVATAR_RATIO);
+		if(avatar_height > act_entry->display.pixel_height) // avatar is bigger than everyting...
+			act_entry->display.pixel_height = avatar_height;
 
 		act_height += act_entry->display.pixel_height;
 
@@ -1076,10 +1084,11 @@ static VOID DrawListPart(Class *cl, Object *obj, LONG start, LONG height, BOOL b
 			{
 				DOUBLE ratio = AVATAR_RATIO;
 				struct Picture *avatar = act_entry->data.avatar;
+				LONG dst_width = (avatar->p_Width > 70 ? 70 : avatar->p_Width) * ratio;
+				LONG dst_height = (avatar->p_Height > 70 ? 70 : avatar->p_Height) * ratio;
 
 				ScalePixelArrayAlpha(avatar->p_Data, avatar->p_Width, avatar->p_Height, avatar->p_Width << 2, _rp(obj),
-				 _mright(obj) - (avatar->p_Width * ratio), _mtop(obj) + act_height,
-				 avatar->p_Width * ratio, avatar->p_Height * ratio, 0xFFFFFFFF);
+				 _mright(obj) - dst_width, _mtop(obj) + act_height, dst_width, dst_height, 0xFFFFFFFF);
 			}
 
 			act_height += act_entry->display.pixel_height;

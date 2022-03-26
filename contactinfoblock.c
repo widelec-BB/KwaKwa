@@ -137,9 +137,9 @@ static IPTR ContactInfoBlockAskMinMax(Class *cl, Object *obj, struct MUIP_AskMin
 
 	if(d->contact && d->contact->avatar)
 	{
-		msg->MinMaxInfo->MinHeight += d->contact->avatar->p_Height;
-		msg->MinMaxInfo->DefHeight += d->contact->avatar->p_Height;
-		msg->MinMaxInfo->MaxHeight += d->contact->avatar->p_Height;
+		msg->MinMaxInfo->MinHeight += d->contact->avatar->p_Height > 70 ? 70 : d->contact->avatar->p_Height;
+		msg->MinMaxInfo->DefHeight += d->contact->avatar->p_Height > 70 ? 70 : d->contact->avatar->p_Height;
+		msg->MinMaxInfo->MaxHeight += d->contact->avatar->p_Height > 70 ? 70 : d->contact->avatar->p_Height;
 	}
 	else
 	{
@@ -246,9 +246,11 @@ static IPTR ContactInfoBlockDraw(Class *cl, Object *obj, struct MUIP_Draw *msg)
 			if(d->contact->avatar != NULL)
 			{
 				struct Picture *avatar = d->contact->avatar;
+				LONG dst_width = avatar->p_Width > 70 ? 70 : avatar->p_Width;
+				LONG dst_height = avatar->p_Height > 70 ? 70 : avatar->p_Height;
 
-				WritePixelArrayAlpha(avatar->p_Data, 0, 0, avatar->p_Width << 2, _rp(obj), _mright(obj) - avatar->p_Width,
-				 _mtop(obj), avatar->p_Width, avatar->p_Height, 0xFFFFFFFF);
+				ScalePixelArrayAlpha(avatar->p_Data, avatar->p_Width, avatar->p_Height, avatar->p_Width << 2, _rp(obj),
+				 _mright(obj) - dst_width, _mtop(obj), dst_width, dst_height, 0xFFFFFFFF);
 			}
 			MUI_RemoveClipping(muiRenderInfo(obj), clip);
 		}
