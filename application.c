@@ -111,6 +111,7 @@ struct ApplicationData
 	Object *history_window, *screenbar;
 	struct SBarControl *sctl;
 	struct Picture *available_pic, *away_pic, *dnd_pic, *ffc_pic, *invisible_pic, *unavailable_pic, *newmsg_pic;
+	STRPTR *used_classes;
 
 	/* last status */
 	ULONG last_status;
@@ -297,6 +298,41 @@ static inline Object *CreateMenuStrip(Object **app_menu, Object **contact_list_m
 	return obj;
 }
 
+static VOID AddUsedMUIClasses(Class *cl, Object *obj, STRPTR *module_classes)
+{
+	struct ApplicationData *d = INST_DATA(cl, obj);
+	ULONG mclasses_len, aclasses_len = 0;
+	STRPTR *newList;
+
+	if(d->used_classes)
+		for(aclasses_len = 0; d->used_classes[aclasses_len]; aclasses_len++);
+	for(mclasses_len = 0; module_classes[mclasses_len]; mclasses_len++);
+
+	if((newList = AllocVec((aclasses_len + mclasses_len + 1) * sizeof(STRPTR), MEMF_ANY)))
+	{
+		ULONG i;
+
+		for(i = 0; i < aclasses_len; i++)
+			newList[i] = StrNew(d->used_classes[i]);
+
+		for(;i < aclasses_len + mclasses_len; i++)
+			newList[i] = StrNew(module_classes[i - aclasses_len]);
+
+		newList[i] = NULL;
+
+		set(obj, MUIA_Application_UsedClasses, newList);
+
+		if(d->used_classes)
+		{
+			for(i = 0; i < aclasses_len; i++)
+				StrFree(d->used_classes[i]);
+
+			FreeVec(d->used_classes);
+		}
+		d->used_classes = newList;
+	}
+}
+
 static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	/* first create a prefs window to avoid problems with global pointer to it. */
@@ -310,7 +346,6 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 	Object *desc_window = NewObject(DescWindowClass->mcc_Class, NULL, TAG_END);
 	Object *main_window, *talk_window, *edit_con_window, *modules_log_window, *history_window;
 	Object *app_menu[3], *contact_list_menu[8], *prefs_menu[2], *tools_menu[4];
-	static STRPTR used_classes[] = {"Hyperlink.mcc", "Lamp.mcc", "TextEditor.mcc", "Busy.mcc", NULL};
 
 	obj = DoSuperNew(cl, obj,
 		MUIA_Application_Author, APP_AUTHOR,
@@ -320,7 +355,6 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Application_Title, APP_NAME,
 		MUIA_Application_Version, APP_VER,
 		MUIA_Application_BrokerPri, 127,
-		MUIA_Application_UsedClasses, used_classes,
 		MUIA_Application_Commands, IpcCommands,
 		MUIA_Application_Menustrip, CreateMenuStrip(app_menu, contact_list_menu, prefs_menu, tools_menu),
 		MUIA_Application_Window, about_window,
@@ -336,6 +370,9 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 	if(obj)
 	{
 		struct ApplicationData *d = INST_DATA(cl, obj);
+		STRPTR used_classes[] = {"Hyperlink.mcc", "Lamp.mcc", "TextEditor.mcc", "Busy.mcc", NULL};
+
+		AddUsedMUIClasses(cl, obj, used_classes);
 
 		d->about_window = about_window;
 		d->main_window = main_window;
@@ -528,6 +565,18 @@ static IPTR ApplicationDispose(Class *cl, Object *obj, Msg msg)
 		}
 
 		FreeVec(d->ignore_modules);
+	}
+
+	if(d->used_classes)
+	{
+		STRPTR *a = d->used_classes;
+
+		set(obj, MUIA_Application_UsedClasses, NULL);
+
+		while(*a)
+			StrFree(*a++);
+
+		FreeVec(d->used_classes);
 	}
 
 	LEAVE();
@@ -1513,6 +1562,10 @@ static IPTR ApplicationAddModulesGui(Class *cl, Object *obj)
 					case KWAG_Window:
 						DoMethod(obj, OM_ADDMEMBER, tag->ti_Data);
 						set((APTR)tag->ti_Data, MUIA_Window_ScreenTitle, APP_SCREEN_TITLE);
+					break;
+
+					case KWAG_UsedClasses:
+						AddUsedMUIClasses(cl, obj, (STRPTR*)tag->ti_Data);
 					break;
 				}
 			}
