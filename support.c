@@ -20,7 +20,9 @@
 
 #include "support.h"
 #include "globaldefines.h"
+#include "locale.h"
 
+#include "kwakwa_api/defs.h"
 #include "kwakwa_api/pictures.h"
 
 extern struct Library *MultimediaBase;
@@ -727,4 +729,22 @@ STRPTR *ExplodeConstString(CONST_STRPTR str, UBYTE delimiter, ULONG *entries)
 	StrFree(temp);
 
 	return res;
+}
+
+STRPTR GetStatusName(ULONG status)
+{
+	if(KWA_S_AVAIL(status))
+		return GetString(MSG_GG_STATUS_AVAIL);
+	if(KWA_S_BUSY(status))
+		return GetString(MSG_GG_STATUS_AWAY);
+	if(KWA_S_FFC(status))
+		return GetString(MSG_GG_STATUS_FFC);
+	if(KWA_S_DND(status))
+		return GetString(MSG_GG_STATUS_DND);
+	if(KWA_S_BLOCKED(status))
+		return GetString(MSG_GG_STATUS_BLOCKED);
+	if(KWA_S_INVISIBLE(status))
+		return GetString(MSG_GG_STATUS_INVISIBLE);
+
+	return GetString(MSG_GG_STATUS_UNAVAIL);
 }

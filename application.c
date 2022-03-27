@@ -1789,8 +1789,6 @@ static IPTR ApplicationListChangeAck(Class *cl, Object *obj, struct APPP_ListCha
 	Object *contacts_list = findobj(USD_CONTACTS_LIST, d->main_window);
 	LONG j;
 	struct ContactEntry *to_update;
-	BYTE buffer[50];
-	IPTR result = 0;
 
 	for(j = 0;;j++)
 	{
@@ -1802,24 +1800,21 @@ static IPTR ApplicationListChangeAck(Class *cl, Object *obj, struct APPP_ListCha
 	if(to_update)
 	{
 		STRPTR new_desc = Utf8ToSystem(msg->change->ke_Description);
+		BOOL statusChanged = to_update->status != msg->change->ke_NewStatus;
 
-		if(to_update->status != KWA_STATUS_FRESH && (to_update->status != msg->change->ke_NewStatus ||
-		  (to_update->statusdesc != new_desc || (to_update->statusdesc && new_desc && !StrEqu(to_update->statusdesc, new_desc)))))
+		if(to_update->statusdesc && new_desc && StrEqu(to_update->statusdesc, new_desc))
+			statusChanged = TRUE;
+		else if(to_update->statusdesc != new_desc)
+			statusChanged = TRUE;
+
+		if(!statusChanged)
+			return 1;
+
+		if(to_update->status != KWA_STATUS_FRESH)
 		{
-			if(KWA_S_NAVAIL(msg->change->ke_NewStatus))
-				FmtNPut((STRPTR)buffer, "%s: %s", sizeof(buffer), ContactName(to_update), GetString(MSG_GG_STATUS_UNAVAIL));
-			if(KWA_S_AVAIL(msg->change->ke_NewStatus))
-				FmtNPut((STRPTR)buffer, "%s: %s", sizeof(buffer), ContactName(to_update), GetString(MSG_GG_STATUS_AVAIL));
-			if(KWA_S_BUSY(msg->change->ke_NewStatus))
-				FmtNPut((STRPTR)buffer, "%s: %s", sizeof(buffer), ContactName(to_update), GetString(MSG_GG_STATUS_AWAY));
-			if(KWA_S_FFC(msg->change->ke_NewStatus))
-				FmtNPut((STRPTR)buffer, "%s: %s", sizeof(buffer), ContactName(to_update), GetString(MSG_GG_STATUS_FFC));
-			if(KWA_S_DND(msg->change->ke_NewStatus))
-				FmtNPut((STRPTR)buffer, "%s: %s", sizeof(buffer), ContactName(to_update), GetString(MSG_GG_STATUS_DND));
-			if(KWA_S_BLOCKED(msg->change->ke_NewStatus))
-				FmtNPut((STRPTR)buffer, "%s: %s", sizeof(buffer), ContactName(to_update), GetString(MSG_GG_STATUS_BLOCKED));
-			if(KWA_S_INVISIBLE(msg->change->ke_NewStatus))
-				FmtNPut((STRPTR)buffer, "%s: %s", sizeof(buffer), ContactName(to_update), GetString(MSG_GG_STATUS_INVISIBLE));
+			BYTE buffer[50];
+
+			FmtNPut((STRPTR)buffer, "%s: %s", sizeof(buffer), ContactName(to_update), GetStatusName(msg->change->ke_NewStatus));
 
 			DoMethod(obj, APPM_NotifyBeacon, (STRPTR)BEACON_STATUS, (STRPTR)buffer, FALSE, NULL, NULL, NULL);
 		}
@@ -1833,11 +1828,10 @@ static IPTR ApplicationListChangeAck(Class *cl, Object *obj, struct APPP_ListCha
 
 		DoMethod(d->talk_window, TKWM_UpdateTabContactStatus, to_update->entryid, to_update->pluginid);
 
-		result++;
 		DoMethod(contacts_list, CLSM_Sort);
 	}
 
-	return result;
+	return 1;
 }
 
 static IPTR ApplicationNewMessageAck(Class *cl, Object *obj, struct APPP_NewMessageAck *msg)

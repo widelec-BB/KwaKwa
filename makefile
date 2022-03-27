@@ -118,7 +118,7 @@ $(OBJDIR)smallsbar.c.o: smallsbar.c globaldefines.h smallsbar.h application.h pr
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)smallsbar.c.o smallsbar.c
 
-$(OBJDIR)support.c.o: support.c support.h globaldefines.h
+$(OBJDIR)support.c.o: support.c support.h globaldefines.h translations.h kwakwa_api/defs.h kwakwa_api/pictures.h locale.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)support.c.o support.c
 

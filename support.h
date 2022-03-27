@@ -53,6 +53,7 @@ VOID SetTimeFixValue(LONG fix_value);
 BOOL CheckForOtherCopy(STRPTR portName, BOOL wake);
 STRPTR *ExplodeString(STRPTR str, UBYTE delimiter, ULONG *entries);
 STRPTR *ExplodeConstString(CONST_STRPTR str, UBYTE delimiter, ULONG *entries);
+STRPTR GetStatusName(ULONG status);
 
 static inline ULONG xget(Object *obj, ULONG att)
 {
