@@ -1,4 +1,4 @@
-## Version $VER: kwakwa.catalog 4.0 (18.03.2022)
+## Version $VER: kwakwa.catalog 4.1 (27.03.2022)
 ## Languages english polski
 ## Codeset english 0
 ## Codeset polski 0
@@ -929,21 +929,13 @@ MSG_PREFS_TALKWINDOW_SYSTEMMSG_HEADLINE_REVERSE_HELP
 Goes to next line after inserting message headline, so message contents will be placed below headline.
 W³±cza przechodzenie do nastêpnej linii po wstawieniu nag³ówka wiadomo¶ci, dziêki temu tre¶æ wiadomo¶ci bêdzie umieszczona poni¿ej nag³ówka.
 ;
-MSG_PREFS_TALKWINDOW_SELECTION
-Text Selection
-Zaznaczanie tekstu
-;
 MSG_PREFS_TALKWINDOW_SELECTION_COLOR
-Selection color:
-Kolor zaznaczenia:
+Text Selection Color:
+Kolor zaznaczenia tekstu:
 ;
 MSG_PREFS_TALKWINDOW_SELECTION_COLOR_HELP
 Allows you to define background color of selected text.
 Pozwala wybraæ kolor t³a zaznaczonego tekstu.
-;
-MSG_PREFS_TALKWINDOW_PICTURES
-Pictures
-Obrazki
 ;
 MSG_PREFS_TALKWINDOW_PICTURES_ON_OFF
 Show pictures in talk window

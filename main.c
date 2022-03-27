@@ -56,7 +56,7 @@ BOOL StartApp(VOID)
 		PutStr("Cannot open locale.library!\n");
 		return FALSE;
 	}
-	Locale_Open("kwakwa.catalog", 4, 0);
+	Locale_Open("kwakwa.catalog", 4, 1);
 	if(!(MUIMasterBase = OpenLibrary("muimaster.library", 20)))
 	{
 		PutStr("Cannot open muimaster.library (V20)\n");
