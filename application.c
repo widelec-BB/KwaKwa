@@ -2316,9 +2316,12 @@ static IPTR ApplicationNewAvatarAck(Class *cl, Object *obj, struct APPP_NewAvata
 			break;
 	}
 
-	if(con && (con->avatar = CopyPicture(msg->newavatar->ke_Picture)))
+	if(con)
+	{
+		FreePicture(con->avatar); /* FreePicture() can be called with NULL pointer */
+		con->avatar = CopyPicture(msg->newavatar->ke_Picture);
 		DoMethod(con_list, CLSM_NewAvatar);
-
+	}
 	return (IPTR)0;
 }
 
