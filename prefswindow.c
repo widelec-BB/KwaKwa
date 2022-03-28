@@ -1435,7 +1435,7 @@ static IPTR PrefsWindowDispose(Class *cl, Object *obj, Msg msg)
 	for(i = 0; i < 6; i++)
 		FmtFree((APTR)d->statuses[i]);
 
-	return 0;
+	return DoSuperMethodA(cl, obj, msg);
 }
 
 
