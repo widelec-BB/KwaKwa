@@ -372,6 +372,8 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		struct ApplicationData *d = INST_DATA(cl, obj);
 		STRPTR used_classes[] = {"Hyperlink.mcc", "Lamp.mcc", "TextEditor.mcc", "Busy.mcc", NULL};
 
+		NEWLIST(&d->modules);
+
 		AddUsedMUIClasses(cl, obj, used_classes);
 
 		d->about_window = about_window;
