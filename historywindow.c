@@ -32,6 +32,8 @@ struct HistoryWindowData
 	Object *contacts_list;
 	Object *conversations_list;
 	Object *virtual_text;
+
+	STRPTR win_title;
 };
 
 struct MUI_CustomClass *CreateHistoryWindowClass(VOID)
@@ -88,6 +90,9 @@ static IPTR HistoryWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	{
 		struct HistoryWindowData *d = INST_DATA(cl, obj);
 
+		if((d->win_title = Utf8ToSystem((STRPTR)xget(obj, MUIA_Window_Title))))
+			set(obj, MUIA_Window_Title, (IPTR)d->win_title);
+
 		d->contacts_list = con_list;
 		d->conversations_list = conv_list;
 		d->virtual_text = vt;
@@ -110,6 +115,16 @@ static IPTR HistoryWindowNew(Class *cl, Object *obj, struct opSet *msg)
 		return (IPTR)obj;
 	}
 	return (IPTR)NULL;
+}
+
+static IPTR HistoryWindowDispose(Class *cl, Object *obj, Msg msg)
+{
+	struct HistoryWindowData *d = INST_DATA(cl, obj);
+
+	if(d->win_title)
+		StrFree(d->win_title);
+
+	return DoSuperMethodA(cl, obj, msg);
 }
 
 static IPTR HistoryWindowContactSelected(Class *cl, Object *obj, struct HWP_ContactSelected *msg)
@@ -194,6 +209,7 @@ static IPTR HistoryWindowDispatcher(VOID)
 	switch (msg->MethodID)
 	{
 		case OM_NEW: return(HistoryWindowNew(cl, obj, (struct opSet*)msg));
+		case OM_DISPOSE: return(HistoryWindowDispose(cl, obj, msg));
 		case HWM_ContactSelected: return(HistoryWindowContactSelected(cl, obj, (struct HWP_ContactSelected*)msg));
 		case HWM_ConversationSelected: return(HistoryWindowConversationSelected(cl, obj, (struct HWP_ConversationSelected*)msg));
 		case HWM_InsertMessage: return(HistoryWindowInsertMessage(cl, obj, (struct HWP_InsertMessage*)msg));

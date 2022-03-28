@@ -3,9 +3,11 @@
  * All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+#include <libvstring.h>
 
 #include "globaldefines.h"
 #include "locale.h"
+#include "support.h"
 #include "modulesmsglist.h"
 #include "moduleslogwindow.h"
 
@@ -18,6 +20,7 @@ struct MLP_AddMsg {ULONG MethodID; STRPTR module_name; ULONG errno; STRPTR msg_t
 struct ModulesLogWindowData
 {
 	Object *msg_list;
+	STRPTR win_title;
 };
 
 struct MUI_CustomClass *CreateModulesLogWindowClass(VOID)
@@ -38,29 +41,42 @@ static IPTR ModulesLogWindowNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	Object *list;
 
-	obj = DoSuperNew(cl, obj,
-		MUIA_Window_ID, USD_MODULESLOG_WINDOW,
-		MUIA_Window_Title, GetString(MSG_MODULE_LOG_WINDOW_TITLE),
-		MUIA_Window_ScreenTitle, APP_SCREEN_TITLE,
-		MUIA_Window_RootObject, MUI_NewObject(MUIC_Group,
+	obj = (Object*)DoSuperNew(cl, obj,
+		MUIA_Window_ID, (IPTR)USD_MODULESLOG_WINDOW,
+		MUIA_Window_Title, (IPTR)GetString(MSG_MODULE_LOG_WINDOW_TITLE),
+		MUIA_Window_ScreenTitle, (IPTR)APP_SCREEN_TITLE,
+		MUIA_Window_RootObject, (IPTR)MUI_NewObject(MUIC_Group,
 			MUIA_Frame, MUIV_Frame_Group,
 			MUIA_Background, MUII_GroupBack,
-			MUIA_Group_Child, (list = NewObject(ModulesMsgListClass->mcc_Class, NULL, TAG_END)),
+			MUIA_Group_Child, (IPTR)(list = NewObject(ModulesMsgListClass->mcc_Class, NULL, TAG_END)),
 		TAG_END),
-	TAG_MORE, msg->ops_AttrList);
+	TAG_MORE, (IPTR)msg->ops_AttrList);
 
 	if(obj)
 	{
 		struct ModulesLogWindowData *d = INST_DATA(cl, obj);
 
+		if((d->win_title = Utf8ToSystem((STRPTR)xget(obj, MUIA_Window_Title))))
+			set(obj, MUIA_Window_Title, (IPTR)d->win_title);
+
 		d->msg_list = list;
 
-		DoMethod(obj, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, obj, 3,
+		DoMethod(obj, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, (IPTR)obj, 3,
 		 MUIM_Set, MUIA_Window_Open, FALSE);
 
 		return (IPTR)obj;
 	}
 	return (IPTR)NULL;
+}
+
+static IPTR ModulesLogWindowDispose(Class *cl, Object *obj, Msg msg)
+{
+	struct ModulesLogWindowData *d = INST_DATA(cl, obj);
+
+	if(d->win_title)
+		StrFree(d->win_title);
+
+	return DoSuperMethodA(cl, obj, msg);
 }
 
 static IPTR ModulesLogWindowAddMsg(Class *cl, Object *obj, struct MLP_AddMsg *msg)
@@ -72,7 +88,7 @@ static IPTR ModulesLogWindowAddMsg(Class *cl, Object *obj, struct MLP_AddMsg *ms
 	new_entry.errno = msg->errno;
 	new_entry.custom_msg = msg->msg_txt;
 
-	DoMethod(d->msg_list, MUIM_List_InsertSingle, &new_entry, MUIV_List_Insert_Bottom);
+	DoMethod(d->msg_list, MUIM_List_InsertSingle, (IPTR)&new_entry, MUIV_List_Insert_Bottom);
 
 	return (IPTR)0;
 }
@@ -87,6 +103,7 @@ static IPTR ModulesLogWindowDispatcher(VOID)
 	switch (msg->MethodID)
 	{
 		case OM_NEW: return(ModulesLogWindowNew(cl, obj, (struct opSet*)msg));
+		case OM_DISPOSE: return(ModulesLogWindowDispose(cl, obj, msg));
 		case MLW_AddMsg: return(ModulesLogWindowAddMsg(cl, obj, (struct MLP_AddMsg*)msg));
 		default: return(DoSuperMethodA(cl, obj, msg));
 	}

@@ -38,6 +38,8 @@ struct MainWindowData
 
 	BOOL hide_installed;
 	struct MUI_InputHandlerNode hide_ihn;
+
+	STRPTR win_title;
 };
 
 struct MUI_CustomClass *CreateMainWindowClass(void)
@@ -147,6 +149,9 @@ static IPTR MainWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	{
 		struct MainWindowData *d = INST_DATA(cl, obj);
 
+		if((d->win_title = Utf8ToSystem((STRPTR)xget(obj, MUIA_Window_Title))))
+			set(obj, MUIA_Window_Title, (IPTR)d->win_title);
+
 		d->contact_list = contact_list;
 		d->screenbarize_button = screenbarize_button;
 		d->gg_act_status = gg_act_status;
@@ -167,6 +172,16 @@ static IPTR MainWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	MUI_DisposeObject(prop);
 	MUI_DisposeObject(contact_search_string);
 	return (CoerceMethod(cl, obj, OM_DISPOSE));
+}
+
+static IPTR MainWindowDispose(Class *cl, Object *obj, Msg msg)
+{
+	struct MainWindowData *d = INST_DATA(cl, obj);
+
+	if(d->win_title)
+		StrFree(d->win_title);
+
+	return DoSuperMethodA(cl, obj, msg);
 }
 
 static IPTR MainWindowShowGGStatusMenu(Class *cl, Object *obj)
@@ -378,6 +393,7 @@ static IPTR MainWindowDispatcher(void)
 	switch (msg->MethodID)
 	{
 		case OM_NEW:  return (MainWindowNew(cl, obj, (struct opSet*)msg));
+		case OM_DISPOSE: return(MainWindowDispose(cl, obj, msg));
 		case MWM_Notifications: return(MainWindowNotifications(cl, obj));
 		case MWM_ShowGGStatusMenu: return (MainWindowShowGGStatusMenu(cl, obj));
 		case MWM_ChangeStatus: return(MainWindowChangeStatus(cl, obj, (struct MWP_ChangeStatus*)msg));

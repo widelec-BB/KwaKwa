@@ -37,6 +37,8 @@ struct EditContactWindowData
 	Object *ok_button, *fetch_pubdir_button;
 	Object *modules_cycle;
 	struct ContactEntry *act_edit;
+
+	STRPTR win_title;
 };
 
 struct MUI_CustomClass *CreateEditContactWindowClass(void)
@@ -122,6 +124,9 @@ static IPTR EditContactWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	{
 		struct EditContactWindowData *d = INST_DATA(cl, obj);
 
+		if((d->win_title = Utf8ToSystem((STRPTR)xget(obj, MUIA_Window_Title))))
+			set(obj, MUIA_Window_Title, (IPTR)d->win_title);
+
 		d->uin_str = uin_str;
 		d->name_str = name_str;
 		d->nickname_str = nickname_str;
@@ -150,6 +155,15 @@ static IPTR EditContactWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	return (IPTR)NULL;
 }
 
+static IPTR EditContactWindowDispose(Class *cl, Object *obj, Msg msg)
+{
+	struct EditContactWindowData *d = INST_DATA(cl, obj);
+
+	if(d->win_title)
+		StrFree(d->win_title);
+
+	return DoSuperMethodA(cl, obj, msg);
+}
 
 static IPTR EditContactWindowEditContact(Class *cl, Object *obj, struct ECWP_EditContact *msg)
 {
@@ -367,6 +381,7 @@ static IPTR EditContactWindowDispatcher(void)
 	switch (msg->MethodID)
 	{
 		case OM_NEW:  return (EditContactWindowNew(cl, obj, (struct opSet*)msg));
+		case OM_DISPOSE: return (EditContactWindowDispose(cl, obj, msg));
 		case ECWM_EditContact: return (EditContactWindowEditContact(cl, obj, (struct ECWP_EditContact*)msg));
 		case ECWM_SaveContact: return (EditContactWindowSaveContact(cl, obj));
 		case ECWM_PubdirFindByUin: return(EditContactWindowPubdirFindByUin(cl, obj));

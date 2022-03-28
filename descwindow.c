@@ -37,6 +37,7 @@ struct DWP_SearchInList
 struct DescWindowData
 {
 	Object *string, *add_to_list, *list, *search_string;
+	STRPTR win_title;
 };
 
 struct MUI_CustomClass *CreateDescWindowClass(void)
@@ -194,11 +195,13 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	{
 		struct DescWindowData *d = INST_DATA(cl, obj);
 
+		if((d->win_title = Utf8ToSystem((STRPTR)xget(obj, MUIA_Window_Title))))
+			set(obj, MUIA_Window_Title, (IPTR)d->win_title);
+
 		d->string = string;
 		d->add_to_list = add_to_list;
 		d->list = list;
 		d->search_string = search_string;
-
 
 		DoMethod(buttons[0], MUIM_Notify, MUIA_Pressed, FALSE, MUIV_Notify_Window, 2,
 		 DWM_ChangeDesc, KWA_STATUS_AVAIL);
@@ -247,6 +250,16 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 
 	CoerceMethod(cl, obj, OM_DISPOSE);
 	return (IPTR)0;
+}
+
+static IPTR DescWindowDispose(Class *cl, Object *obj, Msg msg)
+{
+	struct DescWindowData *d = INST_DATA(cl, obj);
+
+	if(d->win_title)
+		StrFree(d->win_title);
+
+	return DoSuperMethodA(cl, obj, msg);
 }
 
 static IPTR DescWindowChangeStatus(Class *cl, Object *obj, struct DWP_ChangeDesc *msg)
@@ -361,6 +374,7 @@ static IPTR DescWindowDispatcher(void)
 	switch (msg->MethodID)
 	{
 		case OM_NEW:  return (DescWindowNew(cl, obj, (struct opSet*)msg));
+		case OM_DISPOSE: return(DescWindowDispose(cl, obj, msg));
 		case DWM_ChangeDesc: return(DescWindowChangeStatus(cl, obj, (struct DWP_ChangeDesc*)msg));
 		case DWM_ChangeListActive: return(DescWindowChangeListActive(cl, obj));
 		case DWM_AddDescToList: return(DescWindowAddDescToList(cl, obj));

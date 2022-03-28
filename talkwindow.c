@@ -65,7 +65,8 @@ struct TalkWindowData
 	struct TabEntry *tabs_list_start;
 	struct TabEntry *tabs_list_end;
 	ULONG tabs_list_entries;
-	UBYTE window_title[512];
+
+	STRPTR win_title;
 };
 
 struct MUI_CustomClass *CreateTalkWindowClass(VOID)
@@ -111,9 +112,12 @@ static IPTR TalkWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	if(obj)
 	{
 		struct TalkWindowData *d = INST_DATA(cl, obj);
+
+		if((d->win_title = Utf8ToSystem((STRPTR)xget(obj, MUIA_Window_Title))))
+			set(obj, MUIA_Window_Title, (IPTR)d->win_title);
+
 		d->title = title;
 		d->page_group = page_group;
-
 
 		DoMethod(obj, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, MUIV_Notify_Self, 3,
 		 MUIM_Set, MUIA_Window_Open, FALSE);
@@ -137,8 +141,12 @@ static IPTR TalkWindowNew(Class *cl, Object *obj, struct opSet *msg)
 
 static IPTR TalkWindowDispose(Class *cl, Object *obj, Msg msg)
 {
+	struct TalkWindowData *d = INST_DATA(cl, obj);
 	ENTER();
 	DeleteTabsList(cl, obj);
+
+	if(d->win_title)
+		StrFree(d->win_title);
 
 	LEAVE();
 	return DoSuperMethodA(cl, obj, msg);
@@ -512,8 +520,21 @@ static IPTR TalkWindowActivateTab(Class *cl, Object *obj, struct TKWP_ActivateTa
 		}
 		if(ContactName(tab->list_entry))
 		{
-			FmtNPut(d->window_title, "%s: %s", sizeof(d->window_title) * sizeof(UBYTE), APP_NAME, ContactName(tab->list_entry));
-			set(obj, MUIA_Window_Title, d->window_title);
+			STRPTR contact_name_sys = Utf8ToSystem(ContactName(tab->list_entry));
+			if(contact_name_sys)
+			{
+				STRPTR old_title = d->win_title;
+
+				if((d->win_title = FmtNew(APP_NAME": %s", contact_name_sys)))
+				{
+					set(obj, MUIA_Window_Title, d->win_title);
+					StrFree(old_title);
+				}
+				else
+					d->win_title = old_title;
+
+				StrFree(contact_name_sys);
+			}
 		}
 	}
 

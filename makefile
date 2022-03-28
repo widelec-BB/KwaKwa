@@ -167,7 +167,8 @@ $(OBJDIR)modulesmsglist.c.o: modulesmsglist.c globaldefines.h modulesmsglist.h k
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)modulesmsglist.c.o modulesmsglist.c
 
-$(OBJDIR)moduleslogwindow.c.o: moduleslogwindow.c globaldefines.h locale.h translations.h modulesmsglist.h moduleslogwindow.h translations.h locale.h
+$(OBJDIR)moduleslogwindow.c.o: moduleslogwindow.c globaldefines.h locale.h translations.h modulesmsglist.h moduleslogwindow.h translations.h \
+ locale.h support.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)moduleslogwindow.c.o moduleslogwindow.c
 
