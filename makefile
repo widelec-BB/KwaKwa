@@ -26,8 +26,7 @@ PROJECT = $(OUTDIR)$(OUTFILE)
 # COMPILER #
 CC = ppc-morphos-gcc-11
 CWARNS = -Wall -Wno-pointer-sign
-CDEFS  = -D__AMIGADATE__=\"\($(shell date "+%d.%m.%Y")\)\" -DAROS_ALMOST_COMPATIBLE -D__MORPHOS_SHAREDLIBS
-# -D__SVNVERSION__=\"\$(shell svnversion)\"
+CDEFS  = -D__AMIGADATE__=\"\($(shell date "+%d.%m.%Y")\)\" -DAROS_ALMOST_COMPATIBLE -D__MORPHOS_SHAREDLIBS -D__GITHASH__=\"$(shell git log -1 --format=%H)\"
 CFLAGS = -O3 -noixemul
 CLIBS  = -I$(DEPSDIR)libnsgif -I$(DEPSDIR)ftp -I$(DEPSDIR)magicbeacon
 

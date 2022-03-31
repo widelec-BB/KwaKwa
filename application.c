@@ -104,6 +104,8 @@ struct APPP_DeleteContactFromHistory {ULONG MethodID; ULONG plugin_id; STRPTR co
 struct APPP_DeleteConversationFromHistory {ULONG MethodID; QUAD *conversation_id;};
 struct APPP_SetLastStatus {ULONG MethodID; ULONG status; STRPTR desc;};
 
+__attribute__ ((section(".text.consts"))) const char GitHash[] = "git: "__GITHASH__;
+
 struct ApplicationData
 {
 	struct DiskObject *icon;
@@ -356,8 +358,8 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Application_Menustrip, CreateMenuStrip(app_menu, contact_list_menu, prefs_menu, tools_menu),
 		MUIA_Application_Window, (about_window = MUI_NewObject(MUIC_Aboutbox,
 			MUIA_Aboutbox_Credits, APP_ABOUT,
-#ifdef __SVNVERSION__
-			MUIA_Aboutbox_Build, __SVNVERSION__,
+#ifdef __GITHASH__
+			MUIA_Aboutbox_Build, __GITHASH__,
 #endif
 		TAG_END)),
 		MUIA_Application_Window, (history_window = NewObject(HistoryWindowClass->mcc_Class, NULL, TAG_END)),
