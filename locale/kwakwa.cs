@@ -139,7 +139,7 @@ KwaKwa: Ustawienia
 ;
 MSG_PREFSWINDOW_LOGSPREFS
 Log Settings
-Ustawienia archiwum
+Ustawienia archiwum wiadomości
 ;
 MSG_PREFS_LOGS
 Saving Settings
@@ -155,11 +155,11 @@ Włącza/wyłącza zapisywanie treści rozmów do plików.\nZmiana wymaga zamkni
 ;
 MSG_PREFS_LOGS_HISTORY_ONOFF
 Save Conversations to History Database
-Zapisuj rozmowy do archiwum
+Zapisuj rozmowy do bazy danych archiwum wiadomości
 ;
 MSG_PREFS_LOGS_HISTORY_ONOFF_HELP
 Turns on/off writing talk transcription to history database (history.db file).
-Włącza/wyłącza zapisywanie rozmów do archiwum (plik history.db).
+Włącza/wyłącza zapisywanie rozmów do bazy danych archiwum wiadomości (plik history.db).
 ;
 MSG_PREFS_LOGS_HISTORY_CONVERSATION_END_MODE
 Consider Conversation has ended
@@ -211,7 +211,7 @@ Pozwala włączyć albo wyłączyć zapisywanie wiadomości systemowych (np. inf
 ;
 MSG_PREFS_HISTORY
 History Settings
-Ustawienia archiwum
+Ustawienia archiwum wiadomości
 ;
 MSG_PREFSWINDOW_CONTACTSLISTPREFS
 Contacts List
@@ -1003,40 +1003,40 @@ My:
 Mój:
 ;
 MSG_PREFS_TALKWINDOW_MYCOLOR_OLD_HELP
-This color will be used to display outcomming messages loaded from archive.
-Kolor, który zostanie użyty do pokazania wiadomości wychodzących wczytanych z archiwum.
+This color will be used to display outcomming messages loaded from messages history database.
+Kolor, który zostanie użyty do pokazania wiadomości wychodzących wczytanych z archiwum wiadomości.
 ;
 MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD
 Friend:
 Rozmówcy:
 ;
 MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD_HELP
-This color will be used to display incomming messages loaded from archive.
-Kolor, który zostanie użyty do pokazania wiadomości przychodzących wczytanych z archiwum.
+This color will be used to display incomming messages loaded from messages history database.
+Kolor, który zostanie użyty do pokazania wiadomości przychodzących wczytanych z archiwum wiadomości.
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_OLD
 Headline:
 Nagłówek:
 ;
 MSG_PREFS_TALKWINDOW_HEADLINE_OLD_HELP
-This color will be used to display headlines of messages loaded from archive.
-Kolor, który zostanie użyty do pokazania nagłówków wiadomości wczytanych z archiwum.
+This color will be used to display headlines of messages loaded from messages history database.
+Kolor, który zostanie użyty do pokazania nagłówków wiadomości wczytanych z archiwum wiadomości.
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD
 System message:
 Wiadomość systemowa:
 ;
 MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD_HELP
-This color will be used to display system messages loaded from archive.
-Kolor, który zostanie użyty do pokazania wiadomości systemowych wczytanych z archiwum.
+This color will be used to display system messages loaded from messages history database.
+Kolor, który zostanie użyty do pokazania wiadomości systemowych wczytanych z archiwum wiadomości.
 ;
 MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY
 Transparency:
 Przezroczystość:
 ;
 MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY_HELP
-Allows to set text transparency for messages loaded from archive.
-Pozwala ustawić przezroczystość tekstu wiadomości wczytanych z archiwum.
+Allows to set text transparency for messages loaded from messages history database.
+Pozwala ustawić przezroczystość tekstu wiadomości wczytanych z archiwum wiadomości.
 ;
 MSG_PREFS_EMOTICONS_BASICS
 Basics Settings
@@ -1468,7 +1468,7 @@ Obrazek:\x20
 ;
 MSG_SQL_ERROR
 KwaKwa: History Database Error!
-KwaKwa: błąd bazy archiwum!
+KwaKwa: błąd bazy archiwum wiadmości!
 ;
 MSG_SQL_GADGETS
 *_OK
@@ -1553,4 +1553,20 @@ Pozwala na włączenie/wyłączenie pokazywania ikony statusu na panelu tytułow
 MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF
 Show status image on tab title
 Pokazuj ikonę statusu na pasku tytułowym karty
-; 
+;
+MSG_SQL_DB_OPEN_ERROR_TITLE
+KwaKwa: History Database Error!
+KwaKwa: błąd podczas inicjalizacji bazy danych!
+;
+MSG_SQL_DB_OPEN_GADGETS
+_Ignore (Possible Data Loss!)|_Turn Off History Database|*_Quit KwaKwa
+_Ignoruj (możliwa utrata danych!)|_Wyłącz używanie bazy danych|*_Zamknij KwaKwa
+;
+MSG_SQL_DB_OPEN_ERROR
+The database has probably been corrupted.\nContinuing to run Kwakwa with the corrupted database\nenabled may result in data loss.
+Baza danych prawdopodobnie została uszkodzona.\nKontynuowanie uruchamiania programu z włączoną\nuszkodzoną bazą danych może doprowadzić do utraty danych.
+;
+MSG_UPDATE_DATABASE_UNICODE
+Converting message history database to unicode...
+Trwa konwersja bazy danych do unicode...
+;

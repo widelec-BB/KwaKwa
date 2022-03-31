@@ -425,8 +425,12 @@
 #define MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP 384
 #define MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_HELP 385
 #define MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF 386
+#define MSG_SQL_DB_OPEN_ERROR_TITLE 387
+#define MSG_SQL_DB_OPEN_GADGETS 388
+#define MSG_SQL_DB_OPEN_ERROR 389
+#define MSG_UPDATE_DATABASE_UNICODE 390
 
-#define CATCOMP_LASTID 386
+#define CATCOMP_LASTID 390
 
 #endif /* CATCOMP_NUMBERS */
 
@@ -685,15 +689,15 @@
 #define MSG_PREFS_TALKWINDOW_FRIENDCOLOR_HELP_STR "This color will be used to display incomming messages."
 #define MSG_PREFS_TALKWINDOW_COLORS_OLD_STR "Archived Messages Colors"
 #define MSG_PREFS_TALKWINDOW_MYCOLOR_OLD_STR "My:"
-#define MSG_PREFS_TALKWINDOW_MYCOLOR_OLD_HELP_STR "This color will be used to display outcomming messages loaded from archive."
+#define MSG_PREFS_TALKWINDOW_MYCOLOR_OLD_HELP_STR "This color will be used to display outcomming messages loaded from messages history database."
 #define MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD_STR "Friend:"
-#define MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD_HELP_STR "This color will be used to display incomming messages loaded from archive."
+#define MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD_HELP_STR "This color will be used to display incomming messages loaded from messages history database."
 #define MSG_PREFS_TALKWINDOW_HEADLINE_OLD_STR "Headline:"
-#define MSG_PREFS_TALKWINDOW_HEADLINE_OLD_HELP_STR "This color will be used to display headlines of messages loaded from archive."
+#define MSG_PREFS_TALKWINDOW_HEADLINE_OLD_HELP_STR "This color will be used to display headlines of messages loaded from messages history database."
 #define MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD_STR "System message:"
-#define MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD_HELP_STR "This color will be used to display system messages loaded from archive."
+#define MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD_HELP_STR "This color will be used to display system messages loaded from messages history database."
 #define MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY_STR "Transparency:"
-#define MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY_HELP_STR "Allows to set text transparency for messages loaded from archive."
+#define MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY_HELP_STR "Allows to set text transparency for messages loaded from messages history database."
 #define MSG_PREFS_EMOTICONS_BASICS_STR "Basics Settings"
 #define MSG_PREFS_EMOTICONS_ON_OFF_STR "Use Animated Emoticons"
 #define MSG_PREFS_EMOTICONS_ON_OFF_HELP_STR "Turns on/off animated emoticons in Talk Window."
@@ -823,6 +827,10 @@
 #define MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP_STR "Allows to set size of space between buttons in Talk Window toolbar."
 #define MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_HELP_STR "Allows to turn on/off showing contact status icon on tab title."
 #define MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_STR "Show status image on tab title"
+#define MSG_SQL_DB_OPEN_ERROR_TITLE_STR "KwaKwa: History Database Error!"
+#define MSG_SQL_DB_OPEN_GADGETS_STR "_Ignore (Possible Data Loss!)|_Turn Off History Database|*_Quit KwaKwa"
+#define MSG_SQL_DB_OPEN_ERROR_STR "The database has probably been corrupted.\nContinuing to run Kwakwa with the corrupted database\nenabled may result in data loss."
+#define MSG_UPDATE_DATABASE_UNICODE_STR "Converting message history database to unicode..."
 
 #endif /* CATCOMP_STRINGS */
 
@@ -1227,6 +1235,10 @@ static const struct CatCompArrayType CatCompArray[] =
     {MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP,(STRPTR)MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP_STR},
     {MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_HELP,(STRPTR)MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_HELP_STR},
     {MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF,(STRPTR)MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_STR},
+    {MSG_SQL_DB_OPEN_ERROR_TITLE,(STRPTR)MSG_SQL_DB_OPEN_ERROR_TITLE_STR},
+    {MSG_SQL_DB_OPEN_GADGETS,(STRPTR)MSG_SQL_DB_OPEN_GADGETS_STR},
+    {MSG_SQL_DB_OPEN_ERROR,(STRPTR)MSG_SQL_DB_OPEN_ERROR_STR},
+    {MSG_UPDATE_DATABASE_UNICODE,(STRPTR)MSG_UPDATE_DATABASE_UNICODE_STR},
 };
 
 #endif /* CATCOMP_ARRAY */
@@ -1737,23 +1749,23 @@ static const char CatCompBlock[] =
     MSG_PREFS_TALKWINDOW_COLORS_OLD_STR "\x00\x00"
     "\x00\x00\x00\xF8\x00\x04"
     MSG_PREFS_TALKWINDOW_MYCOLOR_OLD_STR "\x00"
-    "\x00\x00\x00\xF9\x00\x4C"
+    "\x00\x00\x00\xF9\x00\x5E"
     MSG_PREFS_TALKWINDOW_MYCOLOR_OLD_HELP_STR "\x00"
     "\x00\x00\x00\xFA\x00\x08"
     MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD_STR "\x00"
-    "\x00\x00\x00\xFB\x00\x4C"
+    "\x00\x00\x00\xFB\x00\x5E"
     MSG_PREFS_TALKWINDOW_FRIENDCOLOR_OLD_HELP_STR "\x00\x00"
     "\x00\x00\x00\xFC\x00\x0A"
     MSG_PREFS_TALKWINDOW_HEADLINE_OLD_STR "\x00"
-    "\x00\x00\x00\xFD\x00\x4E"
+    "\x00\x00\x00\xFD\x00\x60"
     MSG_PREFS_TALKWINDOW_HEADLINE_OLD_HELP_STR "\x00"
     "\x00\x00\x00\xFE\x00\x10"
     MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD_STR "\x00"
-    "\x00\x00\x00\xFF\x00\x48"
+    "\x00\x00\x00\xFF\x00\x5A"
     MSG_PREFS_TALKWINDOW_SYSTEMMSG_OLD_HELP_STR "\x00"
     "\x00\x00\x01\x00\x00\x0E"
     MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY_STR "\x00"
-    "\x00\x00\x01\x01\x00\x42"
+    "\x00\x00\x01\x01\x00\x54"
     MSG_PREFS_TALKWINDOW_OLD_TRANSPARENCY_HELP_STR "\x00"
     "\x00\x00\x01\x02\x00\x10"
     MSG_PREFS_EMOTICONS_BASICS_STR "\x00"
@@ -2013,6 +2025,14 @@ static const char CatCompBlock[] =
     MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_HELP_STR "\x00"
     "\x00\x00\x01\x82\x00\x20"
     MSG_PREFS_TALKWINDOW_TABTITLE_IMAGE_ONOFF_STR "\x00\x00"
+    "\x00\x00\x01\x83\x00\x20"
+    MSG_SQL_DB_OPEN_ERROR_TITLE_STR "\x00"
+    "\x00\x00\x01\x84\x00\x48"
+    MSG_SQL_DB_OPEN_GADGETS_STR "\x00\x00"
+    "\x00\x00\x01\x85\x00\x80"
+    MSG_SQL_DB_OPEN_ERROR_STR "\x00"
+    "\x00\x00\x01\x86\x00\x32"
+    MSG_UPDATE_DATABASE_UNICODE_STR "\x00"
 };
 
 #endif /* CATCOMP_BLOCK */

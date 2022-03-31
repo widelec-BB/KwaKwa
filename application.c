@@ -106,6 +106,37 @@ struct APPP_SetLastStatus {ULONG MethodID; ULONG status; STRPTR desc;};
 
 __attribute__ ((section(".text.consts"))) const char GitHash[] = "git: "__GITHASH__;
 
+enum SQL_E
+{
+	SQL_INSERT_CONVERSATION = 0,
+	SQL_INSERT_MESSAGE,
+	SQL_SELECT_LAST_MESSAGES,
+	SQL_SELECT_LAST_CONVERSATION_MESSAGES,
+	SQL_SELECT_LAST_MESSAGES_TIME,
+	SQL_SELECT_LAST_CONVERSATION,
+	SQL_SELECT_CONTACTS,
+	SQL_SELECT_CONVERSATIONS,
+	SQL_SELECT_MESSAGES,
+	SQL_DELETE_CONTACT,
+	SQL_DELETE_CONVERSATION,
+};
+
+static CONST TEXT *SQL[] =
+{
+	SQL_STMT_INSERT_CONVERSATION,
+	SQL_STMT_INSERT_MESSAGE,
+	SQL_STMT_SELECT_LAST_MESSAGES,
+	SQL_STMT_SELECT_LAST_CONVERSATION_MESSAGES,
+	SQL_STMT_SELECT_LAST_MESSAGES_TIME,
+	SQL_STMT_SELECT_LAST_CONVERSATION,
+	SQL_STMT_SELECT_CONTACTS,
+	SQL_STMT_SELECT_CONVERSATIONS,
+	SQL_STMT_SELECT_MESSAGES,
+	SQL_STMT_DELETE_CONTACT,
+	SQL_STMT_DELETE_CONVERSATION,
+};
+#define SQL_STMT_NO (sizeof(SQL) / sizeof(*SQL))
+
 struct ApplicationData
 {
 	struct DiskObject *icon;
@@ -581,8 +612,10 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 	BPTR fh;
 	ENTER();
 
-	/* will create history database if not exists */
-	DoMethod(obj, APPM_OpenHistoryDatabase);
+	DoMethod(obj, MUIM_Application_Load, MUIV_Application_Load_ENV);
+
+	if((BOOL)DoMethod(obj, APPM_OpenHistoryDatabase) != TRUE)
+		return (IPTR)FALSE;
 
 	if((BOOL)DoMethod(obj, APPM_ScreenbarInstall) != TRUE)
 		return FALSE;
@@ -597,7 +630,6 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 	if(DoMethod(obj, APPM_OpenModules) > 0)
 	{
 		DoMethod(findobj(USD_CONTACTS_LIST, d->main_window), CLSM_ReadList);
-		DoMethod(obj, MUIM_Application_Load, MUIV_Application_Load_ENV);
 
 		/* open main window if user want that */
 		if((BOOL)xget(prefs_object(USD_PREFS_PROGRAM_MAIN_WINDOW_SHOW_START), MUIA_Selected))
@@ -2575,10 +2607,28 @@ static IPTR ApplicationSetLastStatus(Class *cl, Object *obj, struct APPP_SetLast
 	return (IPTR)0;
 }
 
+
+static BOOL OpenHistoryDatabaseError(Object *app, CONST_STRPTR msg_err)
+{
+	LONG rc;
+	rc = MUI_Request_Unicode(app, NULL, GetString(MSG_SQL_DB_OPEN_ERROR_TITLE), GetString(MSG_SQL_DB_OPEN_GADGETS), GetString(MSG_SQL_DB_OPEN_ERROR), msg_err);
+	switch(rc)
+	{
+		case 0:
+			return FALSE;
+		case 1:
+			return TRUE;
+		case 2:
+			set(prefs_object(USD_PREFS_HISTORY_ONOFF_CHECK), MUIA_Selected, FALSE);
+			return TRUE;
+	}
+	return FALSE;
+}
+
 static IPTR ApplicationOpenHistoryDatabase(Class *cl, Object *obj)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
-	IPTR result = -1;
+	BOOL result = FALSE;
 	STRPTR errmsg = NULL;
 	LONG sql_res, i = -1;
 	static CONST TEXT schema[] = SQL_STMT_PRAGMA_CASCADE SQL_STMT_CREATE_TABLE_CONVERSATIONS
@@ -2595,46 +2645,21 @@ static IPTR ApplicationOpenHistoryDatabase(Class *cl, Object *obj)
 			}
 
 			if(i == SQL_STMT_NO)
-				result = 0;
-		}
-		else if(errmsg)
-		{
-			Object *win = NULL;
-
-			if(xget(d->talk_window, MUIA_Window_Open))
-				win = d->talk_window;
-			else if(xget(d->main_window, MUIA_Window_Open))
-				win = d->main_window;
-
-			tprintf("SQLITE ERROR: %ld %ls\n", sql_res, errmsg);
-
-			MUI_Request_Unicode(obj, win, GetString(MSG_SQL_ERROR), GetString(MSG_SQL_GADGETS), errmsg);
-
-			sqlite3_free(errmsg);
-
-			sqlite3_close(d->history_database);
-			d->history_database = NULL;
+				return TRUE;
 		}
 	}
 
-	if(result != 0 && d->history_database)
-	{
-		Object *win = NULL;
+	result = OpenHistoryDatabaseError(obj, errmsg);
 
-		if(xget(d->talk_window, MUIA_Window_Open))
-			win = d->talk_window;
-		else if(xget(d->main_window, MUIA_Window_Open))
-			win = d->main_window;
+	if(errmsg)
+		sqlite3_free(errmsg);
 
-		tprintf("SQLITE ERROR: [%ld] %ld %ls\n", i, sql_res, sqlite3_errmsg(d->history_database));
-
-		MUI_Request_Unicode(obj, win, GetString(MSG_SQL_ERROR), GetString(MSG_SQL_GADGETS), (STRPTR)sqlite3_errmsg(d->history_database));
-
+	if(d->history_database)
 		sqlite3_close(d->history_database);
-		d->history_database = NULL;
-	}
 
-	return result;
+	d->history_database = NULL;
+
+	return (IPTR)result;
 }
 
 static IPTR ApplicationCloseHistoryDatabase(Class *cl, Object *obj)
@@ -2643,9 +2668,11 @@ static IPTR ApplicationCloseHistoryDatabase(Class *cl, Object *obj)
 	LONG i;
 
 	for(i = 0; i < SQL_STMT_NO; i++)
-		sqlite3_finalize(d->history_stmt[i]);
+		if(d->history_stmt[i])
+			sqlite3_finalize(d->history_stmt[i]);
 
-	sqlite3_close(d->history_database);
+	if(d->history_database)
+		sqlite3_close(d->history_database);
 
 	return (IPTR)0;
 }
