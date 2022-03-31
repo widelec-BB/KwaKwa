@@ -244,7 +244,10 @@ int main(VOID)
 				if(DoMethod(app, APPM_Setup))
 				{
 					tprintf("Entering main loop...\n");
-					DoMethod(app, APPM_MainLoop);
+					do
+					{
+						DoMethod(app, APPM_MainLoop);
+					}while(!(BOOL)DoMethod(app, APPM_ConfirmQuit));
 				}
 
 				DoMethod(app, APPM_Cleanup);

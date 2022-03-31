@@ -735,23 +735,7 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 static IPTR ApplicationCleanup(Class *cl, Object *obj)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
-	STRPTR unread_list;
 	ENTER();
-
-	/* check if we have unread messages */
-	if((unread_list = (STRPTR)DoMethod(findobj(USD_CONTACTS_LIST, d->main_window), CLSM_CheckUnread)) != NULL)
-	{
-		/* we have unread messages, so we ask about exiting */
-		LONG req = MUI_Request(obj, d->main_window, 0L, APP_NAME, GetString(MSG_KWAKWAEXIT_UNREAD_BUTTONS), GetString(MSG_KWAKWAEXIT_UNREAD_MSG), unread_list);
-
-		StrFree(unread_list);
-
-		if(req == 0)
-		{
-			/* user doesn't want to exit, so we call MainLoop once again */
-			DoMethod(obj, APPM_MainLoop);
-		}
-	}
 
 	set(d->main_window, MUIA_Window_Open, FALSE);
 	set(d->talk_window, MUIA_Window_Open, FALSE);
@@ -766,6 +750,29 @@ static IPTR ApplicationCleanup(Class *cl, Object *obj)
 
 	LEAVE();
 	return (IPTR)0;
+}
+
+static IPTR ApplicationConfirmQuit(Class *cl, Object *obj)
+{
+	struct ApplicationData *d = INST_DATA(cl, obj);
+	STRPTR unread_list;
+
+	/* check if we have unread messages */
+	if((unread_list = (STRPTR)DoMethod(findobj(USD_CONTACTS_LIST, d->main_window), CLSM_CheckUnread)) != NULL)
+	{
+		/* we have unread messages, so we ask about exiting */
+		LONG req = MUI_Request(obj, d->main_window, 0L, APP_NAME, GetString(MSG_KWAKWAEXIT_UNREAD_BUTTONS), GetString(MSG_KWAKWAEXIT_UNREAD_MSG), unread_list);
+
+		StrFree(unread_list);
+
+		if(req == 0)
+		{
+			/* user doesn't want to exit */
+			return (IPTR)FALSE;
+		}
+	}
+
+	return (IPTR)TRUE;
 }
 
 static IPTR ApplicationClipboardStart(Class *cl, Object *obj, struct APPP_ClipboardStart *msg)
@@ -3336,6 +3343,7 @@ static IPTR ApplicationDispatcher(VOID)
 		case APPM_NotifyBeacon: return(ApplicationNotifyBeacon(cl, obj, (struct APPP_NotifyBeacon*)msg));
 		case APPM_ConvertContactEntry: return(ApplicationConvertContactEntry(cl, obj, (struct APPP_ConvertContactEntry*)msg));
 		case APPM_SetLastStatus: return(ApplicationSetLastStatus(cl, obj, (struct APPP_SetLastStatus*)msg));
+		case APPM_ConfirmQuit: return(ApplicationConfirmQuit(cl, obj));
 
 		/* http */
 		case APPM_SendHttpGet: return(ApplicationSendHttpGet(cl, obj, (struct APPP_SendHttpGet*)msg));
