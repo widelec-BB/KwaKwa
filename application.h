@@ -100,6 +100,8 @@ struct InsertLinkParms
 #define APPM_DeleteConversationFromHistory   0x6EDA0057
 #define APPM_SetLastStatus                   0x6EDA0058
 #define APPM_ConfirmQuit                     0x6EDA0059
+#define APPM_ScreenbarInstall                0x6EDA005A
+#define APPM_ScreenbarRemove                 0x6EDA005B
 
 #define APPM_SecTrigger                      0x6EDA111D
 

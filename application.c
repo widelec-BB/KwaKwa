@@ -335,17 +335,14 @@ static VOID AddUsedMUIClasses(Class *cl, Object *obj, STRPTR *module_classes)
 
 static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 {
-	/* first create a prefs window to avoid problems with global pointer to it. */
-	Object *prefs_window = NewObject(PrefsWindowClass->mcc_Class, NULL, TAG_END);
-	Object *about_window = MUI_NewObject(MUIC_Aboutbox, 
-		MUIA_Aboutbox_Credits, APP_ABOUT,
-#ifdef __SVNVERSION__
-		MUIA_Aboutbox_Build, __SVNVERSION__,
-#endif
-	TAG_END);
-	Object *desc_window = NewObject(DescWindowClass->mcc_Class, NULL, TAG_END);
+	Object *prefs_window, *about_window, *desc_window;
 	Object *main_window, *talk_window, *edit_con_window, *modules_log_window, *history_window;
 	Object *app_menu[3], *contact_list_menu[8], *prefs_menu[2], *tools_menu[4];
+
+	/* first create a prefs window to avoid problems with global pointer to it. */
+	prefs_window = NewObject(PrefsWindowClass->mcc_Class, NULL, TAG_END);
+	if(!prefs_window)
+		return (IPTR)NULL;
 
 	obj = DoSuperNew(cl, obj,
 		MUIA_Application_Author, APP_AUTHOR,
@@ -357,13 +354,18 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Application_BrokerPri, 127,
 		MUIA_Application_Commands, IpcCommands,
 		MUIA_Application_Menustrip, CreateMenuStrip(app_menu, contact_list_menu, prefs_menu, tools_menu),
-		MUIA_Application_Window, about_window,
+		MUIA_Application_Window, (about_window = MUI_NewObject(MUIC_Aboutbox,
+			MUIA_Aboutbox_Credits, APP_ABOUT,
+#ifdef __SVNVERSION__
+			MUIA_Aboutbox_Build, __SVNVERSION__,
+#endif
+		TAG_END)),
 		MUIA_Application_Window, (history_window = NewObject(HistoryWindowClass->mcc_Class, NULL, TAG_END)),
 		MUIA_Application_Window, (main_window = NewObject(MainWindowClass->mcc_Class, NULL, TAG_END)),
 		MUIA_Application_Window, prefs_window,
 		MUIA_Application_Window, (talk_window = NewObject(TalkWindowClass->mcc_Class, NULL, TAG_END)),
 		MUIA_Application_Window, (edit_con_window = NewObject(EditContactWindowClass->mcc_Class, NULL, TAG_END)),
-		MUIA_Application_Window, desc_window,
+		MUIA_Application_Window, (desc_window = NewObject(DescWindowClass->mcc_Class, NULL, TAG_END)),
 		MUIA_Application_Window, (modules_log_window = NewObject(ModulesLogWindowClass->mcc_Class, NULL, TAG_END)),
 	TAG_MORE, msg->ops_AttrList);
 
@@ -463,53 +465,18 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		DoMethod(d->prefs_window, MUIM_Notify, PWA_PrefsChanged, TRUE, obj, 1, APPM_RemoveBroker);
 		DoMethod(d->prefs_window, MUIM_Notify, PWA_PrefsChanged, TRUE, obj, 1, APPM_InstallBroker);
 
-		if((d->available_pic = LoadPictureFile("PROGDIR:gfx/available.mbr")))
+		if((d->slave_object = NewObject(SlaveProcessClass, NULL, TAG_END)))
 		{
-			if((d->away_pic = LoadPictureFile("PROGDIR:gfx/away.mbr")))
+			d->slave_mask = 1UL << (UBYTE)xget(d->slave_object, SPA_SigBit);
+
+			if((d->clipboard_port = CreateMsgPort()))
 			{
-				if((d->dnd_pic = LoadPictureFile("PROGDIR:gfx/dnd.mbr")))
+				if((d->clipboard_request = (struct IOClipReq*)CreateExtIO(d->clipboard_port, sizeof(struct IOClipReq))))
 				{
-					if((d->ffc_pic = LoadPictureFile("PROGDIR:gfx/ffc.mbr")))
+					if(!OpenDevice("clipboard.device", 0, (struct IORequest*)d->clipboard_request, 0))
 					{
-						if((d->invisible_pic = LoadPictureFile("PROGDIR:gfx/invisible.mbr")))
-						{
-							if((d->unavailable_pic = LoadPictureFile("PROGDIR:gfx/unavailable.mbr")))
-							{
-								if((d->newmsg_pic = LoadPictureFile("PROGDIR:gfx/newmsg.mbr")))
-								{
-									if((d->sctl = AllocMem(sizeof(struct SBarControl), MEMF_PUBLIC | MEMF_CLEAR)))
-									{
-										InitSemaphore(&d->sctl->semaphore);
-										d->sctl->app = obj;
-										d->sctl->actPic = d->unavailable_pic;
-										d->sctl->unreadPic = d->newmsg_pic;
-
-										SmallSBarClass->mcc_Class->cl_ID = (UBYTE*)APP_NAME;
-										SmallSBarClass->mcc_Class->cl_UserData = (ULONG)d->sctl;
-										if(ScreenbarControl(SBCT_InstallPlugin, (ULONG)SmallSBarClass, TAG_DONE))
-										{
-											if((d->slave_object = NewObject(SlaveProcessClass, NULL, TAG_END)))
-											{
-												d->slave_mask = 1UL << (UBYTE)xget(d->slave_object, SPA_SigBit);
-
-												if((d->clipboard_port = CreateMsgPort()))
-												{
-													if((d->clipboard_request = (struct IOClipReq*)CreateExtIO(d->clipboard_port, sizeof(struct IOClipReq))))
-													{
-														if(!OpenDevice("clipboard.device", 0, (struct IORequest*)d->clipboard_request, 0))
-														{
-															d->broker_signal = -1;
-
-															return (IPTR)obj;
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
+						d->broker_signal = -1;
+						return (IPTR)obj;
 					}
 				}
 			}
@@ -525,20 +492,6 @@ static IPTR ApplicationDispose(Class *cl, Object *obj, Msg msg)
 	ENTER();
 
 	DoMethod(obj, MUIM_Application_RemInputHandler, &d->sec_ihn);
-
-	ScreenbarControl(SBCT_UninstallPlugin, (ULONG)SmallSBarClass, TAG_DONE);
-
-	if(d->sctl)
-		FreeMem(d->sctl, sizeof(struct SBarControl));
-
-	/* it's safe to call FreePicture with NULL ptr */
-	FreePicture(d->available_pic);
-	FreePicture(d->away_pic);
-	FreePicture(d->dnd_pic);
-	FreePicture(d->ffc_pic);
-	FreePicture(d->invisible_pic);
-	FreePicture(d->unavailable_pic);
-	FreePicture(d->newmsg_pic);
 
 	if(d->icon) FreeDiskObject(d->icon);
 
@@ -634,6 +587,12 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 	struct ApplicationData *d = INST_DATA(cl, obj);
 	BPTR fh;
 	ENTER();
+
+	/* will create history database if not exists */
+	DoMethod(obj, APPM_OpenHistoryDatabase);
+
+	if((BOOL)DoMethod(obj, APPM_ScreenbarInstall) != TRUE)
+		return FALSE;
 
 	if(DoMethod(obj, APPM_OpenModules) > 0)
 	{
@@ -747,6 +706,8 @@ static IPTR ApplicationCleanup(Class *cl, Object *obj)
 	DoMethod(obj, APPM_RemoveBroker);
 	DoMethod(obj, APPM_CloseModules);
 	DoMethod(obj, APPM_CloseHistoryDatabase);
+
+	DoMethod(obj, APPM_ScreenbarRemove);
 
 	LEAVE();
 	return (IPTR)0;
@@ -1107,6 +1068,67 @@ static IPTR ApplicationMainLoop(Class *cl, Object *obj)
 
 	return (IPTR)0;
 
+}
+
+static IPTR ApplicationScreenbarInstall(Class *cl, Object *obj)
+{
+	struct ApplicationData *d = INST_DATA(cl, obj);
+
+	if(!(d->available_pic = LoadPictureFile("PROGDIR:gfx/available.mbr")))
+		return (IPTR)FALSE;
+
+	if(!(d->away_pic = LoadPictureFile("PROGDIR:gfx/away.mbr")))
+		return (IPTR)FALSE;
+
+	if(!(d->dnd_pic = LoadPictureFile("PROGDIR:gfx/dnd.mbr")))
+		return (IPTR)FALSE;
+
+	if(!(d->ffc_pic = LoadPictureFile("PROGDIR:gfx/ffc.mbr")))
+		return (IPTR)FALSE;
+
+	if(!(d->invisible_pic = LoadPictureFile("PROGDIR:gfx/invisible.mbr")))
+		return (IPTR)FALSE;
+
+	if(!(d->unavailable_pic = LoadPictureFile("PROGDIR:gfx/unavailable.mbr")))
+		return (IPTR)FALSE;
+
+	if(!(d->newmsg_pic = LoadPictureFile("PROGDIR:gfx/newmsg.mbr")))
+		return (IPTR)FALSE;
+
+	if((d->sctl = AllocMem(sizeof(struct SBarControl), MEMF_PUBLIC | MEMF_CLEAR)))
+	{
+		InitSemaphore(&d->sctl->semaphore);
+		d->sctl->app = obj;
+		d->sctl->actPic = d->unavailable_pic;
+		d->sctl->unreadPic = d->newmsg_pic;
+
+		SmallSBarClass->mcc_Class->cl_ID = (UBYTE*)APP_NAME;
+		SmallSBarClass->mcc_Class->cl_UserData = (ULONG)d->sctl;
+		if(ScreenbarControl(SBCT_InstallPlugin, (ULONG)SmallSBarClass, TAG_DONE))
+			return (IPTR)TRUE;
+	}
+	return (IPTR)FALSE;
+}
+
+static IPTR ApplicationScreenbarRemove(Class *cl, Object *obj)
+{
+	struct ApplicationData *d = INST_DATA(cl, obj);
+
+	ScreenbarControl(SBCT_UninstallPlugin, (ULONG)SmallSBarClass, TAG_DONE);
+
+	if(d->sctl)
+		FreeMem(d->sctl, sizeof(struct SBarControl));
+
+	/* it's safe to call FreePicture with NULL ptr */
+	FreePicture(d->available_pic);
+	FreePicture(d->away_pic);
+	FreePicture(d->dnd_pic);
+	FreePicture(d->ffc_pic);
+	FreePicture(d->invisible_pic);
+	FreePicture(d->unavailable_pic);
+	FreePicture(d->newmsg_pic);
+
+	return (IPTR)0;
 }
 
 static IPTR ApplicationScreenbarChange(Class *cl, Object *obj, struct APPP_ScreenbarChange *msg)
@@ -3336,6 +3358,8 @@ static IPTR ApplicationDispatcher(VOID)
 
 		/* GUI */
 		case APPM_MainLoop: return(ApplicationMainLoop(cl, obj));
+		case APPM_ScreenbarInstall: return(ApplicationScreenbarInstall(cl, obj));
+		case APPM_ScreenbarRemove: return(ApplicationScreenbarRemove(cl, obj));
 		case APPM_ScreenbarChange: return(ApplicationScreenbarChange(cl, obj, (struct APPP_ScreenbarChange*)msg));
 		case APPM_ScreenbarMenu: return(ApplicationScreenbarMenu(cl, obj, (struct APPP_ScreenbarMenu*)msg));
 		case APPM_Screenbarize: return(ApplicationScreenbarScreenbarize(cl, obj));
