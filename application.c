@@ -390,13 +390,6 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		d->tools_menu = tools_menu[0];
 		d->history_window = history_window;
 
-		d->sec_ihn.ihn_Flags = MUIIHNF_TIMER;
-		d->sec_ihn.ihn_Method = APPM_SecTrigger;
-		d->sec_ihn.ihn_Object = obj;
-		d->sec_ihn.ihn_Millis = 1000;
-
-		DoMethod(obj, MUIM_Application_AddInputHandler, &d->sec_ihn);
-
 		DoMethod(prefs_object(USD_PREFS_WINDOW_CANCEL), MUIM_Notify, MUIA_Pressed, FALSE, obj, 2,
 		 MUIM_Application_Load, MUIV_Application_Load_ENV);
 		DoMethod(d->prefs_window, MUIM_Notify, MUIA_Window_CloseRequest, TRUE, obj, 2,
@@ -492,8 +485,6 @@ static IPTR ApplicationDispose(Class *cl, Object *obj, Msg msg)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
 	ENTER();
-
-	DoMethod(obj, MUIM_Application_RemInputHandler, &d->sec_ihn);
 
 	if(d->icon) FreeDiskObject(d->icon);
 
@@ -595,6 +586,13 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 
 	if((BOOL)DoMethod(obj, APPM_ScreenbarInstall) != TRUE)
 		return FALSE;
+
+	d->sec_ihn.ihn_Flags = MUIIHNF_TIMER;
+	d->sec_ihn.ihn_Method = APPM_SecTrigger;
+	d->sec_ihn.ihn_Object = obj;
+	d->sec_ihn.ihn_Millis = 1000;
+
+	DoMethod(obj, MUIM_Application_AddInputHandler, &d->sec_ihn);
 
 	if(DoMethod(obj, APPM_OpenModules) > 0)
 	{
@@ -710,6 +708,8 @@ static IPTR ApplicationCleanup(Class *cl, Object *obj)
 	DoMethod(obj, APPM_CloseHistoryDatabase);
 
 	DoMethod(obj, APPM_ScreenbarRemove);
+
+	DoMethod(obj, MUIM_Application_RemInputHandler, &d->sec_ihn);
 
 	LEAVE();
 	return (IPTR)0;
