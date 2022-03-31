@@ -7,7 +7,11 @@
 #ifndef __HISTORYSQL_H__
 #define __HISTORYSQL_H__
 
-#define SQL_STMT_VACUUM	"VACUUM"
+#include "globaldefines.h"
+
+#define HISTORY_DB_VERSION 1
+
+#define SQL_STMT_VACUUM "VACUUM"
 
 #define SQL_STMT_PRAGMA_CASCADE "PRAGMA foreign_keys = ON;"
 
@@ -32,6 +36,12 @@ CREATE TABLE IF NOT EXISTS messages( \
 	flags INTEGER NOT NULL, \
 	content TEXT NOT NULL, \
 	FOREIGN KEY(conversationId) REFERENCES conversations(id) ON DELETE CASCADE \
+);"
+
+#define SQL_STMT_CREATE_TABLE_DB_VERSION "\
+CREATE TABLE IF NOT EXISTS db_version( \
+	id INTEGER PRIMARY KEY, \
+	aTimestamp INTEGER NOT NULL \
 );"
 
 #define SQL_STMT_CREATE_INDEX_MESSAGES_CONVERSATIONS "CREATE INDEX IF NOT EXISTS conversationsIndex ON messages(conversationId);"
@@ -80,5 +90,9 @@ SELECT m.flags, m.aTimestamp, m.content FROM messages as m WHERE m.conversationI
 #define SQL_STMT_DELETE_CONTACT "DELETE FROM conversations WHERE pluginId = ? AND contactId = ?;"
 
 #define SQL_STMT_DELETE_CONVERSATION "DELETE FROM conversations WHERE id = ?;"
+
+#define SQL_STMT_SELECT_DB_VERSION "SELECT v.id, v.aTimestamp FROM db_version as v ORDER BY id DESC LIMIT 1;"
+
+#define SQL_STMT_INSERT_CURRENT_DB_VERSION "INSERT INTO db_version VALUES("MACRO_TO_STRING(HISTORY_DB_VERSION)", strftime('%s', 'now') - 252460800);"
 
 #endif /* __HISTORYSQL_H__ */

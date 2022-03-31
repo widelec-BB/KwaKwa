@@ -27,3 +27,4 @@
 0xEEDA XXXX TitleClass
 0xEEDB XXXX ModulesCycleClass
 0xFEDA XXXX EditContactWindowClass
+0xFEDB XXXX LongProcessWindowClass

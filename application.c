@@ -40,6 +40,7 @@
 #include "historyconversationslist.h"
 #include "historywindow.h"
 #include "historysql.h"
+#include "longprocesswindow.h"
 
 #include "kwakwa_api/defs.h"
 #include "kwakwa_api/protocol.h"
@@ -103,6 +104,7 @@ struct APPP_GetMessagesFromHistory {ULONG MethodID; Object *callback_obj; ULONG 
 struct APPP_DeleteContactFromHistory {ULONG MethodID; ULONG plugin_id; STRPTR contact_id;};
 struct APPP_DeleteConversationFromHistory {ULONG MethodID; QUAD *conversation_id;};
 struct APPP_SetLastStatus {ULONG MethodID; ULONG status; STRPTR desc;};
+struct APPP_UpdateHistoryDatabase {ULONG MethodID; LONG db_version;};
 
 __attribute__ ((section(".text.consts"))) const char GitHash[] = "git: "__GITHASH__;
 
@@ -119,6 +121,7 @@ enum SQL_E
 	SQL_SELECT_MESSAGES,
 	SQL_DELETE_CONTACT,
 	SQL_DELETE_CONVERSATION,
+	SQL_SELECT_DB_VERSION,
 };
 
 static CONST TEXT *SQL[] =
@@ -134,6 +137,7 @@ static CONST TEXT *SQL[] =
 	SQL_STMT_SELECT_MESSAGES,
 	SQL_STMT_DELETE_CONTACT,
 	SQL_STMT_DELETE_CONVERSATION,
+	SQL_STMT_SELECT_DB_VERSION,
 };
 #define SQL_STMT_NO (sizeof(SQL) / sizeof(*SQL))
 
@@ -142,6 +146,7 @@ struct ApplicationData
 	struct DiskObject *icon;
 	Object *about_window, *main_window, *prefs_window, *talk_window, *desc_window, *edit_con_window, *modules_log_window, *tools_menu;
 	Object *history_window, *screenbar;
+	Object *startup_progress_window, *startup_progress_message, *startup_progress_gauge;
 	struct SBarControl *sctl;
 	struct Picture *available_pic, *away_pic, *dnd_pic, *ffc_pic, *invisible_pic, *unavailable_pic, *newmsg_pic;
 	STRPTR *used_classes;
@@ -371,6 +376,7 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 	Object *prefs_window, *about_window, *desc_window;
 	Object *main_window, *talk_window, *edit_con_window, *modules_log_window, *history_window;
 	Object *app_menu[3], *contact_list_menu[8], *prefs_menu[2], *tools_menu[4];
+	Object *startup_progress_window, *startup_progress_message, *startup_progress_gauge;
 
 	/* first create a prefs window to avoid problems with global pointer to it. */
 	prefs_window = NewObject(PrefsWindowClass->mcc_Class, NULL, TAG_END);
@@ -400,6 +406,26 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Application_Window, (edit_con_window = NewObject(EditContactWindowClass->mcc_Class, NULL, TAG_END)),
 		MUIA_Application_Window, (desc_window = NewObject(DescWindowClass->mcc_Class, NULL, TAG_END)),
 		MUIA_Application_Window, (modules_log_window = NewObject(ModulesLogWindowClass->mcc_Class, NULL, TAG_END)),
+		MUIA_Application_Window, (startup_progress_window = MUI_NewObject(MUIC_Window,
+			MUIA_Background, MUII_WindowBack,
+			MUIA_Window_Title, GetString(MSG_TALKWINDOW_TITLE),
+			MUIA_Window_Open, FALSE,
+			MUIA_Window_Borderless, TRUE,
+			MUIA_Window_ScreenTitle, APP_SCREEN_TITLE,
+			MUIA_Window_RootObject, MUI_NewObject(MUIC_Group,
+				MUIA_Group_Child, EmptyRectangle(100),
+				MUIA_Group_Child, (startup_progress_gauge = MUI_NewObject(MUIC_Gauge,
+					MUIA_Unicode, TRUE,
+					MUIA_Gauge_Horiz, TRUE,
+					MUIA_Gauge_InfoText, "%ld %%",
+				TAG_END)),
+				MUIA_Group_Child, (startup_progress_message = MUI_NewObject(MUIC_Text,
+					MUIA_Unicode, TRUE,
+					MUIA_Text_PreParse, "\33c",
+				TAG_END)),
+				MUIA_Group_Child, EmptyRectangle(100),
+			TAG_END),
+		TAG_END)),
 	TAG_MORE, msg->ops_AttrList);
 
 	if(obj)
@@ -420,6 +446,9 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		d->modules_log_window = modules_log_window;
 		d->tools_menu = tools_menu[0];
 		d->history_window = history_window;
+		d->startup_progress_window = startup_progress_window;
+		d->startup_progress_message = startup_progress_message;
+		d->startup_progress_gauge = startup_progress_gauge;
 
 		DoMethod(prefs_object(USD_PREFS_WINDOW_CANCEL), MUIM_Notify, MUIA_Pressed, FALSE, obj, 2,
 		 MUIM_Application_Load, MUIV_Application_Load_ENV);
@@ -610,12 +639,21 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
 	BPTR fh;
+	LONG db_version;
 	ENTER();
 
 	DoMethod(obj, MUIM_Application_Load, MUIV_Application_Load_ENV);
 
-	if((BOOL)DoMethod(obj, APPM_OpenHistoryDatabase) != TRUE)
+	if((db_version = DoMethod(obj, APPM_OpenHistoryDatabase)) == -1)
 		return (IPTR)FALSE;
+
+	tprintf("current db version: %ld, required: %ld\n", db_version, HISTORY_DB_VERSION);
+
+	if(db_version < HISTORY_DB_VERSION)
+	{
+		if((BOOL)DoMethod(obj, APPM_UpdateHistoryDatabase, db_version) != TRUE)
+			return (IPTR)FALSE;
+	}
 
 	if((BOOL)DoMethod(obj, APPM_ScreenbarInstall) != TRUE)
 		return FALSE;
@@ -711,9 +749,6 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 			}
 		}
 		DoMethod(obj, APPM_InstallBroker);
-
-		/* will create history database if not exists */
-		DoMethod(obj, APPM_OpenHistoryDatabase);
 
 		LEAVE();
 		return (IPTR)TRUE;
@@ -2607,59 +2642,74 @@ static IPTR ApplicationSetLastStatus(Class *cl, Object *obj, struct APPP_SetLast
 	return (IPTR)0;
 }
 
-
-static BOOL OpenHistoryDatabaseError(Object *app, CONST_STRPTR msg_err)
-{
-	LONG rc;
-	rc = MUI_Request_Unicode(app, NULL, GetString(MSG_SQL_DB_OPEN_ERROR_TITLE), GetString(MSG_SQL_DB_OPEN_GADGETS), GetString(MSG_SQL_DB_OPEN_ERROR), msg_err);
-	switch(rc)
-	{
-		case 0:
-			return FALSE;
-		case 1:
-			return TRUE;
-		case 2:
-			set(prefs_object(USD_PREFS_HISTORY_ONOFF_CHECK), MUIA_Selected, FALSE);
-			return TRUE;
-	}
-	return FALSE;
-}
-
 static IPTR ApplicationOpenHistoryDatabase(Class *cl, Object *obj)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
-	BOOL result = FALSE;
-	STRPTR errmsg = NULL;
-	LONG sql_res, i = -1;
+	BOOL db_exists = FALSE, result = FALSE, close = TRUE;
+	LONG rc, i;
 	static CONST TEXT schema[] = SQL_STMT_PRAGMA_CASCADE SQL_STMT_CREATE_TABLE_CONVERSATIONS
-	 SQL_STMT_CREATE_TABLE_MESSAGES SQL_STMT_CREATE_INDEX_MESSAGES_CONVERSATIONS;
+	 SQL_STMT_CREATE_TABLE_MESSAGES SQL_STMT_CREATE_INDEX_MESSAGES_CONVERSATIONS SQL_STMT_CREATE_TABLE_DB_VERSION;
+	BPTR lock;
+	ENTER();
 
-	if((sql_res = sqlite3_open_v2(HISTORY_DATABASE_PATH, &d->history_database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL)) == SQLITE_OK)
+	if((lock = Lock(HISTORY_DATABASE_PATH, SHARED_LOCK)))
 	{
-		if((sql_res = sqlite3_exec(d->history_database, schema, NULL, NULL, &errmsg)) == SQLITE_OK)
+		db_exists = TRUE;
+		UnLock(lock);
+	}
+
+	if((rc = sqlite3_open_v2(HISTORY_DATABASE_PATH, &d->history_database, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL)) == SQLITE_OK)
+	{
+		if((rc = sqlite3_exec(d->history_database, schema, NULL, NULL, NULL)) == SQLITE_OK)
 		{
 			for(i = 0; i < SQL_STMT_NO; i++)
 			{
-				if((sql_res = sqlite3_prepare_v2(d->history_database, SQL[i], -1, &d->history_stmt[i], NULL)) != SQLITE_OK)
+				if((rc = sqlite3_prepare_v2(d->history_database, SQL[i], -1, &d->history_stmt[i], NULL)) != SQLITE_OK)
 					break;
 			}
 
 			if(i == SQL_STMT_NO)
-				return TRUE;
+			{
+				if(db_exists)
+				{
+					sqlite3_clear_bindings(d->history_stmt[SQL_SELECT_DB_VERSION]);
+					sqlite3_reset(d->history_stmt[SQL_SELECT_DB_VERSION]);
+
+					rc = sqlite3_step(d->history_stmt[SQL_SELECT_DB_VERSION]);
+					if(rc == SQLITE_ROW)
+						return (IPTR)sqlite3_column_int(d->history_stmt[SQL_SELECT_DB_VERSION], 0);
+					else if(rc == SQLITE_DONE)
+						return (IPTR)0;
+				}
+				else if(sqlite3_exec(d->history_database, SQL_STMT_INSERT_CURRENT_DB_VERSION, NULL, NULL, NULL) == SQLITE_OK)
+					return HISTORY_DB_VERSION;
+			}
 		}
 	}
 
-	result = OpenHistoryDatabaseError(obj, errmsg);
+	rc = MUI_Request_Unicode(obj, NULL, GetString(MSG_SQL_DB_OPEN_ERROR_TITLE), GetString(MSG_SQL_DB_OPEN_GADGETS), GetString(MSG_SQL_DB_OPEN_ERROR));
+	switch(rc)
+	{
+		case 1: /* ignore */
+			close = FALSE;
+		break;
 
-	if(errmsg)
-		sqlite3_free(errmsg);
+		case 2: /* disable database */
+			set(prefs_object(USD_PREFS_HISTORY_ONOFF_CHECK), MUIA_Selected, FALSE);
+			close = TRUE;
+		break;
 
-	if(d->history_database)
-		sqlite3_close(d->history_database);
+		case 0: /* quit */
+			close = TRUE;
+			result = FALSE;
+		break;
+	}
 
-	d->history_database = NULL;
+	if(close)
+		DoMethod(obj, APPM_CloseHistoryDatabase);
 
-	return (IPTR)result;
+	LEAVE();
+	return (IPTR)result == TRUE ? 0 : -1;
 }
 
 static IPTR ApplicationCloseHistoryDatabase(Class *cl, Object *obj)
@@ -2668,11 +2718,18 @@ static IPTR ApplicationCloseHistoryDatabase(Class *cl, Object *obj)
 	LONG i;
 
 	for(i = 0; i < SQL_STMT_NO; i++)
+	{
 		if(d->history_stmt[i])
+		{
 			sqlite3_finalize(d->history_stmt[i]);
+			d->history_stmt[i] = NULL;
+		}
+	}
 
 	if(d->history_database)
 		sqlite3_close(d->history_database);
+
+	d->history_database = NULL;
 
 	return (IPTR)0;
 }
@@ -2888,7 +2945,7 @@ static IPTR ApplicationGetLastMessagesFromHistory(Class *cl, Object *obj, struct
 	int rc;
 	ULONG rows_no = 0;
 
-	if(!msg->callback_obj)
+	if(!msg->callback_obj || d->history_stmt[SQL_SELECT_LAST_MESSAGES] == NULL)
 		return -1;
 
 	sqlite3_clear_bindings(d->history_stmt[SQL_SELECT_LAST_MESSAGES]);
@@ -2950,7 +3007,7 @@ static IPTR ApplicationGetLastCovMsgsFromHistory(Class *cl, Object *obj, struct 
 	int rc;
 	ULONG rows_no = 0;
 
-	if(!msg->callback_obj)
+	if(!msg->callback_obj || d->history_stmt[stmt_id] == NULL)
 		return -1;
 
 	sqlite3_clear_bindings(d->history_stmt[stmt_id]);
@@ -3007,7 +3064,7 @@ static IPTR ApplicationGetLastMessagesByTime(Class *cl, Object *obj, struct APPP
 	ULONG rows_no = 0;
 	ULONG timestamp = LocalToUTC(ActLocalTime2Amiga(), NULL) - msg->secs;
 
-	if(!msg->callback_obj)
+	if(!msg->callback_obj || d->history_stmt[stmt_id] == NULL)
 		return -1;
 
 	sqlite3_clear_bindings(d->history_stmt[stmt_id]);
@@ -3069,6 +3126,9 @@ static IPTR ApplicationGetLastConversation(Class *cl, Object *obj, struct APPP_G
 	int rc;
 	ULONG rows_no = 0;
 
+	if(d->history_stmt[stmt_id] == NULL)
+		return -1;
+
 	sqlite3_clear_bindings(d->history_stmt[stmt_id]);
 	sqlite3_reset(d->history_stmt[stmt_id]);
 
@@ -3108,6 +3168,9 @@ static IPTR ApplicationGetContactsFromHistory(Class *cl, Object *obj, struct APP
 	ULONG rows_no = 0;
 	LONG i;
 	int rc;
+
+	if(d->history_stmt[stmt_id] == NULL)
+		return -1;
 
 	sqlite3_clear_bindings(d->history_stmt[stmt_id]);
 	sqlite3_reset(d->history_stmt[stmt_id]);
@@ -3152,6 +3215,9 @@ static IPTR ApplicationGetConversationsFromHistory(Class *cl, Object *obj, struc
 	const LONG stmt_id = SQL_SELECT_CONVERSATIONS;
 	ULONG rows_no = 0;
 	int rc;
+
+	if(d->history_stmt[stmt_id] == NULL)
+		return -1;
 
 	sqlite3_clear_bindings(d->history_stmt[stmt_id]);
 	sqlite3_reset(d->history_stmt[stmt_id]);
@@ -3218,7 +3284,7 @@ static IPTR ApplicationGetMessagesFromHistory(Class *cl, Object *obj, struct APP
 	ULONG rows_no = 0;
 	ENTER();
 
-	if(!msg->callback_obj || !msg->conversation_id)
+	if(!msg->callback_obj || !msg->conversation_id || d->history_stmt[stmt_id] == NULL)
 		return -1;
 
 	sqlite3_clear_bindings(d->history_stmt[stmt_id]);
@@ -3266,6 +3332,9 @@ static IPTR ApplicationDeleteContactFromHistory(Class *cl, Object *obj, struct A
 	ULONG rows_no = 0;
 	ENTER();
 
+	if(d->history_stmt[stmt_id] == NULL)
+		return -1;
+
 	sqlite3_clear_bindings(d->history_stmt[stmt_id]);
 	sqlite3_reset(d->history_stmt[stmt_id]);
 
@@ -3296,7 +3365,7 @@ static IPTR ApplicationDeleteConversationFromHistory(Class *cl, Object *obj, str
 	ULONG rows_no = 0;
 	ENTER();
 
-	if(!msg->conversation_id)
+	if(!msg->conversation_id || d->history_stmt[stmt_id] == NULL)
 		return -1;
 
 	sqlite3_clear_bindings(d->history_stmt[stmt_id]);
@@ -3313,6 +3382,91 @@ static IPTR ApplicationDeleteConversationFromHistory(Class *cl, Object *obj, str
 
 	LEAVE();
 	return rows_no;
+}
+
+static IPTR ApplicationUpdateHistoryDatabase(Class *cl, Object *obj, struct APPP_UpdateHistoryDatabase *msg)
+{
+	struct MUI_CustomClass *lpw_class;
+	Object *lpw;
+	BOOL result = FALSE;
+	ENTER();
+
+	lpw_class = CreateLongProcessWindowClass();
+	if(!lpw_class)
+		return FALSE;
+
+	lpw = NewObject(lpw_class->mcc_Class, NULL, TAG_END);
+
+	if(lpw)
+	{
+		DoMethod(obj, OM_ADDMEMBER, lpw);
+
+		set(lpw, MUIA_Window_Open, TRUE);
+
+		DoMethod(obj, APPM_CloseHistoryDatabase);
+
+		tprintf("go to LPW\n");
+		result = (BOOL)DoMethod(lpw, LPWM_UpdateHistoryDatabase, msg->db_version);
+		tprintf("lpw result: %ls\n", ((BOOL)result) == TRUE ? "TRUE" : "FALSE");
+
+		if(result)
+		{
+			LONG new_version = DoMethod(obj, APPM_OpenHistoryDatabase);
+			if(new_version != HISTORY_DB_VERSION)
+			{
+				result = FALSE;
+				DoMethod(obj, APPM_CloseHistoryDatabase);
+			}
+		}
+
+		if(!result)
+		{
+			STRPTR backup_name = FmtNew(HISTORY_DATABASE_PATH".v%ld.bak", msg->db_version);
+			if(backup_name)
+			{
+				BPTR lock;
+				BOOL backup_exists = FALSE;
+				LONG rc;
+
+				if((lock = Lock(backup_name, SHARED_LOCK)))
+				{
+					backup_exists = TRUE;
+					UnLock(lock);
+				}
+
+				if(backup_exists && DeleteFile(HISTORY_DATABASE_PATH) != 0 && Rename(backup_name, HISTORY_DATABASE_PATH) == DOSTRUE)
+					rc = MUI_Request_Unicode(obj, lpw, GetString(MSG_SQL_DB_UPDATE_ERROR_TITLE), GetString(MSG_SQL_DB_OPEN_GADGETS), GetString(MSG_SQL_DB_UPDATE_ERROR));
+				else
+					rc = MUI_Request_Unicode(obj, lpw, GetString(MSG_SQL_DB_OPEN_ERROR_TITLE), GetString(MSG_SQL_DB_OPEN_GADGETS), GetString(MSG_SQL_DB_OPEN_ERROR));
+				switch(rc)
+				{
+					case 1: /* ignore */
+						DoMethod(obj, APPM_OpenHistoryDatabase);
+						result = TRUE;
+					break;
+
+					case 2: /* disable database */
+						set(prefs_object(USD_PREFS_HISTORY_ONOFF_CHECK), MUIA_Selected, FALSE);
+						result = TRUE;
+					break;
+
+					case 0: /* quit */
+						result = FALSE;
+					break;
+				}
+
+				StrFree(backup_name);
+			}
+		}
+
+		DoMethod(obj, OM_REMMEMBER, lpw);
+		MUI_DisposeObject(lpw);
+	}
+
+	MUI_DeleteCustomClass(lpw_class);
+
+	LEAVE();
+	return (IPTR)result;
 }
 
 static IPTR ApplicationDispatcher(VOID)
@@ -3423,6 +3577,7 @@ static IPTR ApplicationDispatcher(VOID)
 		case APPM_GetMessagesFromHistory: return(ApplicationGetMessagesFromHistory(cl, obj, (struct APPP_GetMessagesFromHistory*)msg));
 		case APPM_DeleteContactFromHistory: return(ApplicationDeleteContactFromHistory(cl, obj, (struct APPP_DeleteContactFromHistory*)msg));
 		case APPM_DeleteConversationFromHistory: return(ApplicationDeleteConversationFromHistory(cl, obj, (struct APPP_DeleteConversationFromHistory*)msg));
+		case APPM_UpdateHistoryDatabase: return(ApplicationUpdateHistoryDatabase(cl, obj, (struct APPP_UpdateHistoryDatabase*)msg));
 
 		default: return(DoSuperMethodA(cl, obj, msg));
 	}

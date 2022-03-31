@@ -60,7 +60,7 @@ $(OBJDIR)title_class.c.o: title_class.c globaldefines.h title_class.h
 
 $(OBJDIR)application.c.o: application.c globaldefines.h application.h mainwindow.h prefswindow.h contactslist.h support.h talkwindow.h \
  descwindow.h editconwindow.h smallsbar.h ipc.h locale.h translations.h modules.h modulescycle.h kwakwa_api/defs.h \
- kwakwa_api/protocol.h kwakwa_api/defs.h moduleslogwindow.h slaveprocess.h historysql.h historywindow.h
+ kwakwa_api/protocol.h kwakwa_api/defs.h moduleslogwindow.h slaveprocess.h historysql.h historywindow.h longprocesswindow.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)application.c.o application.c
 
@@ -228,6 +228,10 @@ $(OBJDIR)historyconversationslist.c.o: historyconversationslist.c historyconvers
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)historyconversationslist.c.o historyconversationslist.c
 
+$(OBJDIR)longprocesswindow.c.o: longprocesswindow.c longprocesswindow.h globaldefines.h locale.h translations.h support.h
+	@$(COMPILE_FILE)
+	@$(COMPILE) -c -o $(OBJDIR)longprocesswindow.c.o longprocesswindow.c
+
 OBJS = $(OBJDIR)application.c.o $(OBJDIR)contactslist.c.o $(OBJDIR)locale.c.o $(OBJDIR)main.c.o $(OBJDIR)mainwindow.c.o $(OBJDIR)descwindow.c.o \
  $(OBJDIR)prefswindow.c.o $(OBJDIR)smallsbar.c.o $(OBJDIR)support.c.o $(OBJDIR)talktab.c.o $(OBJDIR)talkwindow.c.o $(OBJDIR)editconwindow.c.o \
  $(OBJDIR)virtualtext.c.o $(OBJDIR)lexer.c.o $(OBJDIR)title_class.c.o $(OBJDIR)ipc.c.o $(OBJDIR)logs.c.o $(OBJDIR)inputfield.c.o \
@@ -235,7 +239,7 @@ OBJS = $(OBJDIR)application.c.o $(OBJDIR)contactslist.c.o $(OBJDIR)locale.c.o $(
  $(OBJDIR)modules.c.o $(OBJDIR)modulescycle.c.o $(OBJDIR)modulesmsglist.c.o $(OBJDIR)moduleslogwindow.c.o $(OBJDIR)slaveprocess.c.o \
  $(OBJDIR)slave.c.o $(OBJDIR)http.c.o $(OBJDIR)timeslider.c.o $(OBJDIR)pictureview.c.o $(OBJDIR)minmaxslider.c.o $(OBJDIR)fileview.c.o \
  $(OBJDIR)parseftpurl.c.o $(OBJDIR)ftp.c.o $(OBJDIR)emoticonstab.c.o $(OBJDIR)historywindow.c.o $(OBJDIR)tabtitle.c.o $(OBJDIR)historycontactslist.c.o \
- $(OBJDIR)historyconversationslist.c.o
+ $(OBJDIR)historyconversationslist.c.o $(OBJDIR)longprocesswindow.c.o
 
 # link all file(s)
 $(PROJECT): $(OBJS)

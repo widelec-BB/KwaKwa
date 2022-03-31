@@ -102,6 +102,7 @@ struct InsertLinkParms
 #define APPM_ConfirmQuit                     0x6EDA0059
 #define APPM_ScreenbarInstall                0x6EDA005A
 #define APPM_ScreenbarRemove                 0x6EDA005B
+#define APPM_UpdateHistoryDatabase           0x6EDA005C
 
 #define APPM_SecTrigger                      0x6EDA111D
 

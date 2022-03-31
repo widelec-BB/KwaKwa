@@ -1560,13 +1560,53 @@ KwaKwa: błąd podczas inicjalizacji bazy danych!
 ;
 MSG_SQL_DB_OPEN_GADGETS
 _Ignore (Possible Data Loss!)|_Turn Off History Database|*_Quit KwaKwa
-_Ignoruj (możliwa utrata danych!)|_Wyłącz używanie bazy danych|*_Zamknij KwaKwa
+_Ignoruj (możliwa utrata danych!)|_Wyłącz bazę danych|*_Zamknij KwaKwa
 ;
 MSG_SQL_DB_OPEN_ERROR
 The database has probably been corrupted.\nContinuing to run Kwakwa with the corrupted database\nenabled may result in data loss.
 Baza danych prawdopodobnie została uszkodzona.\nKontynuowanie uruchamiania programu z włączoną\nuszkodzoną bazą danych może doprowadzić do utraty danych.
 ;
+MSG_SQL_DB_UPDATE_ERROR_TITLE
+KwaKwa: History Database Update Error!
+KwaKwa: błąd podczas aktualizacji bazy danych!
+;
+MSG_SQL_DB_UPDATE_GADGETS
+_Ignore (Possible Data Loss!)|_Turn Off History Database|*_Quit KwaKwa
+_Ignoruj (możliwa utrata danych!)|_Wyłącz używanie bazy danych|*_Zamknij KwaKwa
+;
+MSG_SQL_DB_UPDATE_ERROR
+The database file has been restored from backup copy.\nContinuing to run Kwakwa with old version of database enabled\nmay result in data loss. There will be another attempt to update database on next KwaKwa startup.
+Baza danych została przywrócona z kopii zapasowej.\nKontynuowanie uruchamiania programu z włączoną starą wersją bazy danych\nmoże doprowadzić do utraty danych.\nPodczas następnego uruchomienia KwaKwa zostanie podjęta kolejna próba aktualizacji.
+;
+MSG_LONG_PROCESS_WINDOW_TITLE
+KwaKwa: Startup
+KwaKwa: Uruchamianie
+;
+MSG_LONG_PROCESS_WINDOW_PROCESS_NAME
+KwaKwa: Startup Process
+KwaKwa: Process Startowy
+;
+MSG_LONG_PROCESS_WINDOW_STOP_BUTTON
+Stop
+Przerwij
+;
+MSG_LONG_PROCESS_WINDOW_STOP_BUTTON_HOTKEY
+s
+p
+;
+MSG_LONG_PROCESS_WINDOW_STATUS_DATABASE_BACKUP
+Creating database backup...
+Tworzenie kopii zapasowej bazy danych...
+;
 MSG_UPDATE_DATABASE_UNICODE
 Converting message history database to unicode...
 Trwa konwersja bazy danych do unicode...
+;
+MSG_LONG_PROCESS_WINDOW_STATUS_DATABASE_VACUUM
+Optimizing database...
+Trwa optymalizacja bazy danych...
+;
+MSG_LONG_PROCESS_WINDOW_PLEASE_WAIT
+Please wait.
+Proszę czekać.
 ;
