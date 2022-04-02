@@ -3147,10 +3147,14 @@ static IPTR ApplicationGetContactsFromHistory(Class *cl, Object *obj, struct APP
 		for(i = 0;;i++)
 		{
 			DoMethod(contacts_list, CLSM_GetEntry, i, &entry);
+			if(entry == NULL)
+				break;
 
-			if(entry == NULL || (entry->pluginid == e.plugin_id && StrEqu(entry->entryid, e.id)))
+			if(entry->pluginid == e.plugin_id && StrEqu(entry->entryid, e.id))
 			{
-				e.name = ContactName(entry);
+				STRPTR list_name = ContactName(entry);
+				if(list_name)
+					e.name = list_name;
 				break;
 			}
 		}
@@ -3208,10 +3212,14 @@ static IPTR ApplicationGetConversationsFromHistory(Class *cl, Object *obj, struc
 		for(i = 0;;i++)
 		{
 			DoMethod(contacts_list, CLSM_GetEntry, i, &entry);
+			if(entry == NULL)
+				break;
 
-			if(entry == NULL || (entry->pluginid == plugin_id && StrEqu(entry->entryid, e.contact_id)))
+			if(entry->pluginid == plugin_id && StrEqu(entry->entryid, e.contact_id))
 			{
-				e.contact_name = ContactName(entry);
+				STRPTR list_name = ContactName(entry);
+				if(list_name)
+					e.contact_name = list_name;
 				break;
 			}
 		}
