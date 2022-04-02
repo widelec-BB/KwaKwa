@@ -146,12 +146,20 @@ Saving Settings
 Ustawienia zapisu
 ;
 MSG_PREFS_LOGS_ONOFF
-Create Logs
-Zapisuj rozmowy do plików
+Create Logs (system encoding)
+Zapisuj rozmowy do plików (kodowanie systemowe)
+;
+MSG_PREFS_LOGS_UNICODE_ONOFF
+Create Logs (UTF-8 encoding)
+Zapisuj rozmowy do plików (kodowanie UTF-8)
 ;
 MSG_PREFS_LOGS_ONOFF_HELP
-Turns on/off writing talk transcription to file.\nEffect after reopening every tab in talk window.
-Włącza/wyłącza zapisywanie treści rozmów do plików.\nZmiana wymaga zamknięcia wszystkich zakładek w oknie rozmowy.
+Turns on/off writing talk transcription to file in system encoding.\nEffect after reopening every tab in talk window.
+Włącza/wyłącza zapisywanie treści rozmów do plików w kodowaniu systemowym.\nZmiana wymaga zamknięcia wszystkich zakładek w oknie rozmowy.
+;
+MSG_PREFS_LOGS_UNICODE_ONOFF_HELP
+Turns on/off writing talk transcription to file in UTF-8 encoding.\nEffect after reopening every tab in talk window.
+Włącza/wyłącza zapisywanie treści rozmów do plików w kodowaniu UTF-8.\nZmiana wymaga zamknięcia wszystkich zakładek w oknie rozmowy.
 ;
 MSG_PREFS_LOGS_HISTORY_ONOFF
 Save Conversations to History Database
@@ -554,8 +562,12 @@ Send file via FTP...
 Wyślij plik przez FTP...
 ;
 MSG_CONTACTLIST_CONTEXTMENU_OPEN_LOG
-Open log file...
-Otwórz zapis rozmów...
+Open log file (system encoding)...
+Otwórz zapis rozmów (w kodowaniu systemowym)...
+;
+MSG_CONTACTLIST_CONTEXTMENU_OPEN_LOG_UNICODE
+Open log file (UTF-8 encoding)...
+Otwórz zapis rozmów (w kodowaniu UTF-8)...
 ;
 MSG_CONTACTLIST_DELETE_GADGETS
 _Yes|*_No

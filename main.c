@@ -43,6 +43,7 @@
 #include "historywindow.h"
 #include "tabtitle.h"
 #include "support.h"
+#include "logs.h"
 
 struct Library *MUIMasterBase, *CharsetsBase, *OpenURLBase, *UtilityBase, *EzxmlBase, *SocketBase, *LocaleBase, *WorkbenchBase, *SQLiteBase;
 struct Library *TextEditorMCC;
@@ -120,12 +121,15 @@ BOOL StartApp(VOID)
 		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
+	if(!SetupLogsSystem())
+		return FALSE;
 
 	return TRUE;
 }
 
 VOID QuitApp(VOID)
 {
+	CleanupLogsSystem();
 	if(TextEditorMCC) CloseLibrary(TextEditorMCC);
 	if(SQLiteBase) CloseLibrary(SQLiteBase);
 	if(WorkbenchBase) CloseLibrary(WorkbenchBase);

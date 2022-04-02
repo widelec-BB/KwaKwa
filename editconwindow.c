@@ -239,7 +239,7 @@ static IPTR EditContactWindowSaveContact(Class *cl, Object *obj)
 
 			if(old_log_name) /* if we edit name we have to rename log file */
 			{
-				LogRename(old_log_name, ContactName(d->act_edit));
+				LogsRename(old_log_name, ContactName(d->act_edit));
 				StrFree(old_log_name);
 			}
 			DoMethod(findobj(USD_CONTACTS_LIST, _app(obj)), CLSM_Sort);

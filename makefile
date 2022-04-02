@@ -89,7 +89,7 @@ $(OBJDIR)locale.c.o: locale.c locale.h translations.h
 
 $(OBJDIR)main.c.o: main.c locale.h translations.h globaldefines.h application.h contactslist.h support.h mainwindow.h descwindow.h \
  prefswindow.h smallsbar.h talkwindow.h editconwindow.h talktab.h virtualtext.h title_class.h inputfield.h contactinfoblock.h \
- percentageslider.h simplestringlist.h modulescycle.h emoticon.h modulesmsglist.h moduleslogwindow.h slaveprocess.h historywindow.h
+ percentageslider.h simplestringlist.h modulescycle.h emoticon.h modulesmsglist.h moduleslogwindow.h slaveprocess.h historywindow.h logs.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)main.c.o main.c
 

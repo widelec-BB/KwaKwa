@@ -55,7 +55,7 @@ struct TalkTabData
 	Object *send_but, *return_check, *lamp;
 	Object *toolbar, *send_pic_but, *clear_txt_but, *open_log_but, *double_but, *edit_contact_button;
 	struct ContactEntry *contact; /* pointer to local copy, not to entry from list -> needs update */
-	BPTR log_fh;
+	BPTR log_fh, log_unicode_fh;
 	struct MUI_InputHandlerNode ihnode;
 	BOOL ihnode_added;
 	QUAD conversation_id;
@@ -125,7 +125,7 @@ static VOID TalkTabNotifications(Class *cl, Object *obj)
 	 VTM_Clear);
 
 	DoMethod(d->open_log_but, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1,
-	 TTBM_OpenLogFile);
+	 TTBM_OpenLogFile, FALSE);
 
 	DoMethod(d->double_but, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1,
 	 TTBM_ToggleDouble);
@@ -302,7 +302,8 @@ static IPTR TalkTabDispose(Class *cl, Object *obj, Msg msg)
 {
 	struct TalkTabData *d = INST_DATA(cl, obj);
 
-	LogClose(d->log_fh);
+	LogClose(d->log_fh, FALSE);
+	LogClose(d->log_unicode_fh, TRUE);
 
 	return 0;
 }
@@ -336,9 +337,10 @@ static IPTR TalkTabInit(Class *cl, Object *obj, struct TTBP_Init *msg)
 	TalkTabNotifications(cl, obj);
 
 	if(xget(prefs_object(USD_PREFS_LOGS_ONOFF_CHECK), MUIA_Selected))
-	{
-		d->log_fh = LogOpen(ContactName(msg->contact));
-	}
+		d->log_fh = LogOpen(ContactName(msg->contact), FALSE);
+
+	if(xget(prefs_object(USD_PREFS_LOGS_UNICODE_ONOFF_CHECK), MUIA_Selected))
+		d->log_unicode_fh = LogOpen(ContactName(msg->contact), TRUE);
 
 	return (IPTR)1;
 }
@@ -349,7 +351,8 @@ static IPTR TalkTabPutMessage(Class *cl, Object *obj, struct TTBP_PutMessage *ms
 	struct TalkTabData *d = INST_DATA(cl, obj);
 	BOOL result = FALSE;
 
-	LogAdd(d->log_fh, msg->sender, msg->message, msg->timestamp); /* adds recived message to log */
+	LogAddSys(d->log_fh, msg->sender, msg->message, msg->timestamp);
+	LogAddUnicode(d->log_unicode_fh, msg->sender, msg->message, msg->timestamp); 
 
 	DoMethod(obj, TTBM_AddToHistory, msg->message, msg->timestamp, HISTORY_MESSAGES_NORMAL | HISTORY_MESSAGES_FRIEND);
 
@@ -401,7 +404,8 @@ static IPTR TalkTabSendMessage(Class *cl, Object *obj, struct TTBP_SendMessage *
 				DoMethod(d->txt, VTM_ExitChange);
 			}
 
-			LogAdd(d->log_fh, user_name, message, timestamp); /* adds my own message to log */
+			LogAddSys(d->log_fh, user_name, message, timestamp);
+			LogAddUnicode(d->log_unicode_fh, user_name, message, timestamp);
 
 			DoMethod(obj, TTBM_AddToHistory, message, timestamp, HISTORY_MESSAGES_NORMAL | HISTORY_MESSAGES_MY);
 
@@ -749,7 +753,7 @@ static IPTR TalkTabOpenLogFile(Class *cl, Object *obj)
 {
 	struct TalkTabData *d = INST_DATA(cl, obj);
 
-	return DoMethod(findobj(USD_CONTACTS_LIST, _app(obj)), CLSM_OpenLogFile, ContactName(d->contact));
+	return DoMethod(findobj(USD_CONTACTS_LIST, _app(obj)), CLSM_OpenLogFile, ContactName(d->contact), FALSE);
 }
 
 static IPTR TalkTabPutInvite(Class *cl, Object *obj, struct TTBP_PutInvite *msg)

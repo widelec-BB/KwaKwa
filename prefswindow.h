@@ -93,6 +93,7 @@ extern Object *PreferencesWindow;
 #define USD_PREFS_HISTORY_LOAD_OLD_TIME                  0x9EDA1204
 #define USD_PREFS_HISTORY_LOAD_OLD_NO                    0x9EDA1205
 #define USD_PREFS_HISTORY_SAVE_SYSTEMMSGS                0x9EDA1206
+#define USD_PREFS_LOGS_UNICODE_ONOFF_CHECK               0x9EDA1207
 
 /* contacts list prefs */
 #define USD_PREFS_CONTACTSLIST_SHOWDESC_CHECK            0x9EDA1300

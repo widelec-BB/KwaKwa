@@ -69,13 +69,14 @@ for((node) = (struct ListEntry*)(((struct MinList*)(list))->mlh_TailPred); \
 #define CONTACTS_LIST_PATH CACHE_DIR GUI_DIR "contactslist.cfg"
 
 /* context menu */
-#define CONLIST_CMENU_EDIT        11
-#define CONLIST_CMENU_DELETE      12
-#define CONLIST_CMENU_GO_TO_LINK  13
-#define CONLIST_CMENU_COPY_DESC   14
-#define CONLIST_CMENU_OPEN_TALK   15
-#define CONLIST_CMENU_SEND_FTP    16
-#define CONLIST_CMENU_OPEN_LOG    17
+#define CONLIST_CMENU_EDIT                11
+#define CONLIST_CMENU_DELETE              12
+#define CONLIST_CMENU_GO_TO_LINK          13
+#define CONLIST_CMENU_COPY_DESC           14
+#define CONLIST_CMENU_OPEN_TALK           15
+#define CONLIST_CMENU_SEND_FTP            16
+#define CONLIST_CMENU_OPEN_LOG            17
+#define CONLIST_CMENU_OPEN_LOG_UNICODE    18
 
 /* DIRTY HACK */
 struct CustomRenderInfo
@@ -109,7 +110,7 @@ struct CLSP_Compare {ULONG MethodID; APTR entry1; APTR entry2;};
 struct CLSP_DrawContextMenu {ULONG MethodID; ULONG x; ULONG y;};
 struct CLSP_SelectEntryByName {ULONG MethodID; ULONG next;};
 struct CLSP_RemoveEntry {ULONG MethodID; struct ContactEntry *entry; ULONG confirm;};
-struct CLSP_OpenLogFile {ULONG MethodID; STRPTR log_file_name;};
+struct CLSP_OpenLogFile {ULONG MethodID; STRPTR log_file_name; BOOL unicode;};
 struct CLSP_FindEntry {ULONG MethodID; LONG mode; struct ContactEntry *entry; struct ContactEntry *start;};
 //-
 
@@ -1538,6 +1539,10 @@ static IPTR ContactsListDrawContextMenu(Class *cl, Object *obj, struct CLSP_Draw
 					MUIA_Menuitem_Title, GetString(MSG_CONTACTLIST_CONTEXTMENU_OPEN_LOG),
 				TAG_END),
 				MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
+					MUIA_UserData, CONLIST_CMENU_OPEN_LOG_UNICODE,
+					MUIA_Menuitem_Title, GetString(MSG_CONTACTLIST_CONTEXTMENU_OPEN_LOG_UNICODE),
+				TAG_END),
+				MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
 					MUIA_Menuitem_Title, NM_BARLABEL,
 				TAG_END),
 				MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
@@ -1657,7 +1662,18 @@ static IPTR ContactsListDrawContextMenu(Class *cl, Object *obj, struct CLSP_Draw
 					DoMethod(obj, CLSM_GetEntry, CLSV_GetEntry_Active, &entry);
 
 					if(entry)
-						DoMethod(obj, CLSM_OpenLogFile, ContactName(entry));
+						DoMethod(obj, CLSM_OpenLogFile, ContactName(entry), FALSE);
+				}
+				break;
+
+				case CONLIST_CMENU_OPEN_LOG_UNICODE:
+				{
+					struct ContactEntry *entry;
+
+					DoMethod(obj, CLSM_GetEntry, CLSV_GetEntry_Active, &entry);
+
+					if(entry)
+						DoMethod(obj, CLSM_OpenLogFile, ContactName(entry), TRUE);
 				}
 				break;
 
@@ -1871,12 +1887,14 @@ static IPTR ContactsListRemoveEntry(Class *cl, Object *obj, struct CLSP_RemoveEn
 static IPTR ContactsListOpenLogFile(Class *cl, Object *obj, struct CLSP_OpenLogFile *msg)
 {
 	BOOL result = FALSE;
-	UBYTE buffer[255];
 	BPTR lock;
+	STRPTR log_file_name;
 
-	if(msg->log_file_name)
+	if((log_file_name = Utf8ToSystem(msg->log_file_name)))
 	{
-		FmtNPut((STRPTR)buffer, LOGS_DRAWER "/%ls", sizeof(buffer), msg->log_file_name);
+		UBYTE buffer[LOGS_UNICODE_DRAWER_LEN + StrLen(log_file_name)];
+
+		FmtNPut((STRPTR)buffer, "%s/%ls", sizeof(buffer), msg->unicode ? LOGS_UNICODE_DRAWER : LOGS_DRAWER, msg->log_file_name);
 
 		if((lock = Lock(buffer, ACCESS_READ)))
 		{
@@ -1886,6 +1904,7 @@ static IPTR ContactsListOpenLogFile(Class *cl, Object *obj, struct CLSP_OpenLogF
 			}
 			UnLock(lock);
 		}
+		StrFree(log_file_name);
 	}
 
 	return(IPTR)result;
