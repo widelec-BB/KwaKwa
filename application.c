@@ -642,31 +642,38 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 	LONG db_version;
 	ENTER();
 
-	DoMethod(obj, MUIM_Application_Load, MUIV_Application_Load_ENV);
-
-	if((db_version = DoMethod(obj, APPM_OpenHistoryDatabase)) == -1)
-		return (IPTR)FALSE;
-
-	tprintf("current db version: %ld, required: %ld\n", db_version, HISTORY_DB_VERSION);
-
-	if(db_version < HISTORY_DB_VERSION)
-	{
-		if((BOOL)DoMethod(obj, APPM_UpdateHistoryDatabase, db_version) != TRUE)
-			return (IPTR)FALSE;
-	}
-
-	if((BOOL)DoMethod(obj, APPM_ScreenbarInstall) != TRUE)
-		return FALSE;
-
-	d->sec_ihn.ihn_Flags = MUIIHNF_TIMER;
-	d->sec_ihn.ihn_Method = APPM_SecTrigger;
-	d->sec_ihn.ihn_Object = obj;
-	d->sec_ihn.ihn_Millis = 1000;
-
-	DoMethod(obj, MUIM_Application_AddInputHandler, &d->sec_ihn);
-
 	if(DoMethod(obj, APPM_OpenModules) > 0)
 	{
+		/* here you can comunicate with modules before starting main loop */
+		DoMethod(d->edit_con_window, ECWM_AddModulesCycle,  NewObject(ModulesCycleClass->mcc_Class, NULL,
+			MCA_ModulesList, &d->modules,
+			MCA_ModulesNo, d->modules_no,
+		TAG_END));
+		DoMethod(obj, APPM_AddModulesGui);
+
+		DoMethod(obj, MUIM_Application_Load, MUIV_Application_Load_ENV);
+
+		if((db_version = DoMethod(obj, APPM_OpenHistoryDatabase)) == -1)
+			return (IPTR)FALSE;
+
+		tprintf("current db version: %ld, required: %ld\n", db_version, HISTORY_DB_VERSION);
+
+		if(db_version < HISTORY_DB_VERSION)
+		{
+			if((BOOL)DoMethod(obj, APPM_UpdateHistoryDatabase, db_version) != TRUE)
+				return (IPTR)FALSE;
+		}
+
+		if((BOOL)DoMethod(obj, APPM_ScreenbarInstall) != TRUE)
+			return FALSE;
+
+		d->sec_ihn.ihn_Flags = MUIIHNF_TIMER;
+		d->sec_ihn.ihn_Method = APPM_SecTrigger;
+		d->sec_ihn.ihn_Object = obj;
+		d->sec_ihn.ihn_Millis = 1000;
+
+		DoMethod(obj, MUIM_Application_AddInputHandler, &d->sec_ihn);
+
 		DoMethod(findobj(USD_CONTACTS_LIST, d->main_window), CLSM_ReadList);
 
 		/* open main window if user want that */
@@ -753,6 +760,8 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 		LEAVE();
 		return (IPTR)TRUE;
 	}
+	else
+		MUI_Request_Unicode(obj, NULL, APP_NAME, GetString(MSG_APPLICATION_NO_PLUGINS_GADGETS), GetString(MSG_APPLICATION_NO_PLUGINS_MSG));
 
 	LEAVE();
 	return (IPTR)FALSE;
@@ -1612,15 +1621,6 @@ static IPTR ApplicationOpenModules(Class *cl, Object *obj)
 		UnLock(lock);
 	}
 
-	if(d->modules_no > 0)
-	{
-		/* here you can comunicate with modules before starting main loop */
-		DoMethod(d->edit_con_window, ECWM_AddModulesCycle,  NewObject(ModulesCycleClass->mcc_Class, NULL, MCA_ModulesList, &d->modules, MCA_ModulesNo, d->modules_no, TAG_END));
-		DoMethod(obj, APPM_AddModulesGui);
-	}
-	else
-		MUI_Request_Unicode(obj, NULL, APP_NAME, GetString(MSG_APPLICATION_NO_PLUGINS_GADGETS), GetString(MSG_APPLICATION_NO_PLUGINS_MSG));
-
 	LEAVE();
 	return (IPTR)d->modules_no;
 }
@@ -1745,7 +1745,6 @@ static IPTR ApplicationCloseModules(Class *cl, Object *obj)
 	LEAVE();
 	return (IPTR)0;
 }
-
 
 static IPTR ApplicationConnect(Class *cl, Object *obj, struct APPP_Connect *msg)
 {
