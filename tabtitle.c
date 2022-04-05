@@ -62,13 +62,14 @@ static STRPTR createTextContent(STRPTR name, ULONG status)
 	else
 		image = "\33I[4:PROGDIR:gfx/unavailable.mbr]";
 
-	len = StrLen(image) + StrLen(name);
-	if((res = (STRPTR)AllocVec(len, MEMF_PUBLIC)))
+	len = StrLen(image) + StrLen(name) + 2 /* 2 = space in the middle and 0x00 at end */;
+	res = (STRPTR)AllocVec(len, MEMF_PUBLIC);
+	if(res)
 	{
 		FmtPut(res, "%s %s", image, name);
-		return res;
 	}
-	return NULL;
+
+	return res;
 }
 
 static IPTR TabTitleNew(Class *cl, Object *obj, struct opSet *msg)
@@ -77,6 +78,7 @@ static IPTR TabTitleNew(Class *cl, Object *obj, struct opSet *msg)
 	ULONG status = KWA_STATUS_FRESH;
 	BOOL show_status_image = FALSE, unread = FALSE;
 	STRPTR contact_name = NULL;
+	ENTER();
 
 	while((tag = NextTagItem(&tagptr)))
 	{
@@ -111,15 +113,7 @@ static IPTR TabTitleNew(Class *cl, Object *obj, struct opSet *msg)
 					MUIA_Text_Contents, (IPTR)content,
 					MUIA_Text_PreParse, (IPTR)(unread ? "\33b" : NULL),
 				TAG_MORE, (IPTR)msg->ops_AttrList);
-				StrFree(content);
-			}
-			else
-			{
-				/* in case of no memory, do not show the status image */
-				obj = (Object*)DoSuperNew(cl, obj,
-					MUIA_Text_Contents, (IPTR)contact_name,
-					MUIA_Text_PreParse, (IPTR)(unread ? "\33b" : NULL),
-				TAG_MORE, (IPTR)msg->ops_AttrList);
+				FreeVec(content);
 			}
 		}
 		else
@@ -142,11 +136,13 @@ static IPTR TabTitleNew(Class *cl, Object *obj, struct opSet *msg)
 			DoMethod(prefs_object(USD_PREFS_TW_TABTITLE_IMAGE_ONOFF), MUIM_Notify, MUIA_Selected, MUIV_EveryTime, (IPTR)obj, 3,
 			 MUIM_Set, TTA_ShowStatusImage, MUIV_TriggerValue);
 
+			LEAVE();
 			return (IPTR)obj;
 		}
 	}
 
 	CoerceMethod(cl, obj, OM_DISPOSE);
+	LEAVE();
 	return (IPTR)NULL;
 }
 
@@ -208,7 +204,7 @@ static IPTR TabTitleSet(Class *cl, Object *obj, struct opSet *msg)
 			{
 				nnset(obj, MUIA_Text_Contents, content);
 				relayout = TRUE;
-				StrFree(content);
+				FreeVec(content);
 			}
 		}
 		else

@@ -149,6 +149,7 @@ static struct TabEntry* AddTabEntry(Class *cl, Object *obj, struct ContactEntry 
 {
 	struct TalkWindowData *d = INST_DATA(cl, obj);
 	struct TabEntry *new = AllocMem(sizeof(struct TabEntry), MEMF_ANY | MEMF_CLEAR);
+	ENTER();
 
 	if(new && (new->entry.entryid = StrNew(contact->entryid)))
 	{
@@ -186,9 +187,10 @@ static struct TabEntry* AddTabEntry(Class *cl, Object *obj, struct ContactEntry 
 			d->tabs_list_end = new;
 		}
 	}
+
+	LEAVE();
 	return new;
 }
-
 
 static struct TabEntry* FindTabEntryByEntryData(Class *cl, Object *obj, STRPTR entryid, LONG pluginid)
 {
