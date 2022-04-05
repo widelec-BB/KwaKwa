@@ -46,6 +46,7 @@
 #include "logs.h"
 
 struct Library *MUIMasterBase, *CharsetsBase, *OpenURLBase, *UtilityBase, *EzxmlBase, *SocketBase, *LocaleBase, *WorkbenchBase, *SQLiteBase;
+struct Library *ClipboardBase;
 
 BOOL StartApp(VOID)
 {
@@ -113,6 +114,13 @@ BOOL StartApp(VOID)
 		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
+	if(!(ClipboardBase = OpenLibrary("clipboard.library", 53)))
+	{
+		PutStr("Cannot open clipboard.library (V53)!\n");
+		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "clipboard.library (V53)");
+		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
+		return FALSE;
+	}
 	if(!SetupLogsSystem())
 		return FALSE;
 
@@ -122,6 +130,7 @@ BOOL StartApp(VOID)
 VOID QuitApp(VOID)
 {
 	CleanupLogsSystem();
+	if(ClipboardBase) CloseLibrary(ClipboardBase);
 	if(SQLiteBase) CloseLibrary(SQLiteBase);
 	if(WorkbenchBase) CloseLibrary(WorkbenchBase);
 	if(SocketBase) CloseLibrary(SocketBase);

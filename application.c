@@ -13,6 +13,9 @@
 #include <proto/commodities.h>
 #include <proto/asl.h>
 #include <proto/sqlite.h>
+#define USE_INLINE_STDARG
+#include <proto/clipboard.h>
+#undef USE_INLINE_STDARG
 #include <mui/Aboutbox_mcc.h>
 #include <libraries/gadtools.h>
 #include <intuition/screenbar.h>
@@ -167,9 +170,9 @@ struct ApplicationData
 	struct MUI_InputHandlerNode sec_ihn;
 
 	/* clipboard */
-	struct MsgPort *clipboard_port;
-	struct IOClipReq *clipboard_request;
-	BOOL add_byte;
+	STRPTR clipboard_buffer;
+	ULONG clipboard_buffer_length;
+	ULONG clipboard_buffer_position;
 
 	/* broker */
 	BYTE broker_signal;
@@ -527,18 +530,8 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 		if((d->slave_object = NewObject(SlaveProcessClass, NULL, TAG_END)))
 		{
 			d->slave_mask = 1UL << (UBYTE)xget(d->slave_object, SPA_SigBit);
-
-			if((d->clipboard_port = CreateMsgPort()))
-			{
-				if((d->clipboard_request = (struct IOClipReq*)CreateExtIO(d->clipboard_port, sizeof(struct IOClipReq))))
-				{
-					if(!OpenDevice("clipboard.device", 0, (struct IORequest*)d->clipboard_request, 0))
-					{
-						d->broker_signal = -1;
-						return (IPTR)obj;
-					}
-				}
-			}
+			d->broker_signal = -1;
+			return (IPTR)obj;
 		}
 	}
 	CoerceMethod(cl, obj, OM_DISPOSE);
@@ -552,13 +545,8 @@ static IPTR ApplicationDispose(Class *cl, Object *obj, Msg msg)
 
 	if(d->icon) FreeDiskObject(d->icon);
 
-	if(d->clipboard_request)
-	{
-		CloseDevice((struct IORequest*)d->clipboard_request);
-		DeleteExtIO((struct IORequest*)d->clipboard_request);
-	}
-	if(d->clipboard_port)
-		DeleteMsgPort(d->clipboard_port);
+	if(d->clipboard_buffer)
+		FreeMem(d->clipboard_buffer, d->clipboard_buffer_length);
 
 	if(d->slave_object)
 		DisposeObject(d->slave_object);
@@ -822,70 +810,41 @@ static IPTR ApplicationConfirmQuit(Class *cl, Object *obj)
 static IPTR ApplicationClipboardStart(Class *cl, Object *obj, struct APPP_ClipboardStart *msg)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
-	BOOL odd = msg->length & 1;
-	ULONG tiff_len = odd ? msg->length + 13 : msg->length + 12;
 	ENTER();
 
-	if(odd)
-		d->add_byte = TRUE;
+	if(msg->length > d->clipboard_buffer_length)
+	{
+		if(d->clipboard_buffer)
+			FreeMem(d->clipboard_buffer, d->clipboard_buffer_length);
 
-	d->clipboard_request->io_Offset = 0;
-	d->clipboard_request->io_ClipID = 0;
-	d->clipboard_request->io_Error = 0;
+		d->clipboard_buffer = AllocMem(msg->length + 1, MEMF_ANY);
+		d->clipboard_buffer_length = msg->length + 1;
+	}
 
-	d->clipboard_request->io_Data = (APTR)"FORM";
-	d->clipboard_request->io_Length = 4;
-	d->clipboard_request->io_Command = CMD_WRITE;
-
-	if(DoIO((struct IORequest*)d->clipboard_request))
-		return (IPTR)FALSE;
-
-	d->clipboard_request->io_Data = (APTR)&tiff_len;
-	d->clipboard_request->io_Length = 4;
-	d->clipboard_request->io_Command = CMD_WRITE;
-
-	if(DoIO((struct IORequest*)d->clipboard_request))
-		return (IPTR)FALSE;
-
-	d->clipboard_request->io_Data = (APTR)"FTXT";
-	d->clipboard_request->io_Length = 4;
-	d->clipboard_request->io_Command = CMD_WRITE;
-
-	if(DoIO((struct IORequest*)d->clipboard_request))
-		return (IPTR)FALSE;
-
-	d->clipboard_request->io_Data = (APTR)"CHRS";
-	d->clipboard_request->io_Length = 4;
-	d->clipboard_request->io_Command = CMD_WRITE;
-
-	if(DoIO((struct IORequest*)d->clipboard_request))
-		return (IPTR)FALSE;
-
-	d->clipboard_request->io_Data = (APTR)&msg->length;
-	d->clipboard_request->io_Length = 4;
-	d->clipboard_request->io_Command = CMD_WRITE;
-
-
-	if(DoIO((struct IORequest*)d->clipboard_request))
-		return (IPTR)FALSE;
+	if(d->clipboard_buffer)
+	{
+		d->clipboard_buffer_position = 0;
+		return (IPTR)TRUE;
+	}
 
 	LEAVE();
-	return (IPTR)TRUE;
+	return (IPTR)FALSE;
 }
 
 static IPTR ApplicationClipboardWrite(Class *cl, Object *obj, struct APPP_ClipboardWrite *msg)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
+	STRPTR b = d->clipboard_buffer + d->clipboard_buffer_position;
 
 	if(msg->length == -1)
 		msg->length = StrLen(msg->data);
 
-	d->clipboard_request->io_Data = (APTR)msg->data;
-	d->clipboard_request->io_Length = msg->length;
-	d->clipboard_request->io_Command = CMD_WRITE;
-
-	if(DoIO((struct IORequest*)d->clipboard_request))
-		return (IPTR)FALSE;
+	while(msg->length--)
+	{
+		d->clipboard_buffer_position++;
+		if(!(*b++ = *msg->data++))
+			break;
+	}
 
 	return (IPTR)TRUE;
 }
@@ -893,27 +852,17 @@ static IPTR ApplicationClipboardWrite(Class *cl, Object *obj, struct APPP_Clipbo
 static IPTR ApplicationClipboardEnd(Class *cl, Object *obj)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
+	LONG err;
 
-	if(d->add_byte)
-	{
-		d->clipboard_request->io_Data = (APTR)"\0";
-		d->clipboard_request->io_Length = 1UL;
-		d->clipboard_request->io_Command = CMD_WRITE;
+	d->clipboard_buffer[d->clipboard_buffer_position] = 0x00;
 
-		if(DoIO((struct IORequest*)d->clipboard_request))
-			return (IPTR)FALSE;
+	err = WriteClipText(d->clipboard_buffer,
+		CLP_ClipUnit, 0,
+		CLP_Charset, MIBENUM_UTF_8,
+		CLP_Format, CLIPTXTFMT_PLAIN,
+	TAG_END);
 
-		d->add_byte = FALSE;
-	}
-
-	d->clipboard_request->io_Data = NULL;
-	d->clipboard_request->io_Length = 0UL;
-	d->clipboard_request->io_Command = CMD_UPDATE;
-
-	if(DoIO((struct IORequest*)d->clipboard_request))
-		return (IPTR)FALSE;
-
-	return (IPTR)TRUE;
+	return (IPTR)err == 0;
 }
 
 static IPTR ApplicationInstallBroker(Class *cl, Object *obj)
