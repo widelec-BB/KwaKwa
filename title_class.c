@@ -84,11 +84,6 @@ static IPTR TitleClose(Class *cl, Object *obj, struct MUIP_Title_Close *msg)
 	return(DoSuperMethodA(cl,obj,msg));
 }
 
-static IPTR TitleDraw(Class *cl, Object *obj, struct MUIP_Draw *msg)
-{
-	return DoSuperMethodA(cl, obj, msg);
-}
-
 static IPTR TitleDispatcher(void)
 {
 	Class *cl = (Class*)REG_A0;
@@ -100,8 +95,6 @@ static IPTR TitleDispatcher(void)
 		case OM_SET: return(TitleSet(cl, obj, (struct opSet*)msg));
 		case OM_GET: return(TitleGet(cl, obj, (struct opGet*)msg));
 		case MUIM_Title_Close: return(TitleClose(cl, obj, (struct MUIP_Title_Close*)msg));
-		case MUIM_Draw: return(TitleDraw(cl, obj, (struct MUIP_Draw*)msg));
-
 		default: return (DoSuperMethodA(cl, obj, msg));
 	}
 }
