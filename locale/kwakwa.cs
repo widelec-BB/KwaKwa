@@ -1622,3 +1622,39 @@ MSG_LONG_PROCESS_WINDOW_PLEASE_WAIT
 Please wait.
 Proszę czekać.
 ;
+MSG_PREFS_TALKWINDOW_FIRST_INPUT_GADGET
+Type of gadget used as primary input field:
+Typ gadżetu używany jako podstawowe pole tekstowe:
+;
+MSG_PREFS_TALKWINDOW_FIRST_INPUT_GADGET_HELP
+Allows to select the type of gadget used as primary input field in talk window. Changes are applied to new tabs. Availabilty of extra options depends on external MUI classes installed in system.
+Pozwala wybrać jaki typ gadgetu użyć jako podstawowe pole tekstowe w oknie rozmowy. Zmiany zostają zastosowane w nowo otwartych kartach. Dostępność dodatkowych opcji zależy od zainstalowanych klas MUI w systemie.
+;
+MSG_PREFS_TALKWINDOW_SECOND_INPUT_GADGET
+Type of gadget used as secondary (double mode) input field:
+Typ gadżetu używany jako dodatkowe (w trybie podwójnym) pole tekstowe:
+;
+MSG_PREFS_TALKWINDOW_SECOND_INPUT_GADGET_HELP
+Allows to select the type of gadget used as secondary input field in talk window. Secondary input field is visible after enabling double mode. Changes are applied to new tabs. Availabilty of extra options depends on external MUI classes installed in system.
+Pozwala wybrać jaki typ gadgetu użyć jako dodatkowe pole tekstowe w oknie rozmowy. Dodatkowe pole tekstowe jest widoczne po włączeniu trybu podwójnego. Zmiany zostają zastosowane w nowo otwartych kartach. Dostępność dodatkowych opcji zależy od zainstalowanych klas MUI w systemie.
+;
+MSG_PREFS_TALKWINDOW_INPUT_GADGET_UNICODE
+String.mui (one line, full unicode support).
+String.mui (jednoliniowy, z pełną obsługą unicode).
+;
+MSG_PREFS_TALKWINDOW_INPUT_GADGET_TEXTEDITOR_MCC
+TextEditor.mcc (four lines, unicode support via conversion).
+TextEditor.mcc (czteroliniowy, wsparcie unicode poprzez konwersję).
+;
+MSG_PREFS_PROGRAM_DESCWINDOW
+Status Description Window
+Okno statusów opisowych
+;
+MSG_PREFS_DESCWINDOW_INPUT_GADGET
+Type of gadget used as status description input field:
+Typ gadżetu używany jako pole tekstowe statusu opisowego:
+;
+MSG_PREFS_DESCWINDOW_INPUT_GADGET_HELP
+Allows to select the type of gadget used as status description field in status description window. Availabilty of extra options depends on external MUI classes installed in system.
+Pozwala wybrać jaki typ gadżetu użyć jako pole wprowadzania opisu statusu i oknie statusów opisowych. Dostępność dodatkowych opcji zależy od zanstalowanych klas MUI w systemie.
+;

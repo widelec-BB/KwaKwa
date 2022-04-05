@@ -47,6 +47,8 @@ extern Object *PreferencesWindow;
 #define USD_PREFS_PROGRAM_MAIN_WINDOW_SHOW_HIDE_BUTTON   0x9EDA101A
 #define USD_PREFS_PROGRAM_CONNECT_AUTO_GROUP             0x9EDA101B
 
+#define USD_PREFS_DESCWINDOW_INPUT_GADGET                0x9EDA1030
+
 /* message list prefs */
 #define USD_PREFS_ML_MYCOLOR_POPPEN                      0x9EDA1102
 #define USD_PREFS_ML_FRIENDCOLOR_POPPEN                  0x9EDA1103
@@ -75,15 +77,14 @@ extern Object *PreferencesWindow;
 #define USD_PREFS_TW_HEADLINE_OLD_COLOR                  0x9EDA1125
 
 #define USD_PREFS_TW_SYSTEMMSG_HEADLINE                  0x9EDA1126
-
 #define USD_PREFS_TW_HEADLINE_INSERT_NEWLINE             0x9EDA1127
 #define USD_PREFS_TW_HEADLINE_REVERSE                    0x9EDA1128
-
 #define USD_PREFS_TW_SYSTEMMSG_HEADLINE_REVERSE          0x9EDA1129
 
 #define USD_PREFS_TW_TOOLBAR_SPACE_SIZE                  0x9EDA112A
-
 #define USD_PREFS_TW_TABTITLE_IMAGE_ONOFF                0x9EDA112B
+#define USD_PREFS_TW_FIRST_INPUT_GADGET_SELECT           0x9EDA112C
+#define USD_PREFS_TW_SECOND_INPUT_GADGET_SELECT          0x9EDA112D
 
 /* logs prefs */
 #define USD_PREFS_LOGS_ONOFF_CHECK                       0x9EDA1200

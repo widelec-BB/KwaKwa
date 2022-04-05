@@ -21,9 +21,19 @@
 #include "talktab.h"
 #include "virtualtext.h"
 
+#ifndef MUIC_StringUnicode
+	#define MUIC_StringUnicode "StringU.mui"
+#endif /* MUIC_StringUnicode */
+
+struct Library *TextEditorMCC;
+
 struct MUI_CustomClass *InputFieldClass;
 static IPTR InputFieldDispatcher(VOID);
 const struct EmulLibEntry InputFieldGate = {TRAP_LIB, 0, (VOID(*)(VOID))InputFieldDispatcher};
+
+struct MUI_CustomClass *InputFieldUnicodeClass;
+static IPTR InputFieldUnicodeDispatcher(VOID);
+const struct EmulLibEntry InputFieldUnicodeGate = {TRAP_LIB, 0, (VOID(*)(VOID))InputFieldUnicodeDispatcher};
 
 #define IFV_ContextMenu_Copy             1
 #define IFV_ContextMenu_Cut              2
@@ -35,33 +45,63 @@ const struct EmulLibEntry InputFieldGate = {TRAP_LIB, 0, (VOID(*)(VOID))InputFie
 
 struct IFP_ContextMenu {ULONG MethodID; LONG mouse_x; LONG mouse_y;};
 struct IFP_LoadTxtFile {ULONG MethodID; STRPTR path;};
+struct IFP_AppendText  {ULONG MethodID; STRPTR text;};
 
 struct InputFieldData
 {
 	BOOL send_after_return;
+	BOOL add_event_handler;
 	struct MUI_EventHandlerNode handler;
 	Object *talk_tab;
+
+	BOOL has_changed;
+	BOOL is_unicode;
 };
 
 struct MUI_CustomClass *CreateInputFieldClass(VOID)
 {
 	struct MUI_CustomClass *cl;
 
-	cl = MUI_CreateCustomClass(NULL, MUIC_TextEditor, NULL, sizeof(struct InputFieldData), (APTR)&InputFieldGate);
-	InputFieldClass = cl;
-	return cl;
+	if((TextEditorMCC = OpenLibrary("mui/TextEditor.mcc", 15)))
+	{
+		cl = MUI_CreateCustomClass(NULL, MUIC_TextEditor, NULL, sizeof(struct InputFieldData), (APTR)&InputFieldGate);
+		InputFieldClass = cl;
+		return cl;
+	}
+
+	InputFieldClass = NULL;
+	return NULL;
 }
 
 VOID DeleteInputFieldClass(VOID)
 {
-	if (InputFieldClass) MUI_DeleteCustomClass(InputFieldClass);
+	if (InputFieldClass)
+		MUI_DeleteCustomClass(InputFieldClass);
+
+	if(TextEditorMCC)
+		CloseLibrary(TextEditorMCC);
+}
+
+struct MUI_CustomClass *CreateInputFieldUnicodeClass(VOID)
+{
+	struct MUI_CustomClass *cl;
+
+	cl = MUI_CreateCustomClass(NULL, MUIC_StringUnicode, NULL, sizeof(struct InputFieldData), (APTR)&InputFieldUnicodeGate);
+	InputFieldUnicodeClass = cl;
+	return cl;
+}
+
+VOID DeleteInputFieldUnicodeClass(VOID)
+{
+	if (InputFieldUnicodeClass)
+		MUI_DeleteCustomClass(InputFieldUnicodeClass);
 }
 
 static IPTR InputFieldNew(Class *cl, Object *obj, struct opSet *msg)
 {
-	obj = (Object*)DoSuperNew(cl, obj,
-			MUIA_CycleChain, 1,
-			MUIA_TextEditor_Rows, 4,
+	obj = (Object *)DoSuperNew(cl, obj,
+		MUIA_CycleChain, TRUE,
+		MUIA_TextEditor_Rows, 4,
 	TAG_MORE, (IPTR)msg->ops_AttrList);
 
 	if(obj)
@@ -69,6 +109,36 @@ static IPTR InputFieldNew(Class *cl, Object *obj, struct opSet *msg)
 		struct InputFieldData *d = INST_DATA(cl, obj);
 
 		d->send_after_return = TRUE;
+		d->is_unicode = FALSE;
+		d->add_event_handler = GetTagData(IFA_AddEventHandler, FALSE, msg->ops_AttrList);
+
+		DoMethod(obj, MUIM_Notify, MUIA_TextEditor_HasChanged, MUIV_EveryTime, obj, 3, MUIM_Set, IFA_HasChanged, MUIV_TriggerValue);
+		return (IPTR)obj;
+	}
+	CoerceMethod(cl, obj, OM_DISPOSE);
+	return (IPTR)NULL;
+}
+
+static IPTR InputFieldUnicodeNew(Class *cl, Object *obj, struct opSet *msg)
+{
+	obj = (Object *)DoSuperNew(cl, obj,
+		MUIA_Unicode, TRUE,
+		MUIA_CycleChain, TRUE,
+		MUIA_Frame, MUIV_Frame_String,
+		MUIA_Background, MUII_StringBack,
+		MUIA_String_MaxLen, 8192,
+		MUIA_String_AdvanceOnCR, TRUE,
+	TAG_MORE, (IPTR)msg->ops_AttrList);
+
+	if(obj)
+	{
+		struct InputFieldData *d = INST_DATA(cl, obj);
+
+		d->send_after_return = TRUE;
+		d->is_unicode = TRUE;
+		d->add_event_handler = GetTagData(IFA_AddEventHandler, FALSE, msg->ops_AttrList);
+
+		DoMethod(obj, MUIM_Notify, MUIA_String_Contents, MUIV_EveryTime, obj, 3, MUIM_Set, IFA_HasChanged, TRUE);
 
 		return (IPTR)obj;
 	}
@@ -89,14 +159,22 @@ static IPTR InputFieldSet(Class *cl, Object *obj, struct opSet *msg)
 			case IFA_SendAfterReturn:
 				d->send_after_return = (BOOL)tag->ti_Data;
 				tagcount++;
-			break;
+				break;
 
 			case IFA_TalkTab:
-				d->talk_tab = (Object*)tag->ti_Data;
+				d->talk_tab = (Object *)tag->ti_Data;
 				tagcount++;
-			break;
+				break;
+
+			case IFA_HasChanged:
+				d->has_changed = (BOOL)tag->ti_Data;
+				tagcount++;
+				break;
 
 			case IFA_TextContents:
+				if(d->is_unicode)
+					set(obj, MUIA_String_Contents, tag->ti_Data);
+				else
 				{
 					STRPTR converted = Utf8ToSystem((STRPTR)tag->ti_Data);
 					if(converted)
@@ -105,7 +183,7 @@ static IPTR InputFieldSet(Class *cl, Object *obj, struct opSet *msg)
 						StrFree(converted);
 					}
 				}
-			break;
+				break;
 		}
 	}
 
@@ -115,13 +193,21 @@ static IPTR InputFieldSet(Class *cl, Object *obj, struct opSet *msg)
 
 static IPTR InputFieldGet(Class *cl, Object *obj, struct opGet *msg)
 {
+	struct InputFieldData *d = INST_DATA(cl, obj);
 	int rv = FALSE;
 
 	switch(msg->opg_AttrID)
 	{
 		case IFA_Acknowledge:
 			return TRUE;
-		break;
+			break;
+
+		case IFA_HasChanged:
+			*msg->opg_Storage = d->has_changed;
+			d->has_changed = FALSE;
+			if(!d->is_unicode)
+				nnset(obj, MUIA_TextEditor_HasChanged, FALSE);
+			return TRUE;
 
 		default:
 			rv = (DoSuperMethodA(cl, obj, (Msg)msg));
@@ -136,7 +222,7 @@ static IPTR InputFieldSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
 	IPTR result = (IPTR)DoSuperMethodA(cl, obj, msg);
 	ENTER();
 
-	if(result)
+	if(result && d->add_event_handler)
 	{
 		d->handler.ehn_Class = cl;
 		d->handler.ehn_Object = obj;
@@ -154,7 +240,8 @@ static IPTR InputFieldCleanup(Class *cl, Object *obj, struct MUIP_Cleanup *msg)
 {
 	struct InputFieldData *d = INST_DATA(cl, obj);
 
-	DoMethod(_win(obj), MUIM_Window_RemEventHandler, (IPTR)&d->handler);
+	if(d->add_event_handler)
+		DoMethod(_win(obj), MUIM_Window_RemEventHandler, (IPTR)&d->handler);
 
 	return (DoSuperMethodA(cl, obj, msg));
 }
@@ -178,7 +265,10 @@ static IPTR InputFieldHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEven
 
 			if(msg->imsg->Code == RAWKEY_KP_ENTER)
 			{
-				DoMethod(obj, MUIM_TextEditor_InsertText, "\n", MUIV_TextEditor_InsertText_Cursor);
+				if(d->is_unicode)
+					return (IPTR)0; /* this is one line gadget, so adding new line is unsupported */
+				else
+					DoMethod(obj, MUIM_TextEditor_InsertText, "\n", MUIV_TextEditor_InsertText_Cursor);
 				return MUI_EventHandlerRC_Eat;
 			}
 
@@ -216,21 +306,22 @@ static IPTR InputFieldHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEven
 
 			if(msg->imsg->Code >= RAWKEY_F1 && msg->imsg->Code <= RAWKEY_F10)
 			{
-				DoMethod(obj, MUIM_TextEditor_InsertText,
-				 (IPTR)xget(prefs_object(USD_PREFS_FKEYS_STRING(msg->imsg->Code - RAWKEY_F1)), MUIA_String_Contents), MUIV_TextEditor_InsertText_Cursor);
-
+				IPTR text = (IPTR)xget(prefs_object(USD_PREFS_FKEYS_STRING(msg->imsg->Code - RAWKEY_F1)), MUIA_String_Contents);
+				DoMethod(obj, IFM_AppendText, text);
 				return MUI_EventHandlerRC_Eat;
 			}
 
 			if(msg->imsg->Code == RAWKEY_F11)
 			{
-				DoMethod(obj, MUIM_TextEditor_InsertText, (IPTR)xget(prefs_object(USD_PREFS_FKEYS_STRING(10)), MUIA_String_Contents), MUIV_TextEditor_InsertText_Cursor);
+				IPTR text = (IPTR)xget(prefs_object(USD_PREFS_FKEYS_STRING(10)), MUIA_String_Contents);
+				DoMethod(obj, IFM_AppendText, text);
 				return MUI_EventHandlerRC_Eat;
 			}
 
 			if(msg->imsg->Code == RAWKEY_F12)
 			{
-				DoMethod(obj, MUIM_TextEditor_InsertText, (IPTR)xget(prefs_object(USD_PREFS_FKEYS_STRING(11)), MUIA_String_Contents), MUIV_TextEditor_InsertText_Cursor);
+				IPTR text = (IPTR)xget(prefs_object(USD_PREFS_FKEYS_STRING(11)), MUIA_String_Contents);
+				DoMethod(obj, IFM_AppendText, text);
 				return MUI_EventHandlerRC_Eat;
 			}
 		}
@@ -238,7 +329,7 @@ static IPTR InputFieldHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEven
 		{
 			if(_isinobject(msg->imsg->MouseX, msg->imsg->MouseY))
 			{
-				if(msg->imsg->Code == IECODE_RBUTTON)
+				if(msg->imsg->Code == IECODE_RBUTTON && !d->is_unicode)
 				{
 					DoMethod(obj, IFM_ContextMenu, msg->imsg->MouseX, msg->imsg->MouseY);
 					return MUI_EventHandlerRC_Eat;
@@ -247,7 +338,10 @@ static IPTR InputFieldHandleEvent(Class *cl, Object *obj, struct MUIP_HandleEven
 		}
 	}
 
-	return (IPTR)0;
+	if(!d->is_unicode)
+		return 0;
+
+	return (IPTR)DoSuperMethodA(cl, obj, msg);
 }
 
 static IPTR InputFieldContextMenu(Class *cl, Object *obj, struct IFP_ContextMenu *msg)
@@ -255,6 +349,7 @@ static IPTR InputFieldContextMenu(Class *cl, Object *obj, struct IFP_ContextMenu
 	Object *strip;
 
 	strip = MUI_NewObject(MUIC_Menustrip,
+		MUIA_Unicode, TRUE,
 		MUIA_Group_Child, MUI_NewObject(MUIC_Menu,
 			MUIA_Group_Child, MUI_NewObject(MUIC_Menuitem,
 				MUIA_Menuitem_Title, GetString(MSG_INPUTFIELD_CUT),
@@ -325,7 +420,7 @@ static IPTR InputFieldContextMenu(Class *cl, Object *obj, struct IFP_ContextMenu
 			break;
 
 			case IFV_ContextMenu_Clear:
-				DoMethod(obj, MUIM_TextEditor_ClearText);
+				DoMethod(obj, IFM_Clear);
 			break;
 		}
 
@@ -337,6 +432,7 @@ static IPTR InputFieldContextMenu(Class *cl, Object *obj, struct IFP_ContextMenu
 
 static IPTR InputFieldExternalEdit(Class *cl, Object *obj)
 {
+	struct InputFieldData *d = INST_DATA(cl, obj);
 	BPTR fh;
 	UBYTE buffer[50];
 
@@ -346,7 +442,12 @@ static IPTR InputFieldExternalEdit(Class *cl, Object *obj)
 	{
 		STRPTR txt;
 
-		if((txt = (STRPTR)DoMethod(obj, IFM_ExportText)))
+		if(d->is_unicode)
+			txt = Utf8ToSystem((STRPTR)xget(obj, MUIA_String_Contents));
+		else
+			txt = (STRPTR)DoMethod(obj, MUIM_TextEditor_ExportText);
+
+		if(txt)
 		{
 			ULONG len = StrLen(txt);
 
@@ -380,7 +481,7 @@ static IPTR InputFieldImportTxtFile(Class *cl, Object *obj)
 			ASLFR_InitialPattern, "#?",
 			ASLFR_DoPatterns, TRUE,
 			ASLFR_RejectIcons, TRUE,
-			TAG_END))
+		TAG_END))
 		{
 			UBYTE location[500];
 
@@ -401,6 +502,7 @@ static IPTR InputFieldImportTxtFile(Class *cl, Object *obj)
 
 static IPTR InputFieldLoadTxtFile(Class *cl, Object *obj, struct IFP_LoadTxtFile *msg)
 {
+	struct InputFieldData *d = INST_DATA(cl, obj);
 	BPTR fh;
 
 	if((fh = Open(msg->path, MODE_OLDFILE)))
@@ -408,8 +510,10 @@ static IPTR InputFieldLoadTxtFile(Class *cl, Object *obj, struct IFP_LoadTxtFile
 		UBYTE buffer[1024];
 		ULONG loaded;
 
-		DoMethod(obj, MUIM_TextEditor_ClearText);
-		set(obj, MUIA_TextEditor_Quiet, TRUE);
+		DoMethod(obj, IFM_Clear);
+
+		if(!d->is_unicode)
+			set(obj, MUIA_TextEditor_Quiet, TRUE);
 
 		do
 		{
@@ -417,11 +521,23 @@ static IPTR InputFieldLoadTxtFile(Class *cl, Object *obj, struct IFP_LoadTxtFile
 
 			buffer[loaded] = 0x00;
 
-			DoMethod(obj, MUIM_TextEditor_InsertText, (IPTR)buffer, MUIV_TextEditor_InsertText_Cursor);
+			if(d->is_unicode)
+			{
+				STRPTR txt_unicode = SystemToUtf8(buffer);
+				if(txt_unicode)
+				{
+					DoMethod(obj, IFM_AppendText, (IPTR)txt_unicode);
+					StrFree(txt_unicode);
+				}
+			}
+			else
+				DoMethod(obj, MUIM_TextEditor_InsertText, buffer, MUIV_TextEditor_InsertText_Bottom);
+		}
+		while(loaded != 0);
 
-		}while(loaded != 0);
+		if(!d->is_unicode)
+			set(obj, MUIA_TextEditor_Quiet, FALSE);
 
-		set(obj, MUIA_TextEditor_Quiet, FALSE);
 		Close(fh);
 	}
 
@@ -430,32 +546,106 @@ static IPTR InputFieldLoadTxtFile(Class *cl, Object *obj, struct IFP_LoadTxtFile
 
 static IPTR InputFieldExportText(Class *cl, Object *obj)
 {
-	STRPTR sys_text = (STRPTR)DoSuperMethod(cl, obj, MUIM_TextEditor_ExportText);
-	if(sys_text)
-		return (IPTR)SystemToUtf8(sys_text);
-	return (IPTR)NULL;
+	struct InputFieldData *d = INST_DATA(cl, obj);
+	STRPTR unicode_text = NULL;
+
+	if(!d->is_unicode)
+	{
+		STRPTR sys_text = (STRPTR)DoSuperMethod(cl, obj, MUIM_TextEditor_ExportText);
+		if(sys_text != NULL)
+		{
+			unicode_text = SystemToUtf8(sys_text);
+			FreeVec(sys_text);
+		}
+	}
+	else
+		unicode_text = StrNew((STRPTR)xget(obj, MUIA_String_Contents));
+
+	return (IPTR)unicode_text;
+}
+
+static IPTR InputFieldAppendText(Class *cl, Object *obj, struct IFP_AppendText *msg)
+{
+	struct InputFieldData *d = INST_DATA(cl, obj);
+	STRPTR new;
+
+	if(!d->is_unicode)
+	{
+		if((new = Utf8ToSystem(msg->text)))
+		{
+			DoMethod(obj, MUIM_TextEditor_InsertText, new, MUIV_TextEditor_InsertText_Cursor);
+			StrFree(new);
+		}
+	}
+	else
+	{
+		new = FmtNew("%s%s", xget(obj, MUIA_String_Contents), msg->text);
+		if(new)
+		{
+			set(obj, MUIA_String_Contents, new);
+			StrFree(new);
+		}
+	}
+	return (IPTR)0;
+}
+
+static IPTR InputFieldClear(Class *cl, Object *obj)
+{
+	struct InputFieldData *d = INST_DATA(cl, obj);
+
+	if(d->is_unicode)
+		set(obj, MUIA_String_Contents, NULL);
+	else
+		DoMethod(obj, MUIM_TextEditor_ClearText);
+
+	return (IPTR)0;
 }
 
 static IPTR InputFieldDispatcher(VOID)
 {
-	Class *cl = (Class*)REG_A0;
-	Object *obj = (Object*)REG_A2;
+	Class *cl = (Class *)REG_A0;
+	Object *obj = (Object *)REG_A2;
 	Msg msg = (Msg)REG_A1;
 
-	switch (msg->MethodID)
+	switch(msg->MethodID)
 	{
-		case OM_NEW:  return (InputFieldNew(cl, obj, (struct opSet*)msg));
-		case OM_SET:  return (InputFieldSet(cl, obj, (struct opSet*)msg));
-		case OM_GET:  return (InputFieldGet(cl, obj, (struct opGet*)msg));
-		case MUIM_Setup: return(InputFieldSetup(cl, obj, (struct MUIP_Setup*)msg));
-		case MUIM_Cleanup: return(InputFieldCleanup(cl, obj, (struct MUIP_Cleanup*)msg));
-		case MUIM_HandleEvent: return(InputFieldHandleEvent(cl, obj, (struct MUIP_HandleEvent*)msg));
-		case IFM_ContextMenu: return(InputFieldContextMenu(cl, obj, (struct IFP_ContextMenu*)msg));
+		case OM_NEW: return(InputFieldNew(cl, obj, (struct opSet *)msg));
+		case OM_SET: return(InputFieldSet(cl, obj, (struct opSet *)msg));
+		case OM_GET: return(InputFieldGet(cl, obj, (struct opGet *)msg));
+		case MUIM_Setup: return(InputFieldSetup(cl, obj, (struct MUIP_Setup *)msg));
+		case MUIM_Cleanup: return(InputFieldCleanup(cl, obj, (struct MUIP_Cleanup *)msg));
+		case MUIM_HandleEvent: return(InputFieldHandleEvent(cl, obj, (struct MUIP_HandleEvent *)msg));
+		case IFM_ContextMenu: return(InputFieldContextMenu(cl, obj, (struct IFP_ContextMenu *)msg));
 		case IFM_ExternalEdit: return(InputFieldExternalEdit(cl, obj));
 		case IFM_ImportTxtFile: return(InputFieldImportTxtFile(cl, obj));
-		case IFM_LoadTxtFile: return(InputFieldLoadTxtFile(cl, obj, (struct IFP_LoadTxtFile*)msg));
+		case IFM_LoadTxtFile: return(InputFieldLoadTxtFile(cl, obj, (struct IFP_LoadTxtFile *)msg));
 		case IFM_ExportText: return(InputFieldExportText(cl, obj));
-		default:  return (DoSuperMethodA(cl, obj, msg));
+		case IFM_AppendText: return(InputFieldAppendText(cl, obj, (struct IFP_AppendText *)msg));
+		case IFM_Clear: return(InputFieldClear(cl, obj));
+		default: return(DoSuperMethodA(cl, obj, msg));
+	}
+}
+
+static IPTR InputFieldUnicodeDispatcher(VOID)
+{
+	Class *cl = (Class *)REG_A0;
+	Object *obj = (Object *)REG_A2;
+	Msg msg = (Msg)REG_A1;
+
+	switch(msg->MethodID)
+	{
+		case OM_NEW: return(InputFieldUnicodeNew(cl, obj, (struct opSet *)msg));
+		case OM_SET: return(InputFieldSet(cl, obj, (struct opSet *)msg));
+		case OM_GET: return(InputFieldGet(cl, obj, (struct opGet *)msg));
+		case MUIM_Setup: return(InputFieldSetup(cl, obj, (struct MUIP_Setup *)msg));
+		case MUIM_Cleanup: return(InputFieldCleanup(cl, obj, (struct MUIP_Cleanup *)msg));
+		case MUIM_HandleEvent: return(InputFieldHandleEvent(cl, obj, (struct MUIP_HandleEvent *)msg));
+		case IFM_ExternalEdit: return(InputFieldExternalEdit(cl, obj));
+		case IFM_LoadTxtFile: return(InputFieldLoadTxtFile(cl, obj, (struct IFP_LoadTxtFile *)msg));
+		case IFM_ExportText: return(InputFieldExportText(cl, obj));
+		case IFM_AppendText: return(InputFieldAppendText(cl, obj, (struct IFP_AppendText *)msg));
+		case IFM_Clear: return(InputFieldClear(cl, obj));
+		default: return(DoSuperMethodA(cl, obj, msg));
 	}
 }
 

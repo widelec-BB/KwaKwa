@@ -8,7 +8,6 @@
 #include <proto/dos.h>
 #include <exec/types.h>
 #include <emul/emulregs.h>
-#include <mui/TextEditor_mcc.h>
 #include <libvstring.h>
 
 #include "kwakwa_api/defs.h"
@@ -24,6 +23,7 @@
 #include "contactslist.h"
 #include "descwindow.h"
 #include "support.h"
+#include "inputfield.h"
 #include "ipc.h"
 
 
@@ -353,7 +353,7 @@ static IPTR insertMessage(VOID)
 			input = findobj(USD_TALKTAB_INPUT_SECOND, app);
 
 		if(input)
-			DoMethod(input, MUIM_TextEditor_InsertText, args->message);
+			DoMethod(input, IFM_AppendText, args->message);
 	}
 
 

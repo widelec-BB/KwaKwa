@@ -20,6 +20,7 @@
 #include "support.h"
 #include "parseftpurl.h"
 #include "emoticonstab.h"
+#include "inputfield.h"
 #include "prefswindow.h"
 
 
@@ -34,7 +35,6 @@ Object *PreferencesWindow; /* one, dirty, global pointer for reading preferences
 struct PWP_SavePrefs {ULONG MethodId; ULONG EnvArc;};
 struct PWP_AddPrefsPage {ULONG MethodID; Object *PrefsPage;};
 struct PWP_ParseFTPUrl {ULONG MethodID; STRPTR Url;};
-
 
 struct PrefsWindowData
 {
@@ -59,7 +59,7 @@ void DeletePrefsWindowClass(void)
 	if (PrefsWindowClass) MUI_DeleteCustomClass(PrefsWindowClass);
 }
 
-static inline Object *CreateProgramPrefs(CONST_STRPTR statuses[6])
+static inline Object *CreateProgramPrefs(CONST_STRPTR statuses[6], CONST_STRPTR input_gadget_options[3])
 {
 	Object *result;
 	Object *auto_check, *const_group, *last_group, *auto_type;
@@ -148,6 +148,26 @@ static inline Object *CreateProgramPrefs(CONST_STRPTR statuses[6])
 				MUIA_Group_Child, StringLabel(GetString(MSG_PREFS_PROGRAM_MAIN_WINDOW_SHOW_HIDE_BUTTON), "\33l"),
 				MUIA_Group_Child, EmptyRectangle(100),
 			TAG_END)),
+		TAG_END),
+
+		/* desc window */
+		MUIA_Group_Child, MUI_NewObject(MUIC_Group,
+			MUIA_Unicode, TRUE,
+			MUIA_Background, MUII_GroupBack,
+			MUIA_Frame, MUIV_Frame_Group,
+			MUIA_FrameTitle, GetString(MSG_PREFS_PROGRAM_DESCWINDOW),
+			MUIA_Group_Child, MUI_NewObject(MUIC_Group,
+				MUIA_Group_Horiz, TRUE,
+				MUIA_Group_Child, StringLabel(GetString(MSG_PREFS_DESCWINDOW_INPUT_GADGET), "\33r"),
+				MUIA_Group_Child, MUI_NewObject(MUIC_Cycle,
+					MUIA_Unicode, TRUE,
+					MUIA_UserData, USD_PREFS_DESCWINDOW_INPUT_GADGET,
+					MUIA_ObjectID, USD_PREFS_DESCWINDOW_INPUT_GADGET,
+					MUIA_Cycle_Entries, input_gadget_options,
+					MUIA_Cycle_Active, 1, /* default to TextEditor.mcc for compatibility with older versions. will fallback to MUIC_StringUnicode if TextEditor.mcc is not available */
+					MUIA_ShortHelp, GetString(MSG_PREFS_DESCWINDOW_INPUT_GADGET_HELP),
+				TAG_END),
+			TAG_END),
 		TAG_END),
 
 		/* autoconnect */
@@ -295,7 +315,7 @@ static inline Object *CreateProgramPrefs(CONST_STRPTR statuses[6])
 	return result;
 }
 
-static inline Object *CreateTalkWindowPrefs(VOID)
+static inline Object *CreateTalkWindowPrefs(CONST_STRPTR input_gadget_options[3])
 {
 	Object *result, *pic_width_slider, *pic_width_onoff, *toolbar_onoff, *toolbar_spacer_size;
 	Object *systemmsg_title, *systemmsg_title_bg, *systemmsg_title_width, *systemmsg_title_reverse;
@@ -687,6 +707,30 @@ static inline Object *CreateTalkWindowPrefs(VOID)
 				TAG_END),
 				MUIA_Group_Child, MUI_NewObject(MUIC_Group,
 					MUIA_Group_Horiz, TRUE,
+					MUIA_Group_Child, StringLabel(GetString(MSG_PREFS_TALKWINDOW_FIRST_INPUT_GADGET), "\33r"),
+					MUIA_Group_Child, MUI_NewObject(MUIC_Cycle,
+						MUIA_Unicode, TRUE,
+						MUIA_UserData, USD_PREFS_TW_FIRST_INPUT_GADGET_SELECT,
+						MUIA_ObjectID, USD_PREFS_TW_FIRST_INPUT_GADGET_SELECT,
+						MUIA_Cycle_Entries, input_gadget_options,
+						MUIA_Cycle_Active, 1, /* default to TextEditor.mcc for compatibility with older versions. will fallback to MUIC_StringUnicode if TextEditor.mcc is not available */
+						MUIA_ShortHelp, GetString(MSG_PREFS_TALKWINDOW_FIRST_INPUT_GADGET_HELP),
+					TAG_END),
+				TAG_END),
+				MUIA_Group_Child, MUI_NewObject(MUIC_Group,
+					MUIA_Group_Horiz, TRUE,
+					MUIA_Group_Child, StringLabel(GetString(MSG_PREFS_TALKWINDOW_SECOND_INPUT_GADGET), "\33r"),
+					MUIA_Group_Child, MUI_NewObject(MUIC_Cycle,
+						MUIA_Unicode, TRUE,
+						MUIA_UserData, USD_PREFS_TW_SECOND_INPUT_GADGET_SELECT,
+						MUIA_ObjectID, USD_PREFS_TW_SECOND_INPUT_GADGET_SELECT,
+						MUIA_Cycle_Entries, input_gadget_options,
+						MUIA_Cycle_Active, 1, /* default to TextEditor.mcc for compatibility with older versions. will fallback to MUIC_StringUnicode if TextEditor.mcc is not available */
+						MUIA_ShortHelp, GetString(MSG_PREFS_TALKWINDOW_SECOND_INPUT_GADGET_HELP),
+					TAG_END),
+				TAG_END),
+				MUIA_Group_Child, MUI_NewObject(MUIC_Group,
+					MUIA_Group_Horiz, TRUE,
 					MUIA_Group_Child, MUI_NewObject(MUIC_Image,
 						MUIA_Unicode, TRUE,
 						MUIA_ObjectID, USD_PREFS_TW_TABTITLE_IMAGE_ONOFF,
@@ -784,29 +828,32 @@ static inline Object *CreateTalkWindowPrefs(VOID)
 		MUIA_Group_Child, EmptyRectangle(100),
 	TAG_END);
 
-	DoMethod(pic_width_onoff, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, pic_width_slider, 3,
-	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+	if(result)
+	{
+		DoMethod(pic_width_onoff, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, pic_width_slider, 3,
+		 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
 
-	DoMethod(toolbar_onoff, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, toolbar_spacer_size, 3,
-	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+		DoMethod(toolbar_onoff, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, toolbar_spacer_size, 3,
+		 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
 
-	DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_bg, 3,
-	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+		DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_bg, 3,
+		 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
 
-	DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_width, 3,
-	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+		DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_width, 3,
+		 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
 
-	DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_reverse, 3,
-	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+		DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_reverse, 3,
+		 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
 
-	DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_bg_label, 3,
-	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+		DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_bg_label, 3,
+		 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
 
-	DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_width_label, 3,
-	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+		DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_width_label, 3,
+		 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
 
-	DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_reverse_label, 3,
-	 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+		DoMethod(systemmsg_title, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, systemmsg_title_reverse_label, 3,
+		 MUIM_Set, MUIA_Disabled, MUIV_NotTriggerValue);
+	}
 
 	return result;
 }
@@ -1365,7 +1412,7 @@ static IPTR PrefsWindowNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	Object *list, *page_group, *save_b, *use_b, *cancel_b;
 	static CONST_STRPTR statuses[6];
-
+	static CONST_STRPTR input_gadget_options[3] = {NULL, NULL, NULL};
 	CONST_STRPTR pages[] =
 	{
 		GetString(MSG_PREFSWINDOW_PROGRAM),
@@ -1377,6 +1424,10 @@ static IPTR PrefsWindowNew(Class *cl, Object *obj, struct opSet *msg)
 		GetString(MSG_PREFSWINDOW_FKEYS),
 		NULL,
 	};
+
+	input_gadget_options[0] = GetString(MSG_PREFS_TALKWINDOW_INPUT_GADGET_UNICODE);
+	if(InputFieldClass)
+		input_gadget_options[1] = GetString(MSG_PREFS_TALKWINDOW_INPUT_GADGET_TEXTEDITOR_MCC);
 
 	if((statuses[0] = FmtNew("%s %s", "\33I[4:PROGDIR:gfx/available.mbr]", GetString(MSG_GG_STATUS_AVAIL))))
 	{
@@ -1421,7 +1472,7 @@ static IPTR PrefsWindowNew(Class *cl, Object *obj, struct opSet *msg)
 										MUIA_Group_Child, MUI_NewObject(MUIC_Scrollgroup,
 											MUIA_Scrollgroup_UseWinBorder, TRUE,
 											MUIA_Scrollgroup_Contents, MUI_NewObject(MUIC_Virtgroup,
-												MUIA_Group_Child, CreateProgramPrefs(statuses),
+												MUIA_Group_Child, CreateProgramPrefs(statuses, input_gadget_options),
 											TAG_END),
 										TAG_END),
 										MUIA_Group_Child, MUI_NewObject(MUIC_Scrollgroup,
@@ -1433,7 +1484,7 @@ static IPTR PrefsWindowNew(Class *cl, Object *obj, struct opSet *msg)
 										MUIA_Group_Child, MUI_NewObject(MUIC_Scrollgroup,
 											MUIA_Scrollgroup_UseWinBorder, TRUE,
 											MUIA_Scrollgroup_Contents, MUI_NewObject(MUIC_Virtgroup,
-												MUIA_Group_Child, CreateTalkWindowPrefs(),
+												MUIA_Group_Child, CreateTalkWindowPrefs(input_gadget_options),
 											TAG_END),
 										TAG_END),
 										MUIA_Group_Child, MUI_NewObject(MUIC_Scrollgroup,

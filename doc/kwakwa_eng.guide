@@ -247,7 +247,7 @@ are @{b}case sensitive@{ub}.
 
 
 @{b}Function@{ub}
- Inserts given message in selected input gadget in active talk window tab.
+ Appends given message in selected input gadget in active talk window tab.
 
 @{b}Template@{ub}
  INPUT/A - selects input gadget @{b}@{i}first@{ui}@{ub} or @{b}@{i}second@{ui}@{ub}

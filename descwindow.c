@@ -15,6 +15,7 @@
 #include "inputfield.h"
 #include "simplestringlist.h"
 #include "descwindow.h"
+#include "prefswindow.h"
 
 struct MUI_CustomClass *DescWindowClass;
 
@@ -38,6 +39,7 @@ struct DescWindowData
 {
 	Object *string, *add_to_list, *list, *search_string;
 	STRPTR win_title;
+	LONG input_class;
 };
 
 struct MUI_CustomClass *CreateDescWindowClass(void)
@@ -71,11 +73,12 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Window_Title, (ULONG)GetString(MSG_DESCWINDOW_TITLE),
 		MUIA_Window_ScreenTitle, (ULONG)APP_SCREEN_TITLE,
 		MUIA_Window_RootObject, (ULONG)MUI_NewObject(MUIC_Group,
-			MUIA_Group_Child, (ULONG)(string = NewObject(InputFieldClass->mcc_Class, NULL,
-				MUIA_UserData, USD_DESC_STRING,
-				MUIA_ObjectID, USD_DESC_STRING,
-				MUIA_Unicode, TRUE,
-			TAG_END)),
+			MUIA_Group_Child, (IPTR)MUI_NewObject(MUIC_Group,
+				MUIA_Group_Child, (ULONG)(string = NewObject(InputFieldUnicodeClass->mcc_Class, NULL,
+					MUIA_UserData, USD_DESC_STRING,
+					MUIA_ObjectID, USD_DESC_STRING,
+				TAG_END)),
+			TAG_END),
 			MUIA_Group_Child, MUI_NewObject(MUIC_Group,
 				MUIA_Group_Horiz, TRUE,
 				MUIA_Group_Child, (add_to_list = MUI_NewObject(MUIC_Image,
@@ -202,6 +205,7 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 		d->add_to_list = add_to_list;
 		d->list = list;
 		d->search_string = search_string;
+		d->input_class = DWV_InputFieldClassUnicode;
 
 		DoMethod(buttons[0], MUIM_Notify, MUIA_Pressed, FALSE, MUIV_Notify_Window, 2,
 		 DWM_ChangeDesc, KWA_STATUS_AVAIL);
@@ -242,6 +246,8 @@ static IPTR DescWindowNew(Class *cl, Object *obj, struct opSet *msg)
 		DoMethod(next_button, MUIM_Notify, MUIA_Pressed, FALSE, (IPTR)obj, 1,
 		 DWM_SearchNext);
 
+		DoMethod(prefs_object(USD_PREFS_DESCWINDOW_INPUT_GADGET), MUIM_Notify, MUIA_Cycle_Active, MUIV_EveryTime, (IPTR)obj, 3,
+		 MUIM_Set, DWA_InputFieldClass, MUIV_TriggerValue);
 
 		set(string, IFA_SendAfterReturn, FALSE);
 
@@ -260,6 +266,72 @@ static IPTR DescWindowDispose(Class *cl, Object *obj, Msg msg)
 		StrFree(d->win_title);
 
 	return DoSuperMethodA(cl, obj, msg);
+}
+
+static BOOL ChangeInputField(Class *cl, Object *obj, LONG new_class_type)
+{
+	struct DescWindowData *d = INST_DATA(cl, obj);
+	STRPTR current_text = (STRPTR)DoMethod(d->string, IFM_ExportText);
+	Object *group = (Object*)xget(d->string, MUIA_Parent), *new_input;
+	struct MUI_CustomClass *new_class = InputFieldUnicodeClass;
+
+	if(d->input_class == new_class_type)
+		return TRUE;
+
+	if(new_class_type == DWV_InputFieldClassTextEditor && InputFieldClass)
+		new_class = InputFieldClass;
+
+	new_input = NewObject(new_class->mcc_Class, NULL,
+		MUIA_UserData, USD_DESC_STRING,
+		MUIA_ObjectID, USD_DESC_STRING,
+	TAG_END);
+
+	if(!new_input)
+		return FALSE;
+
+	set(new_input, IFA_SendAfterReturn, FALSE);
+	if(current_text)
+	{
+		set(new_input, IFA_TextContents, current_text);
+		StrFree(current_text);
+	}
+
+	DoMethod(group, MUIM_Group_InitChange);
+
+	DoMethod(group, OM_REMMEMBER, (IPTR)d->string);
+	DoMethod(group, OM_ADDMEMBER, (IPTR)new_input);
+
+	DoMethod(group, MUIM_Group_ExitChange);
+
+	DoMethod(obj, MUIM_Notify, MUIA_Window_Open, TRUE, MUIV_Notify_Self, 3,
+	 MUIM_Set, MUIA_Window_ActiveObject, (IPTR)new_input);
+
+	MUI_DisposeObject(d->string);
+	d->string = new_input;
+
+	d->input_class = new_class_type;
+
+	return TRUE;
+}
+
+static IPTR DescWindowSet(Class *cl, Object *obj, struct opSet *msg)
+{
+	int tagcount = 0;
+	struct TagItem *tag, *tagptr = msg->ops_AttrList;
+
+	while((tag = NextTagItem(&tagptr)))
+	{
+		switch(tag->ti_Tag)
+		{
+			case DWA_InputFieldClass:
+				ChangeInputField(cl, obj, tag->ti_Data);
+				tagcount++;
+			break;
+		}
+	}
+
+	tagcount += DoSuperMethodA(cl, obj, (Msg)msg);
+	return tagcount;
 }
 
 static IPTR DescWindowChangeStatus(Class *cl, Object *obj, struct DWP_ChangeDesc *msg)
@@ -373,14 +445,15 @@ static IPTR DescWindowDispatcher(void)
 
 	switch (msg->MethodID)
 	{
-		case OM_NEW:  return (DescWindowNew(cl, obj, (struct opSet*)msg));
+		case OM_NEW: return (DescWindowNew(cl, obj, (struct opSet*)msg));
 		case OM_DISPOSE: return(DescWindowDispose(cl, obj, msg));
+		case OM_SET: return(DescWindowSet(cl, obj, (struct opSet*)msg));
 		case DWM_ChangeDesc: return(DescWindowChangeStatus(cl, obj, (struct DWP_ChangeDesc*)msg));
 		case DWM_ChangeListActive: return(DescWindowChangeListActive(cl, obj));
 		case DWM_AddDescToList: return(DescWindowAddDescToList(cl, obj));
 		case DWM_LoadActualDescription: return(DescWindowLoadActualDescription(cl, obj));
 		case DWM_SearchNext: return(DescWindowSearchNext(cl, obj));
-		default:  return (DoSuperMethodA(cl, obj, msg));
+		default: return (DoSuperMethodA(cl, obj, msg));
 	}
 }
 

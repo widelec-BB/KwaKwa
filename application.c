@@ -41,6 +41,7 @@
 #include "historywindow.h"
 #include "historysql.h"
 #include "longprocesswindow.h"
+#include "inputfield.h"
 
 #include "kwakwa_api/defs.h"
 #include "kwakwa_api/protocol.h"
@@ -431,11 +432,14 @@ static IPTR ApplicationNew(Class *cl, Object *obj, struct opSet *msg)
 	if(obj)
 	{
 		struct ApplicationData *d = INST_DATA(cl, obj);
-		STRPTR used_classes[] = {"Hyperlink.mcc", "Lamp.mcc", "TextEditor.mcc", "Busy.mcc", NULL};
+		STRPTR used_classes[] = {"Hyperlink.mcc", "Lamp.mcc", "Busy.mcc", NULL};
+		STRPTR text_editor_mcc[] = {"TextEditor.mcc", NULL};
 
 		NEWLIST(&d->modules);
 
 		AddUsedMUIClasses(cl, obj, used_classes);
+		if(InputFieldClass)
+			AddUsedMUIClasses(cl, obj, text_editor_mcc);
 
 		d->about_window = about_window;
 		d->main_window = main_window;
@@ -652,6 +656,7 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 		DoMethod(obj, APPM_AddModulesGui);
 
 		DoMethod(obj, MUIM_Application_Load, MUIV_Application_Load_ENV);
+		set(d->desc_window, DWA_InputFieldClass, xget(prefs_object(USD_PREFS_DESCWINDOW_INPUT_GADGET), MUIA_Cycle_Active));
 
 		if((db_version = DoMethod(obj, APPM_OpenHistoryDatabase)) == -1)
 			return (IPTR)FALSE;

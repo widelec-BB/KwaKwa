@@ -86,7 +86,7 @@ static VOID TalkTabNotifications(Class *cl, Object *obj)
 	 TTBM_SendMessage, NULL, TRUE, d->input);
 
 	DoMethod(d->input, MUIM_Notify, IFA_Acknowledge, MUIV_EveryTime, MUIV_Notify_Self, 1,
-	 MUIM_TextEditor_ClearText);
+	 IFM_Clear);
 
 	DoMethod(d->input, MUIM_Notify, IFA_Acknowledge, MUIV_EveryTime, obj, 1,
 	 TTBM_Activate);
@@ -95,7 +95,7 @@ static VOID TalkTabNotifications(Class *cl, Object *obj)
 	 TTBM_SendMessage, NULL, TRUE, d->sec_input);
 
 	DoMethod(d->sec_input, MUIM_Notify, IFA_Acknowledge, MUIV_EveryTime, MUIV_Notify_Self, 1,
-	 MUIM_TextEditor_ClearText);
+	 IFM_Clear);
 
 	DoMethod(d->sec_input, MUIM_Notify, IFA_Acknowledge, MUIV_EveryTime, obj, 1,
 	 TTBM_Activate);
@@ -104,7 +104,7 @@ static VOID TalkTabNotifications(Class *cl, Object *obj)
 	 TTBM_SendMessage, NULL, TRUE, d->input);
 
 	DoMethod(d->send_but, MUIM_Notify, MUIA_Pressed, FALSE, d->input, 1,
-	 MUIM_TextEditor_ClearText);
+	 IFM_Clear);
 
 	DoMethod(d->send_but, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1,
 	 TTBM_Activate);
@@ -115,7 +115,7 @@ static VOID TalkTabNotifications(Class *cl, Object *obj)
 	DoMethod(d->return_check, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, d->sec_input, 3,
 	 MUIM_Set, IFA_SendAfterReturn, MUIV_TriggerValue);
 
-	DoMethod(d->input, MUIM_Notify, MUIA_TextEditor_HasChanged, TRUE, obj, 1,
+	DoMethod(d->input, MUIM_Notify, IFA_HasChanged, TRUE, obj, 1,
 	 TTBM_SendWriteNotify);
 
 	DoMethod(d->send_pic_but, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1,
@@ -138,6 +138,13 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 	Object *txt, *input, *send_but, *return_check, *lamp, *info_block, *scroll, *sec_input;
 	Object *toolbar, *send_pic_but, *clear_txt_but, *open_log_but, *double_button;
 	Object *edit_contact_button;
+	struct MUI_CustomClass *input_class = InputFieldUnicodeClass, *sec_input_class = InputFieldUnicodeClass;
+
+	if(xget(prefs_object(USD_PREFS_TW_FIRST_INPUT_GADGET_SELECT), MUIA_Cycle_Active) == 1 && InputFieldClass)
+		input_class = InputFieldClass;
+
+	if(xget(prefs_object(USD_PREFS_TW_SECOND_INPUT_GADGET_SELECT), MUIA_Cycle_Active) == 1 && InputFieldClass)
+		sec_input_class = InputFieldClass;
 
 	obj = DoSuperNew(cl, obj,
 		MUIA_Group_Child, (info_block = NewObject(ContactInfoBlockClass->mcc_Class, NULL, TAG_END)),
@@ -212,11 +219,13 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 			TAG_END)),
 			MUIA_Group_Child, EmptyRectangle(100),
 		TAG_END)),
-		MUIA_Group_Child, (input = NewObject(InputFieldClass->mcc_Class, NULL,
+		MUIA_Group_Child, (input = NewObject(input_class->mcc_Class, NULL,
 			MUIA_UserData, USD_TALKTAB_INPUT_FIRST,
+			IFA_AddEventHandler, TRUE,
 		TAG_END)),
-		MUIA_Group_Child, (sec_input = NewObject(InputFieldClass->mcc_Class, NULL,
+		MUIA_Group_Child, (sec_input = NewObject(sec_input_class->mcc_Class, NULL,
 			MUIA_UserData, USD_TALKTAB_INPUT_SECOND,
+			IFA_AddEventHandler, TRUE,
 			MUIA_ShowMe, FALSE,
 		TAG_END)),
 		MUIA_Group_Child, MUI_NewObject(MUIC_Group,
@@ -426,6 +435,7 @@ static IPTR TalkTabActivateString(Class *cl, Object *obj)
 	struct TalkTabData *d = INST_DATA(cl, obj);
 
 	nnset(_win(d->input), MUIA_Window_ActiveObject, d->input);
+
 	return (IPTR)1;
 }
 
@@ -504,8 +514,6 @@ static IPTR TalkTabSendWriteNotify(Class *cl, Object *obj)
 
 		FreeVec(new_msg);
 	}
-
-	set(d->input, MUIA_TextEditor_HasChanged, FALSE);
 
 	return (IPTR)1;
 }
@@ -1009,6 +1017,8 @@ static IPTR TalkTabToggleDouble(Class *cl, Object *obj)
 			MUIA_Selected, TRUE,
 			MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/doublei.mbr]",
 		TAG_END);
+
+		nnset(_win(d->sec_input), MUIA_Window_ActiveObject, d->sec_input);
 	}
 	else
 	{
@@ -1018,6 +1028,8 @@ static IPTR TalkTabToggleDouble(Class *cl, Object *obj)
 			MUIA_Selected, FALSE,
 			MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/double.mbr]",
 		TAG_END);
+
+		nnset(_win(d->input), MUIA_Window_ActiveObject, d->input);
 	}
 
 	d->double_hidden = !d->double_hidden;

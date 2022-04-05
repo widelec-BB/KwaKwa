@@ -60,7 +60,7 @@ $(OBJDIR)title_class.c.o: title_class.c globaldefines.h title_class.h
 
 $(OBJDIR)application.c.o: application.c globaldefines.h application.h mainwindow.h prefswindow.h contactslist.h support.h talkwindow.h \
  descwindow.h editconwindow.h smallsbar.h ipc.h locale.h translations.h modules.h modulescycle.h kwakwa_api/defs.h \
- kwakwa_api/protocol.h kwakwa_api/defs.h moduleslogwindow.h slaveprocess.h historysql.h historywindow.h longprocesswindow.h
+ kwakwa_api/protocol.h kwakwa_api/defs.h moduleslogwindow.h slaveprocess.h historysql.h historywindow.h longprocesswindow.h inputfield.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)application.c.o application.c
 
@@ -99,7 +99,7 @@ $(OBJDIR)mainwindow.c.o: mainwindow.c globaldefines.h locale.h translations.h ap
 	@$(COMPILE) -c -o $(OBJDIR)mainwindow.c.o mainwindow.c
 
 $(OBJDIR)prefswindow.c.o: prefswindow.c globaldefines.h application.h contactslist.h support.h locale.h translations.h percentageslider.h \
- prefswindow.h modules.h kwakwa_api/protocol.h kwakwa_api/defs.h emoticonstab.h
+ prefswindow.h modules.h kwakwa_api/protocol.h kwakwa_api/defs.h emoticonstab.h inputfield.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)prefswindow.c.o prefswindow.c
 
@@ -127,11 +127,11 @@ $(OBJDIR)talkwindow.c.o: talkwindow.c locale.h translations.h globaldefines.h ap
 	@$(COMPILE) -c -o $(OBJDIR)talkwindow.c.o talkwindow.c
 
 $(OBJDIR)descwindow.c.o: descwindow.c globaldefines.h locale.h translations.h support.h application.h kwakwa_api/defs.h inputfield.h \
- simplestringlist.h descwindow.h
+ simplestringlist.h descwindow.h prefswindow.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)descwindow.c.o descwindow.c
 
-$(OBJDIR)ipc.c.o: ipc.c kwakwa_api/defs.h globaldefines.h application.h ipc.h
+$(OBJDIR)ipc.c.o: ipc.c kwakwa_api/defs.h globaldefines.h application.h inputfield.h ipc.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)ipc.c.o ipc.c
 

@@ -25,6 +25,12 @@ void DeleteDescWindowClass(void);
 #define DWM_LoadActualDescription   0xCEDC0003
 #define DWM_SearchNext              0xCEDC0004
 
+/* attrs */
+#define DWA_InputFieldClass         0xCEDC0100
+
+/* consts */
+#define DWV_InputFieldClassUnicode       0
+#define DWV_InputFieldClassTextEditor    1
 
 /* objects */
 #define USD_DESC_WINDOW                0xCEDC1000

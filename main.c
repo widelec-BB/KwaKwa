@@ -46,7 +46,6 @@
 #include "logs.h"
 
 struct Library *MUIMasterBase, *CharsetsBase, *OpenURLBase, *UtilityBase, *EzxmlBase, *SocketBase, *LocaleBase, *WorkbenchBase, *SQLiteBase;
-struct Library *TextEditorMCC;
 
 BOOL StartApp(VOID)
 {
@@ -114,13 +113,6 @@ BOOL StartApp(VOID)
 		MUI_Request_Unicode(NULL, NULL, APP_NAME, "*_OK", (STRPTR)error, NULL);
 		return FALSE;
 	}
-	if(!(TextEditorMCC = OpenLibrary("mui/TextEditor.mcc", 15)))
-	{
-		PutStr("Cannot open texteditor.mcc (V15)!\n");
-		FmtNPut((STRPTR)error, GetString(MSG_OPEN_LIBRARY_FAILED), 128, "texteditor.mcc (V15)");
-		MUI_Request(NULL, NULL, 0L, APP_NAME, "*_OK", (STRPTR)error, NULL);
-		return FALSE;
-	}
 	if(!SetupLogsSystem())
 		return FALSE;
 
@@ -130,7 +122,6 @@ BOOL StartApp(VOID)
 VOID QuitApp(VOID)
 {
 	CleanupLogsSystem();
-	if(TextEditorMCC) CloseLibrary(TextEditorMCC);
 	if(SQLiteBase) CloseLibrary(SQLiteBase);
 	if(WorkbenchBase) CloseLibrary(WorkbenchBase);
 	if(SocketBase) CloseLibrary(SocketBase);
@@ -169,7 +160,7 @@ BOOL CreateClasses(VOID)
 	CreateClass(ContactInfoBlock);
 	CreateClass(VirtualText);
 	CreateClass(SimpleStringList);
-	CreateClass(InputField);
+	CreateClass(InputFieldUnicode);
 	CreateClass(Emoticon);
 	CreateClass(ModulesCycle);
 	CreateClass(EditContactWindow);
@@ -185,12 +176,16 @@ BOOL CreateClasses(VOID)
 	CreateClass(HistoryContactsList);
 	CreateClass(HistoryConversationsList);
 
+	CreateInputFieldClass(); /* do not check result here, TextEditor.mcc is optional now. */
+
 	return TRUE;
 }
 
 
 VOID DeleteClasses(VOID)
 {
+	DeleteClass(InputField);
+
 	DeleteClass(HistoryConversationsList);
 	DeleteClass(HistoryContactsList);
 	DeleteClass(HistoryWindow);
@@ -205,7 +200,7 @@ VOID DeleteClasses(VOID)
 	DeleteClass(EditContactWindow);
 	DeleteClass(ModulesCycle);
 	DeleteClass(Emoticon);
-	DeleteClass(InputField);
+	DeleteClass(InputFieldUnicode);
 	DeleteClass(SimpleStringList);
 	DeleteClass(VirtualText);
 	DeleteClass(ContactInfoBlock);
