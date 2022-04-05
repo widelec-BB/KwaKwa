@@ -111,6 +111,9 @@ static VOID TalkTabNotifications(Class *cl, Object *obj)
 	DoMethod(d->return_check, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, d->input, 3,
 	 MUIM_Set, IFA_SendAfterReturn, MUIV_TriggerValue);
 
+	DoMethod(d->return_check, MUIM_Notify, MUIA_Selected, MUIV_EveryTime, d->sec_input, 3,
+	 MUIM_Set, IFA_SendAfterReturn, MUIV_TriggerValue);
+
 	DoMethod(d->input, MUIM_Notify, MUIA_TextEditor_HasChanged, TRUE, obj, 1,
 	 TTBM_SendWriteNotify);
 
