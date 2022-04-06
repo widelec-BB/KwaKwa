@@ -1658,3 +1658,7 @@ MSG_PREFS_DESCWINDOW_INPUT_GADGET_HELP
 Allows to select the type of gadget used as status description field in status description window. Availabilty of extra options depends on external MUI classes installed in system.
 Pozwala wybrać jaki typ gadżetu użyć jako pole wprowadzania opisu statusu i oknie statusów opisowych. Dostępność dodatkowych opcji zależy od zanstalowanych klas MUI w systemie.
 ;
+MSG_APPLICATION_PLUGINS_OPEN_FAILED
+Could not open any protocol modules.\nPlease check you have installed modules in version at least %s.
+Nie udało się załadować modułów protokołów.\nProszę sprawdzić czy zainstalowane moduły są w wersji %s lub wyższej.
+;

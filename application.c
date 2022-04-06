@@ -109,6 +109,7 @@ struct APPP_DeleteContactFromHistory {ULONG MethodID; ULONG plugin_id; STRPTR co
 struct APPP_DeleteConversationFromHistory {ULONG MethodID; QUAD *conversation_id;};
 struct APPP_SetLastStatus {ULONG MethodID; ULONG status; STRPTR desc;};
 struct APPP_UpdateHistoryDatabase {ULONG MethodID; LONG db_version;};
+struct APPP_OpenModules {ULONG MethodID; LONG *open_fails;};
 
 __attribute__ ((section(".text.consts"))) const char GitHash[] = "git: "__GITHASH__;
 
@@ -631,10 +632,10 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
 	BPTR fh;
-	LONG db_version;
+	LONG db_version, open_fails;
 	ENTER();
 
-	if(DoMethod(obj, APPM_OpenModules) > 0)
+	if(DoMethod(obj, APPM_OpenModules, &open_fails) > 0)
 	{
 		/* here you can comunicate with modules before starting main loop */
 		DoMethod(d->edit_con_window, ECWM_AddModulesCycle,  NewObject(ModulesCycleClass->mcc_Class, NULL,
@@ -753,8 +754,10 @@ static IPTR ApplicationSetup(Class *cl, Object *obj)
 		LEAVE();
 		return (IPTR)TRUE;
 	}
-	else
+	else if(open_fails == 0)
 		MUI_Request_Unicode(obj, NULL, APP_NAME, GetString(MSG_APPLICATION_NO_PLUGINS_GADGETS), GetString(MSG_APPLICATION_NO_PLUGINS_MSG));
+	else
+		MUI_Request_Unicode(obj, NULL, APP_NAME, GetString(MSG_APPLICATION_NO_PLUGINS_GADGETS), GetString(MSG_APPLICATION_PLUGINS_OPEN_FAILED), MACRO_TO_STRING(MODULE_VERSION_MIN)".0");
 
 	LEAVE();
 	return (IPTR)FALSE;
@@ -1524,11 +1527,12 @@ static IPTR ApplicationFtpPutCallback(Class *cl, Object *obj, struct APPP_FtpPut
 	return (IPTR)0;
 }
 
-static IPTR ApplicationOpenModules(Class *cl, Object *obj)
+static IPTR ApplicationOpenModules(Class *cl, Object *obj, struct APPP_OpenModules *msg)
 {
 	struct ApplicationData *d = INST_DATA(cl, obj);
 	BPTR lock;
 	UBYTE path[255];
+	LONG open_fails = 0;
 	ENTER();
 
 	d->modules_no = 0;
@@ -1569,11 +1573,16 @@ static IPTR ApplicationOpenModules(Class *cl, Object *obj)
 						ADDTAIL((struct List*)&d->modules, (struct Node*)m);
 						d->modules_no++;
 					}
+					else
+						open_fails++;
 				}
 			}
 		}
 		UnLock(lock);
 	}
+
+	if(msg->open_fails)
+		*msg->open_fails = open_fails;
 
 	LEAVE();
 	return (IPTR)d->modules_no;
@@ -3472,7 +3481,7 @@ static IPTR ApplicationDispatcher(VOID)
 		case APPM_FtpPutCallback: return(ApplicationFtpPutCallback(cl, obj, (struct APPP_FtpPutCallback*)msg));
 
 		/* modules -> basics */
-		case APPM_OpenModules: return(ApplicationOpenModules(cl, obj));
+		case APPM_OpenModules: return(ApplicationOpenModules(cl, obj, (struct APPP_OpenModules*)msg));
 		case APPM_CloseModules: return(ApplicationCloseModules(cl, obj));
 		case APPM_SecTrigger: return(ApplicationSecTrigger(cl, obj));
 		case APPM_AddModulesGui: return(ApplicationAddModulesGui(cl, obj));

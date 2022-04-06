@@ -451,8 +451,9 @@
 #define MSG_PREFS_PROGRAM_DESCWINDOW 410
 #define MSG_PREFS_DESCWINDOW_INPUT_GADGET 411
 #define MSG_PREFS_DESCWINDOW_INPUT_GADGET_HELP 412
+#define MSG_APPLICATION_PLUGINS_OPEN_FAILED 413
 
-#define CATCOMP_LASTID 412
+#define CATCOMP_LASTID 413
 
 #endif /* CATCOMP_NUMBERS */
 
@@ -875,6 +876,7 @@
 #define MSG_PREFS_PROGRAM_DESCWINDOW_STR "Status Description Window"
 #define MSG_PREFS_DESCWINDOW_INPUT_GADGET_STR "Type of gadget used as status description input field:"
 #define MSG_PREFS_DESCWINDOW_INPUT_GADGET_HELP_STR "Allows to select the type of gadget used as status description field in status description window. Availabilty of extra options depends on external MUI classes installed in system."
+#define MSG_APPLICATION_PLUGINS_OPEN_FAILED_STR "Could not open any protocol modules.\nPlease check you have installed modules in version at least %s."
 
 #endif /* CATCOMP_STRINGS */
 
@@ -1305,6 +1307,7 @@ static const struct CatCompArrayType CatCompArray[] =
     {MSG_PREFS_PROGRAM_DESCWINDOW,(STRPTR)MSG_PREFS_PROGRAM_DESCWINDOW_STR},
     {MSG_PREFS_DESCWINDOW_INPUT_GADGET,(STRPTR)MSG_PREFS_DESCWINDOW_INPUT_GADGET_STR},
     {MSG_PREFS_DESCWINDOW_INPUT_GADGET_HELP,(STRPTR)MSG_PREFS_DESCWINDOW_INPUT_GADGET_HELP_STR},
+    {MSG_APPLICATION_PLUGINS_OPEN_FAILED,(STRPTR)MSG_APPLICATION_PLUGINS_OPEN_FAILED_STR},
 };
 
 #endif /* CATCOMP_ARRAY */
@@ -2143,6 +2146,8 @@ static const char CatCompBlock[] =
     MSG_PREFS_DESCWINDOW_INPUT_GADGET_STR "\x00\x00"
     "\x00\x00\x01\x9C\x00\xB6"
     MSG_PREFS_DESCWINDOW_INPUT_GADGET_HELP_STR "\x00\x00"
+    "\x00\x00\x01\x9D\x00\x66"
+    MSG_APPLICATION_PLUGINS_OPEN_FAILED_STR "\x00\x00"
 };
 
 #endif /* CATCOMP_BLOCK */

@@ -20,7 +20,7 @@ struct Module *OpenModule(STRPTR mod_path, STRPTR file_name, Object *app)
 	struct Library *libbase;
 	ENTER();
 
-	if((libbase = OpenLibrary(mod_path, 0)))
+	if((libbase = OpenLibrary(mod_path, MODULE_VERSION_MIN)))
 	{
 		struct Module *m;
 

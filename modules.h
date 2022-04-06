@@ -27,6 +27,6 @@ struct Module *OpenModule(STRPTR mod_path, STRPTR file_name, Object *app);
 VOID CloseModule(struct Module *m);
 
 #define MODULE_IS_CONNECTED(m) m->mod_Connected
-
+#define MODULE_VERSION_MIN 2
 
 #endif /* __MODULES_H__ */
