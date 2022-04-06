@@ -1551,8 +1551,8 @@ Appearance
 Wygląd
 ;
 MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE
-Space between buttons in toolbar
-Przestrzeń pomiędzy przyciskami paska narzędzi
+Space between buttons in toolbar:
+Przestrzeń pomiędzy przyciskami paska narzędzi:
 ;
 MSG_PREFS_TALKWINDOW_TOOLBAR_SPACE_HELP
 Allows to set size of space between buttons in Talk Window toolbar.
