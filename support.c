@@ -71,6 +71,21 @@ Object* GfxButton(ULONG id, STRPTR pic, UBYTE control)
 	return obj;
 }
 
+Object* CheckBox(ULONG id, BOOL selected, STRPTR help)
+{
+	return MUI_NewObject(MUIC_Image,
+		MUIA_Unicode, TRUE,
+		MUIA_ObjectID, id,
+		MUIA_UserData, id,
+		MUIA_Image_Spec, "6:15",
+		MUIA_ShowSelState, FALSE,
+		MUIA_Selected, selected,
+		MUIA_InputMode, MUIV_InputMode_Toggle,
+		MUIA_CycleChain, TRUE,
+		MUIA_ShortHelp, help,
+	TAG_END);
+}
+
 Object* NormalButton(STRPTR label, UBYTE control, LONG objid, ULONG weight)
 {
 	Object *obj;

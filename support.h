@@ -25,6 +25,7 @@
 Object* StringGadget(ULONG id);
 Object* StringLabel(STRPTR label, STRPTR preparse);
 Object* GfxButton(ULONG id, STRPTR pic, UBYTE control);
+Object* CheckBox(ULONG id, BOOL selected, STRPTR help);
 Object* NormalButton(STRPTR label, UBYTE control, LONG objid, ULONG weight);
 VOID Beep(VOID);
 VOID ActLocalTimeToClockData(struct ClockData *cd);
