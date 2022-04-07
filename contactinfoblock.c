@@ -23,24 +23,6 @@ struct MUI_CustomClass *ContactInfoBlockClass;
 static IPTR ContactInfoBlockDispatcher(VOID);
 const struct EmulLibEntry ContactInfoBlockGate = {TRAP_LIB, 0, (VOID(*)(VOID))ContactInfoBlockDispatcher};
 
-/* DIRTY HACK */
-struct CustomRenderInfo
-{
-	char dummy[256];
-	struct TextFont *mri_Font[MUIV_Font_Count];
-};
-
-static IPTR ChangeFont(Object *obj, LONG font)
-{
-	struct CustomRenderInfo *cri = (struct CustomRenderInfo *)muiRenderInfo(obj);
-	IPTR result = (IPTR)_font(obj);
-
-	_font(obj) = cri->mri_Font[-font];
-
-	return result;
-}
-/* DIRTY HACK END */
-
 struct ContactInfoBlockData
 {
 	struct ContactEntry *contact; /* contact to draw, may be null! */
@@ -177,7 +159,6 @@ static IPTR ContactInfoBlockDraw(Class *cl, Object *obj, struct MUIP_Draw *msg)
 
 			if(d->contact->statusdesc != NULL)
 			{
-				IPTR old_font = ChangeFont(obj, MUIV_Font_Tiny);
 				LONG act_desc_height = name_height + SPACE_BETWEEN_NAME_AND_DESCRIPTION, words_in_line = 0, width = d->contact->avatar ? _mwidth(obj) - d->contact->avatar->p_Width : _mwidth(obj);
 				STRPTR line_end = d->contact->statusdesc, line_start = d->contact->statusdesc, prev_word_end = NULL, last_space = NULL;
 				ULONG line_size;
@@ -228,8 +209,6 @@ static IPTR ContactInfoBlockDraw(Class *cl, Object *obj, struct MUIP_Draw *msg)
 					DoMethod(obj, MUIM_Text, _mleft(obj), _mtop(obj) + act_desc_height, _mwidth(obj), _mheight(obj), line_start, line_end - line_start, NULL, 0x00);
 					act_desc_height +=  line_size >> 16;
 				}
-
-				_font(obj) = (struct TextFont *) old_font;
 			}
 
 			if(d->contact->avatar != NULL)

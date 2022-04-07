@@ -78,25 +78,6 @@ for((node) = (struct ListEntry*)(((struct MinList*)(list))->mlh_TailPred); \
 #define CONLIST_CMENU_OPEN_LOG            17
 #define CONLIST_CMENU_OPEN_LOG_UNICODE    18
 
-/* DIRTY HACK */
-struct CustomRenderInfo
-{
-	char dummy[256];
-	struct TextFont *mri_Font[MUIV_Font_Count];
-};
-
-static inline IPTR ChangeFont(Object *obj, LONG font)
-{
-	struct CustomRenderInfo *cri = (struct CustomRenderInfo *)muiRenderInfo(obj);
-	IPTR result = (IPTR)_font(obj);
-
-	_font(obj) = cri->mri_Font[-font];
-
-	return result;
-}
-
-/* DIRTY HACK END */
-
 static LONG TotalHeight(Class *cl, Object *obj);
 struct MUI_CustomClass *ContactsListClass;
 static IPTR ContactsListDispatcher(void);
@@ -893,7 +874,6 @@ static IPTR ContactsListSort(Class *cl, Object *obj)
 
 static LONG StatusDescHeight(Object *obj, STRPTR desc, LONG width)
 {
-	IPTR old_font = ChangeFont(obj, MUIV_Font_Tiny); // hack, change font
 	LONG result = 0, words_in_line = 0;
 	ULONG line_size;
 	STRPTR line_end = desc, line_start = desc, prev_word_end = NULL, last_space = NULL;
@@ -938,7 +918,6 @@ static LONG StatusDescHeight(Object *obj, STRPTR desc, LONG width)
 		result +=  line_size >> 16;
 	}
 
-	_font(obj) = (struct TextFont *) old_font; // hack, recover old font
 	return result;
 }
 
@@ -1054,7 +1033,6 @@ static VOID DrawListPart(Class *cl, Object *obj, LONG start, LONG height, BOOL b
 
 			if(descs && act_entry->data.statusdesc != NULL)
 			{
-				IPTR old_font = ChangeFont(obj, MUIV_Font_Tiny);
 				LONG act_desc_height = act_height + name_height, words_in_line = 0, width = avatars && act_entry->data.avatar ? _mwidth(obj) - (act_entry->data.avatar->p_Width * AVATAR_RATIO) : _mwidth(obj);
 				STRPTR line_end = act_entry->data.statusdesc, line_start = act_entry->data.statusdesc, prev_word_end = NULL, last_space = NULL;
 				ULONG line_size;
@@ -1108,8 +1086,6 @@ static VOID DrawListPart(Class *cl, Object *obj, LONG start, LONG height, BOOL b
 					DoMethod(obj, MUIM_Text, _mleft(obj), _mtop(obj) + act_desc_height, _mwidth(obj), _mheight(obj), line_start, line_end - line_start, NULL, 0x00);
 					act_desc_height +=  line_size >> 16;
 				}
-
-				_font(obj) = (struct TextFont *) old_font;
 			}
 
 			if(avatars && act_entry->data.avatar != NULL)
