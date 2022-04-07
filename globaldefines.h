@@ -42,12 +42,24 @@
                      "\33b%t\33n\n\tDeez^BB\n\tDrako^BB\n\tEastone\n\tGrxmrx\n\tJacaDcaps\n\tKiero\n\tKrashan\n\tLubmil\n\tPampers\n\n"
 
 #define CACHE_DIR                "PROGDIR:cache/"
-#define GUI_DIR                  "gui/"
+#define GUI_CACHE_DIR            CACHE_DIR "gui/"
+#define GFX_DIR                  "PROGDIR:gfx/"
 #define EMOT_DIR                 "PROGDIR:gfx/emots/"
 #define MODULES_DIR              "PROGDIR:modules/"
-#define LASTMESSAGESBASE         CACHE_DIR GUI_DIR "lastmessages.db"
-#define HISTORY_DATABASE_PATH    CACHE_DIR GUI_DIR "history.db"
-#define LAST_STATUS_FILE         CACHE_DIR GUI_DIR "laststatus.cfg"
+#define LASTMESSAGESBASE         GUI_CACHE_DIR "lastmessages.db"
+#define HISTORY_DATABASE_PATH    GUI_CACHE_DIR "history.db"
+#define LAST_STATUS_FILE         GUI_CACHE_DIR "laststatus.cfg"
+
+#define MUI_IMAGE_FILE_STR(x) "\33I[4:" GFX_DIR x ".mbr]"
+
+#define STATUS_IMAGE_AVAILABLE_MUI_STR         MUI_IMAGE_FILE_STR("available")
+#define STATUS_IMAGE_AWAY_MUI_STR              MUI_IMAGE_FILE_STR("away")
+#define STATUS_IMAGE_FFC_MUI_STR               MUI_IMAGE_FILE_STR("ffc")
+#define STATUS_IMAGE_DND_MUI_STR               MUI_IMAGE_FILE_STR("dnd")
+#define STATUS_IMAGE_BLOCKED_MUI_STR           MUI_IMAGE_FILE_STR("blocked")
+#define STATUS_IMAGE_INVISIBLE_MUI_STR         MUI_IMAGE_FILE_STR("invisible")
+#define STATUS_IMAGE_UNAVAILABLE_MUI_STR       MUI_IMAGE_FILE_STR("unavailable")
+#define STATUS_IMAGE_UNREAD_MUI_STR            MUI_IMAGE_FILE_STR("newmsg")
 
 #define GG_MODULE_ID 0x23000000  /* for compatibility -> importing old configuration and old contacts list */
 

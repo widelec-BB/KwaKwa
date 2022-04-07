@@ -101,7 +101,7 @@ static IPTR SimpleStringListExport(Class *cl, Object *obj, struct MUIP_Export *m
 	BPTR fh;
 	ENTER();
 
-	if((fh = Open(CACHE_DIR GUI_DIR "desclist.cfg", MODE_NEWFILE)))
+	if((fh = Open(GUI_CACHE_DIR "desclist.cfg", MODE_NEWFILE)))
 	{
 		ULONG i;
 		STRPTR entry = NULL;
@@ -135,7 +135,7 @@ static IPTR SimpleStringListImport(Class *cl, Object *obj, struct MUIP_Import *m
 		BPTR fh;
 		BOOL unicode_enabled = FALSE, charset_check = TRUE;
 
-		if((fh = Open(CACHE_DIR GUI_DIR "desclist.cfg", MODE_OLDFILE)))
+		if((fh = Open(GUI_CACHE_DIR "desclist.cfg", MODE_OLDFILE)))
 		{
 			ULONG pos = 0;
 			BYTE ch;

@@ -1159,15 +1159,15 @@ static IPTR PrefsWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	if(InputFieldClass)
 		input_gadget_options[1] = GetString(MSG_PREFS_TALKWINDOW_INPUT_GADGET_TEXTEDITOR_MCC);
 
-	if((statuses[0] = FmtNew("%s %s", "\33I[4:PROGDIR:gfx/available.mbr]", GetString(MSG_GG_STATUS_AVAIL))))
+	if((statuses[0] = FmtNew(STATUS_IMAGE_AVAILABLE_MUI_STR" %ls", GetString(MSG_GG_STATUS_AVAIL))))
 	{
-		if((statuses[1] = FmtNew("%s %s", "\33I[4:PROGDIR:gfx/away.mbr]", GetString(MSG_GG_STATUS_AWAY))))
+		if((statuses[1] = FmtNew(STATUS_IMAGE_AWAY_MUI_STR" %ls", GetString(MSG_GG_STATUS_AWAY))))
 		{
-			if((statuses[2] = FmtNew("%s %s", "\33I[4:PROGDIR:gfx/invisible.mbr]", GetString(MSG_GG_STATUS_INVISIBLE))))
+			if((statuses[2] = FmtNew(STATUS_IMAGE_INVISIBLE_MUI_STR" %ls", GetString(MSG_GG_STATUS_INVISIBLE))))
 			{
-				if((statuses[3] = FmtNew("%s %s", "\33I[4:PROGDIR:gfx/ffc.mbr]", GetString(MSG_GG_STATUS_FFC))))
+				if((statuses[3] = FmtNew(STATUS_IMAGE_FFC_MUI_STR" %ls", GetString(MSG_GG_STATUS_FFC))))
 				{
-					if((statuses[4] = FmtNew("%s %s", "\33I[4:PROGDIR:gfx/dnd.mbr]", GetString(MSG_GG_STATUS_DND))))
+					if((statuses[4] = FmtNew(STATUS_IMAGE_DND_MUI_STR" %ls", GetString(MSG_GG_STATUS_DND))))
 					{
 						statuses[5] = NULL;
 

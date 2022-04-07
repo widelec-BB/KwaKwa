@@ -327,7 +327,7 @@ static IPTR PictureViewSavePicture(Class *cl, Object *obj)
 
 	if((freq = MUI_AllocAslRequestTags(ASL_FileRequest, TAG_END)))
 	{
-		STRPTR last_path = LoadFile(CACHE_DIR GUI_DIR "picture_save_asl.cfg", NULL);
+		STRPTR last_path = LoadFile(GUI_CACHE_DIR "picture_save_asl.cfg", NULL);
 
 		if(MUI_AslRequestTags(freq,
 			ASLFR_Window, _window(obj),
@@ -343,7 +343,7 @@ static IPTR PictureViewSavePicture(Class *cl, Object *obj)
 		{
 			UBYTE location[500];
 
-			FmtNPut(location, CACHE_DIR GUI_DIR "picture_save_asl.cfg", sizeof(location));
+			FmtNPut(location, GUI_CACHE_DIR "picture_save_asl.cfg", sizeof(location));
 			SaveFile(location, freq->fr_Drawer, StrLen(freq->fr_Drawer));
 
 			StrNCopy(freq->fr_Drawer, (STRPTR)location, sizeof(location));

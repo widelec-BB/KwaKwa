@@ -93,7 +93,7 @@ static IPTR MainWindowNew(Class *cl, Object *obj, struct opSet *msg)
 	Object *gg_act_status = MUI_NewObject(MUIC_Text,
 		MUIA_Unicode, TRUE,
 		MUIA_Weight, 0,
-		MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/unavailable.mbr]",
+		MUIA_Text_Contents, STATUS_IMAGE_UNAVAILABLE_MUI_STR,
 		MUIA_ShortHelp, GetString(MSG_MAINWINDOW_ACT_STATUS_HELP),
 	TAG_END);
 	Object *next_button = NormalButton(GetString(MSG_MAINWINDOW_SEARCH_NEXT_BUTTON), *GetString(MSG_MAINWINDOW_SEARCH_NEXT_BUTTON_HOTKEY), USD_MAIN_WINDOW_SEARCH_NEXT_BUTTON, 0);
@@ -189,9 +189,9 @@ static IPTR MainWindowShowGGStatusMenu(Class *cl, Object *obj)
 	struct MainWindowData *d = INST_DATA(cl, obj);
 	Object *strip = NULL;
 	ULONG result;
-	UBYTE avail[50] = "\33I[4:PROGDIR:gfx/available.mbr] ", unavail[50] = "\33I[4:PROGDIR:gfx/unavailable.mbr] ",
-			invi[50] = "\33I[4:PROGDIR:gfx/invisible.mbr] ", away[50] = "\33I[4:PROGDIR:gfx/away.mbr] ",
-			ffc[50] = "\33I[4:PROGDIR:gfx/ffc.mbr] ", dnd[50] = "\33I[4:PROGDIR:gfx/dnd.mbr] ";
+	UBYTE avail[50] = STATUS_IMAGE_AVAILABLE_MUI_STR" ", unavail[50] = STATUS_IMAGE_UNAVAILABLE_MUI_STR" ",
+			invi[50] = STATUS_IMAGE_INVISIBLE_MUI_STR" ", away[50] = STATUS_IMAGE_AWAY_MUI_STR" ",
+			ffc[50] = STATUS_IMAGE_FFC_MUI_STR" ", dnd[50] = STATUS_IMAGE_DND_MUI_STR" ";
 
 
 	StrCat(GetString(MSG_GG_STATUS_AVAIL), (STRPTR)avail);
@@ -296,32 +296,7 @@ static IPTR MainWindowChangeStatus(Class *cl, Object *obj, struct MWP_ChangeStat
 {
 	struct MainWindowData *d = INST_DATA(cl, obj);
 
-	switch(KWA_S(msg->new_status))
-	{
-		case KWA_STATUS_NOT_AVAIL:
-			set(d->gg_act_status, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/unavailable.mbr]");
-		break;
-
-		case KWA_STATUS_AVAIL:
-			set(d->gg_act_status, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/available.mbr]");
-		break;
-
-		case KWA_STATUS_BUSY:
-			set(d->gg_act_status, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/away.mbr]");
-		break;
-
-		case KWA_STATUS_INVISIBLE:
-			set(d->gg_act_status, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/invisible.mbr]");
-		break;
-
-		case KWA_STATUS_FFC:
-			set(d->gg_act_status, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/ffc.mbr]");
-		break;
-
-		case KWA_STATUS_DND:
-			set(d->gg_act_status, MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/dnd.mbr]");
-		break;
-	}
+	set(d->gg_act_status, MUIA_Text_Contents, Status2MUIImageStr(msg->new_status));
 
 	return (IPTR)1;
 }

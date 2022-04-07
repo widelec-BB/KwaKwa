@@ -139,7 +139,8 @@ $(OBJDIR)logs.c.o: logs.c globaldefines.h support.h locale.h translations.h logs
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)logs.c.o logs.c
 
-$(OBJDIR)contactinfoblock.c.o: contactinfoblock.c globaldefines.h talkwindow.h contactslist.h support.h contactinfoblock.h kwakwa_api/defs.h
+$(OBJDIR)contactinfoblock.c.o: contactinfoblock.c globaldefines.h talkwindow.h contactslist.h support.h contactinfoblock.h \
+ kwakwa_api/defs.h support.h
 	@$(COMPILE_FILE)
 	@$(COMPILE) -c -o $(OBJDIR)contactinfoblock.c.o contactinfoblock.c
 

@@ -66,7 +66,7 @@ for((node) = (struct ListEntry*)(((struct MinList*)(list))->mlh_TailPred); \
 #define SPACE_BETWEEN_NAME_AND_DESCRIPTION xget(prefs_object(USD_PREFS_CONTACTSLIST_SPACENAMEDESC_SLIDER), MUIA_Slider_Level)
 #define SPACE_BETWEEN_ENTRIES xget(prefs_object(USD_PREFS_CONTACTSLIST_SPACEENTRIES_SLIDER), MUIA_Slider_Level)
 
-#define CONTACTS_LIST_PATH CACHE_DIR GUI_DIR "contactslist.cfg"
+#define CONTACTS_LIST_PATH GUI_CACHE_DIR "contactslist.cfg"
 
 /* context menu */
 #define CONLIST_CMENU_EDIT                11
@@ -700,7 +700,7 @@ static IPTR ContactsListExportToFile(Class *cl, Object *obj)
 	{
 		struct ClockData cd;
 		STRPTR initialfile;
-		STRPTR initialdrawer = LoadFile(CACHE_DIR GUI_DIR "list_export_asl.cfg", NULL);
+		STRPTR initialdrawer = LoadFile(GUI_CACHE_DIR "list_export_asl.cfg", NULL);
 
 		ActLocalTimeToClockData(&cd);
 
@@ -720,7 +720,7 @@ static IPTR ContactsListExportToFile(Class *cl, Object *obj)
 			UBYTE location[500];
 			BPTR fh;
 
-			FmtNPut(location, CACHE_DIR GUI_DIR "list_export_asl.cfg", sizeof(location));
+			FmtNPut(location, GUI_CACHE_DIR "list_export_asl.cfg", sizeof(location));
 			SaveFile(location, freq->fr_Drawer, StrLen(freq->fr_Drawer));
 
 			StrNCopy(freq->fr_Drawer, (STRPTR)location, sizeof(location));
@@ -1044,24 +1044,9 @@ static VOID DrawListPart(Class *cl, Object *obj, LONG start, LONG height, BOOL b
 			}
 
 			if(act_entry->data.unread)
-				FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), "\33I[4:PROGDIR:gfx/newmsg.mbr]", ContactNameLoc(act_entry->data));
+				FmtNPut((STRPTR)buffer, STATUS_IMAGE_UNREAD_MUI_STR" %ls", sizeof(buffer), ContactNameLoc(act_entry->data));
 			else
-			{
-				if(KWA_S_AVAIL(act_entry->data.status))
-					FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), "\33I[4:PROGDIR:gfx/available.mbr]", ContactNameLoc(act_entry->data));
-				else if(KWA_S_BUSY(act_entry->data.status))
-					FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), "\33I[4:PROGDIR:gfx/away.mbr]", ContactNameLoc(act_entry->data));
-				else if(KWA_S_FFC(act_entry->data.status))
-					FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), "\33I[4:PROGDIR:gfx/ffc.mbr]", ContactNameLoc(act_entry->data));
-				else if(KWA_S_DND(act_entry->data.status))
-					FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), "\33I[4:PROGDIR:gfx/dnd.mbr]", ContactNameLoc(act_entry->data));
-				else if(KWA_S_BLOCKED(act_entry->data.status))
-					FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), "\33I[4:PROGDIR:gfx/blocked.mbr]", ContactNameLoc(act_entry->data));
-				else if(KWA_S_INVISIBLE(act_entry->data.status))
-					FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), "\33I[4:PROGDIR:gfx/invisible.mbr]", ContactNameLoc(act_entry->data));
-				else
-					FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), "\33I[4:PROGDIR:gfx/unavailable.mbr]", ContactNameLoc(act_entry->data));
-			}
+				FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), Status2MUIImageStr(act_entry->data.status), ContactNameLoc(act_entry->data));
 
 			name_height = DoMethod(obj, MUIM_TextDim, (STRPTR)buffer, StrLen((STRPTR)buffer), NULL, 0x00) >> 16;
 

@@ -804,3 +804,21 @@ LONG MUI_Request_Unicode(Object *app, Object *win, STRPTR title, STRPTR gadgets,
 
 	return res;
 }
+
+CONST_STRPTR Status2MUIImageStr(ULONG status)
+{
+	if(KWA_S_BLOCKED(status))
+		return "\33I[4:PROGDIR:gfx/blocked.mbr]";
+	if(KWA_S_AVAIL(status))
+		return "\33I[4:PROGDIR:gfx/available.mbr]";
+	if(KWA_S_BUSY(status))
+		return "\33I[4:PROGDIR:gfx/away.mbr]";
+	if(KWA_S_FFC(status))
+		return "\33I[4:PROGDIR:gfx/ffc.mbr]";
+	if(KWA_S_DND(status))
+		return "\33I[4:PROGDIR:gfx/dnd.mbr]";
+	if(KWA_S_INVISIBLE(status))
+		return "\33I[4:PROGDIR:gfx/invisible.mbr]";
+
+	return "\33I[4:PROGDIR:gfx/unavailable.mbr]";
+}

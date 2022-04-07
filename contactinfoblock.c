@@ -10,6 +10,7 @@
 #include "globaldefines.h"
 #include "talkwindow.h"
 #include "contactslist.h"
+#include "support.h"
 #include "contactinfoblock.h"
 
 #include "kwakwa_api/defs.h"
@@ -166,20 +167,7 @@ static IPTR ContactInfoBlockDraw(Class *cl, Object *obj, struct MUIP_Draw *msg)
 			ULONG name_height;
 			APTR clip;
 
-			if(KWA_S_AVAIL(d->contact->status))
-				FmtNPut((STRPTR)buffer, "%s %s", sizeof(buffer), "\33I[4:PROGDIR:gfx/available.mbr]", ContactName(d->contact));
-			else if(KWA_S_BUSY(d->contact->status))
-				FmtNPut((STRPTR)buffer, "%s %s", sizeof(buffer), "\33I[4:PROGDIR:gfx/away.mbr]", ContactName(d->contact));
-			else if(KWA_S_FFC(d->contact->status))
-				FmtNPut((STRPTR)buffer, "%s %s", sizeof(buffer), "\33I[4:PROGDIR:gfx/ffc.mbr]", ContactName(d->contact));
-			else if(KWA_S_DND(d->contact->status))
-				FmtNPut((STRPTR)buffer, "%s %s", sizeof(buffer), "\33I[4:PROGDIR:gfx/dnd.mbr]", ContactName(d->contact));
-			else if(KWA_S_BLOCKED(d->contact->status))
-				FmtNPut((STRPTR)buffer, "%s %s", sizeof(buffer), "\33I[4:PROGDIR:gfx/blocked.mbr]", ContactName(d->contact));
-			else if(KWA_S_INVISIBLE(d->contact->status))
-				FmtNPut((STRPTR)buffer, "%s %s", sizeof(buffer), "\33I[4:PROGDIR:gfx/invisible.mbr]", ContactName(d->contact));
-			else
-				FmtNPut((STRPTR)buffer, "%s %s", sizeof(buffer), "\33I[4:PROGDIR:gfx/unavailable.mbr]", ContactName(d->contact));
+			FmtNPut((STRPTR)buffer, "%ls %ls", sizeof(buffer), Status2MUIImageStr(d->contact->status), ContactName(d->contact));
 
 			clip = MUI_AddClipping(muiRenderInfo(obj), _mleft(obj), _mtop(obj), _mwidth(obj), _mheight(obj));
 

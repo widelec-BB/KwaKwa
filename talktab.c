@@ -133,6 +133,21 @@ static VOID TalkTabNotifications(Class *cl, Object *obj)
 	DoMethod(d->edit_contact_button, MUIM_Notify, MUIA_Pressed, FALSE, obj, 1, TTBM_EditContact);
 }
 
+static inline Object *ToolbarButton(STRPTR label, CONST_STRPTR help)
+{
+	return MUI_NewObject(MUIC_Text,
+		MUIA_Unicode, TRUE,
+		MUIA_Text_Contents, label,
+		MUIA_Text_PreParse, "\33c",
+		MUIA_Frame, MUIV_Frame_ImageButton,
+		MUIA_Background, MUII_ImageButtonBack,
+		MUIA_InputMode, MUIV_InputMode_RelVerify,
+		MUIA_CycleChain, TRUE,
+		MUIA_HorizWeight, 0,
+		MUIA_ShortHelp, help,
+	TAG_END);
+}
+
 static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 {
 	Object *txt, *input, *send_but, *return_check, *lamp, *info_block, *scroll, *sec_input;
@@ -160,63 +175,11 @@ static IPTR TalkTabNew(Class *cl, Object *obj, struct opSet *msg)
 		MUIA_Group_Child, (toolbar = MUI_NewObject(MUIC_Group,
 			MUIA_Group_Horiz, TRUE,
 			MUIA_Group_HorizSpacing, xget(prefs_object(USD_PREFS_TW_TOOLBAR_SPACE_SIZE), MUIA_Slider_Level),
-			MUIA_Group_Child, (clear_txt_but = MUI_NewObject(MUIC_Text,
-				MUIA_Unicode, TRUE,
-				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/clean.mbr]",
-				MUIA_Text_PreParse, "\33c",
-				MUIA_Frame, MUIV_Frame_ImageButton,
-				MUIA_Background, MUII_ImageButtonBack,
-				MUIA_InputMode, MUIV_InputMode_RelVerify,
-				MUIA_CycleChain, TRUE,
-				MUIA_HorizWeight, 0,
-				MUIA_ShortHelp, GetString(MSG_TALKTAB_BUTTON_CLEAR),
-			TAG_END)),
-			MUIA_Group_Child, (send_pic_but = MUI_NewObject(MUIC_Text,
-				MUIA_Unicode, TRUE,
-				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/sendimage.mbr]",
-				MUIA_Text_PreParse, "\33c",
-				MUIA_Frame, MUIV_Frame_ImageButton,
-				MUIA_Background, MUII_ImageButtonBack,
-				MUIA_InputMode, MUIV_InputMode_RelVerify,
-				MUIA_CycleChain, TRUE,
-				MUIA_HorizWeight, 0,
-				MUIA_ShortHelp, GetString(MSG_TALKTAB_BUTTON_SEND_PICTURE),
-				MUIA_UserData, USD_TALKTAB_SEND_PICTURE,
-			TAG_END)),
-			MUIA_Group_Child, (open_log_but = MUI_NewObject(MUIC_Text,
-				MUIA_Unicode, TRUE,
-				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/log.mbr]",
-				MUIA_Text_PreParse, "\33c",
-				MUIA_Frame, MUIV_Frame_ImageButton,
-				MUIA_Background, MUII_ImageButtonBack,
-				MUIA_InputMode, MUIV_InputMode_RelVerify,
-				MUIA_CycleChain, TRUE,
-				MUIA_HorizWeight, 0,
-				MUIA_ShortHelp, GetString(MSG_TALKTAB_BUTTON_OPEN_LOG),
-				MUIA_UserData, USD_TALKTAB_OPEN_LOG,
-			TAG_END)),
-			MUIA_Group_Child, (double_button = MUI_NewObject(MUIC_Text,
-				MUIA_Unicode, TRUE,
-				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/double.mbr]",
-				MUIA_Text_PreParse, "\33c",
-				MUIA_Frame, MUIV_Frame_ImageButton,
-				MUIA_Background, MUII_ImageButtonBack,
-				MUIA_InputMode, MUIV_InputMode_RelVerify,
-				MUIA_CycleChain, TRUE,
-				MUIA_HorizWeight, 0,
-				MUIA_ShortHelp, GetString(MSG_TALKTAB_BUTTON_DOUBLE),
-			TAG_END)),
-			MUIA_Group_Child, (edit_contact_button = MUI_NewObject(MUIC_Text,
-				MUIA_Unicode, TRUE,
-				MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/editcon.mbr]",
-				MUIA_Text_PreParse, "\33c",
-				MUIA_Frame, MUIV_Frame_ImageButton,
-				MUIA_Background, MUII_ImageButtonBack,
-				MUIA_InputMode, MUIV_InputMode_RelVerify,
-				MUIA_CycleChain, TRUE,
-				MUIA_HorizWeight, 0,
-				MUIA_ShortHelp, GetString(MSG_TALKTAB_BUTTON_EDIT_CONTACT),
-			TAG_END)),
+			MUIA_Group_Child, (clear_txt_but = ToolbarButton(MUI_IMAGE_FILE_STR("toolbar/clean"), GetString(MSG_TALKTAB_BUTTON_CLEAR))),
+			MUIA_Group_Child, (send_pic_but = ToolbarButton(MUI_IMAGE_FILE_STR("toolbar/sendimage"), GetString(MSG_TALKTAB_BUTTON_SEND_PICTURE))),
+			MUIA_Group_Child, (open_log_but = ToolbarButton(MUI_IMAGE_FILE_STR("toolbar/log"), GetString(MSG_TALKTAB_BUTTON_OPEN_LOG))),
+			MUIA_Group_Child, (double_button = ToolbarButton(MUI_IMAGE_FILE_STR("toolbar/double"), GetString(MSG_TALKTAB_BUTTON_DOUBLE))),
+			MUIA_Group_Child, (edit_contact_button = ToolbarButton(MUI_IMAGE_FILE_STR("toolbar/editcon"), GetString(MSG_TALKTAB_BUTTON_EDIT_CONTACT))),
 			MUIA_Group_Child, EmptyRectangle(100),
 		TAG_END)),
 		MUIA_Group_Child, (input = NewObject(input_class->mcc_Class, NULL,
@@ -1006,7 +969,7 @@ static IPTR TalkTabToggleDouble(Class *cl, Object *obj)
 
 		SetAttrs(d->double_but,
 			MUIA_Selected, TRUE,
-			MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/doublei.mbr]",
+			MUIA_Text_Contents, MUI_IMAGE_FILE_STR("toolbar/doublei"),
 		TAG_END);
 
 		nnset(_win(d->sec_input), MUIA_Window_ActiveObject, d->sec_input);
@@ -1017,7 +980,7 @@ static IPTR TalkTabToggleDouble(Class *cl, Object *obj)
 
 		SetAttrs(d->double_but,
 			MUIA_Selected, FALSE,
-			MUIA_Text_Contents, "\33I[4:PROGDIR:gfx/toolbar/double.mbr]",
+			MUIA_Text_Contents, MUI_IMAGE_FILE_STR("toolbar/double"),
 		TAG_END);
 
 		nnset(_win(d->input), MUIA_Window_ActiveObject, d->input);

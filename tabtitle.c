@@ -44,30 +44,14 @@ VOID DeleteTabTitleClass(VOID)
 
 static STRPTR createTextContent(STRPTR name, ULONG status)
 {
-	STRPTR image, res;
+	CONST_STRPTR image = Status2MUIImageStr(status);
+	STRPTR res;
 	LONG len;
 
-	if(KWA_S_AVAIL(status))
-		image = "\33I[4:PROGDIR:gfx/available.mbr]";
-	else if(KWA_S_BUSY(status))
-		image = "\33I[4:PROGDIR:gfx/away.mbr]";
-	else if(KWA_S_FFC(status))
-		image =  "\33I[4:PROGDIR:gfx/ffc.mbr]";
-	else if(KWA_S_DND(status))
-		image = "\33I[4:PROGDIR:gfx/dnd.mbr]";
-	else if(KWA_S_BLOCKED(status))
-		image = "\33I[4:PROGDIR:gfx/blocked.mbr]";
-	else if(KWA_S_INVISIBLE(status))
-		image = "\33I[4:PROGDIR:gfx/invisible.mbr]";
-	else
-		image = "\33I[4:PROGDIR:gfx/unavailable.mbr]";
-
-	len = StrLen(image) + StrLen(name) + 2 /* 2 = space in the middle and 0x00 at end */;
+	len = StrLen((STRPTR)image) + StrLen(name) + 2 /* 2 = space in the middle and 0x00 at end */;
 	res = (STRPTR)AllocVec(len, MEMF_PUBLIC);
 	if(res)
-	{
 		FmtPut(res, "%s %s", image, name);
-	}
 
 	return res;
 }
