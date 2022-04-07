@@ -279,7 +279,12 @@ static BOOL ChangeInputField(Class *cl, Object *obj, LONG new_class_type)
 		return TRUE;
 
 	if(new_class_type == DWV_InputFieldClassTextEditor && InputFieldClass)
+	{
+		DoMethod(d->list, MUIM_SimpleStringList_AddEventHandler);
 		new_class = InputFieldClass;
+	}
+	else
+		DoMethod(d->list, MUIM_SimpleStringList_RemEventHandler);
 
 	new_input = NewObject(new_class->mcc_Class, NULL,
 		MUIA_UserData, USD_DESC_STRING,

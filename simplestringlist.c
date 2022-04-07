@@ -28,6 +28,8 @@ struct MUIP_SimpleStringList_Find{ULONG MethodID; STRPTR string; LONG next;};
 struct SimpleStringListData
 {
 	Object *menu;
+
+	struct MUI_EventHandlerNode ehn;
 };
 
 struct MUI_CustomClass *CreateSimpleStringListClass(VOID)
@@ -188,10 +190,19 @@ static IPTR SimpleStringListSetup(Class *cl, Object *obj, struct MUIP_Setup *msg
 {
 	IPTR result = DoSuperMethodA(cl, obj, msg);
 
-	DoMethod(_win(obj), MUIM_Notify, MUIA_Window_Open, FALSE, obj, 2,
-	 MUIM_Export, NULL);
+	if(result)
+	{
+		DoMethod(_win(obj), MUIM_Notify, MUIA_Window_Open, FALSE, obj, 2,
+		 MUIM_Export, NULL);
+	}
 
 	return result;
+}
+
+static IPTR SimpleStringListCleanup(Class *cl, Object *obj, struct MUIP_Cleanup *msg)
+{
+	DoMethod(obj, MUIM_SimpleStringList_RemEventHandler);
+	return DoSuperMethodA(cl, obj, (Msg)msg);
 }
 
 static IPTR SimpleStringListFind(Class *cl, Object *obj, struct MUIP_SimpleStringList_Find *msg)
@@ -276,6 +287,36 @@ static IPTR SimpleStringListContextMenuChoice(Class *cl, Object *obj, struct MUI
 	return (IPTR)0;
 }
 
+static IPTR SimpleStringListAddEventHandler(Class *cl, Object *obj)
+{
+	struct SimpleStringListData *d = INST_DATA(cl, obj);
+	Object *win = muiRenderInfo(obj) ? _win(obj) : NULL;
+
+	if(win != NULL && !(d->ehn.ehn_Flags & MUI_EHF_ISENABLED))
+	{
+		d->ehn.ehn_Class = cl;
+		d->ehn.ehn_Object = obj;
+		d->ehn.ehn_Events = IDCMP_RAWKEY;
+		d->ehn.ehn_Flags = MUI_EHF_PRIORITY; /* not for public use? bite me. needed to override sending event first to active/default gadget */
+		d->ehn.ehn_Priority = 2;
+
+		DoMethod(_win(obj), MUIM_Window_AddEventHandler, &d->ehn);
+	}
+
+	return (IPTR)0;
+}
+
+static IPTR SimpleStringListRemEventHandler(Class *cl, Object *obj)
+{
+	struct SimpleStringListData *d = INST_DATA(cl, obj);
+	Object *win = muiRenderInfo(obj) ? _win(obj) : NULL;
+
+	if(win != NULL)
+		DoMethod(_win(obj), MUIM_Window_RemEventHandler, &d->ehn);
+
+	return (IPTR)0;
+}
+
 static IPTR SimpleStringListDispatcher(VOID)
 {
 	Class *cl = (Class*)REG_A0;
@@ -289,8 +330,11 @@ static IPTR SimpleStringListDispatcher(VOID)
 		case MUIM_Export: return (SimpleStringListExport(cl, obj, (struct MUIP_Export*) msg));
 		case MUIM_Import: return (SimpleStringListImport(cl, obj, (struct MUIP_Import*) msg));
 		case MUIM_Setup: return (SimpleStringListSetup(cl, obj, (struct MUIP_Setup*) msg));
+		case MUIM_Cleanup: return (SimpleStringListCleanup(cl, obj, (struct MUIP_Cleanup*)msg));
 		case MUIM_SimpleStringList_Find: return(SimpleStringListFind(cl, obj, (struct MUIP_SimpleStringList_Find*)msg));
 		case MUIM_ContextMenuChoice: return(SimpleStringListContextMenuChoice(cl, obj, (struct MUIP_ContextMenuChoice*)msg));
+		case MUIM_SimpleStringList_AddEventHandler: return (SimpleStringListAddEventHandler(cl, obj));
+		case MUIM_SimpleStringList_RemEventHandler: return (SimpleStringListRemEventHandler(cl, obj));
 		default:  return (DoSuperMethodA(cl, obj, msg));
 	}
 }

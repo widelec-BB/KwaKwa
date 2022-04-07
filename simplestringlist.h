@@ -18,7 +18,8 @@ struct MUI_CustomClass *CreateSimpleStringListClass(VOID);
 VOID DeleteSimpleStringListClass(VOID);
 
 /* methods */
-#define MUIM_SimpleStringList_Find 0x7EDC0000
-
+#define MUIM_SimpleStringList_Find                     0x7EDC0000
+#define MUIM_SimpleStringList_AddEventHandler          0x7EDC0001
+#define MUIM_SimpleStringList_RemEventHandler          0x7EDC0002
 
 #endif /* __SIMPLESTRING_H__ */
