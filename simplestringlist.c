@@ -30,6 +30,7 @@ struct SimpleStringListData
 	Object *menu;
 
 	struct MUI_EventHandlerNode ehn;
+	BOOL add_ehn;
 };
 
 struct MUI_CustomClass *CreateSimpleStringListClass(VOID)
@@ -188,12 +189,16 @@ static IPTR SimpleStringListImport(Class *cl, Object *obj, struct MUIP_Import *m
 
 static IPTR SimpleStringListSetup(Class *cl, Object *obj, struct MUIP_Setup *msg)
 {
+	struct SimpleStringListData *d = INST_DATA(cl, obj);
 	IPTR result = DoSuperMethodA(cl, obj, msg);
 
 	if(result)
 	{
 		DoMethod(_win(obj), MUIM_Notify, MUIA_Window_Open, FALSE, obj, 2,
 		 MUIM_Export, NULL);
+
+		if(d->add_ehn)
+			DoMethod(obj, MUIM_SimpleStringList_AddEventHandler);
 	}
 
 	return result;
@@ -303,6 +308,8 @@ static IPTR SimpleStringListAddEventHandler(Class *cl, Object *obj)
 		DoMethod(_win(obj), MUIM_Window_AddEventHandler, &d->ehn);
 	}
 
+	d->add_ehn = TRUE;
+
 	return (IPTR)0;
 }
 
@@ -313,6 +320,8 @@ static IPTR SimpleStringListRemEventHandler(Class *cl, Object *obj)
 
 	if(win != NULL)
 		DoMethod(_win(obj), MUIM_Window_RemEventHandler, &d->ehn);
+
+	d->add_ehn = FALSE;
 
 	return (IPTR)0;
 }
