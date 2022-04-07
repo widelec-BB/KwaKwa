@@ -1,11 +1,11 @@
 @database "kwakwa.guide"
 @author "Filip 'widelec' Maryjanski"
 @remark "Created with Ed"
-@$VER: KwaKwa.guide 1.9 (10.03.2022)
+@$VER: KwaKwa.guide 1.10 (08.04.2022)
 
 @node main "KwaKwa" "KwaKwa: Index"
 @{b}..:: KwaKwa ::..@{ub}
-Version: 1.9
+Version: 1.10
 
 Copyright © 2012-2022 Filip Maryjanski, BlaBla group
 
@@ -36,17 +36,20 @@ This is a simple instant messenger program.
 
  o any computer with MorphOS 3.16 running on;
  o Internet connection;
- o ezxml.library (V8.7);
- o TextEditor.mcc 15.56 [MOS/PPC].
+ o @{"ezxml.library" system "OpenURL https://www.morphos-storage.net/?id=1532839"} (V8.7);
+ o @{"TextEditor.mcc" system "OpenURL https://github.com/amiga-mui/texteditor/releases"} 15.56 [MOS/PPC] (optional).
 
+Having TextEditor.mcc installed will activate extra configuration options,
+allowing to choose type of text input gadget.
 
 @endnode
 
 @node "installation" "KwaKwa: Installation"
 @{b}Installation:@{ub}
 
-Please unpack archive to any directory you want. Make sure that you have installed @{"ezxml.library" system "OpenURL http://morphos-files.net/download/ezxml.library"}
-(V8.7) and  @{"TextEditor.mcc" system "OpenURL https://github.com/amiga-mui/texteditor/releases"} (V15.56).
+Please unpack archive to any directory you want. Make sure that you have
+installed @{"ezxml.library" system "OpenURL https://www.morphos-storage.net/?id=1532839"}
+(V8.7). Optionally you can install @{"TextEditor.mcc" system "OpenURL https://github.com/amiga-mui/texteditor/releases"} (V15.56).
 
 KwaKwa uses native MorphOS notification system (MagicBeacon).
 At the moment KwaKwa sends following notifications:
@@ -313,25 +316,49 @@ KwaKwa supports following tooltypes:
 @{b}FAQ (Frequently Asked Questions):@{ub}
 
 Q: Whether it is planned to support protocol XXX? (XXX - your favorite one)
-A: Starting with version 1.5 KwaKwa has ability to add new protocols as external modules, but curently there
-   are no plans for creating new modules.
+A: Starting with version 1.5 KwaKwa has ability to add new protocols as external
+   modules, but curently there are no plans for creating new modules.
 
 Q: I installed new module and now KwaKwa is crashing. What can I do?
-A: Probably this module is not configured properly, please, configure it. Also, do not install modules
-   you don't want to use. If you really want to have not needed files on your disk, you can use
-   @{"IGNORE_MODULES tooltype" link tooltypes} to disable not needed modules.
+A: Probably this module is not configured properly, please, configure it. Also,
+   do not install modules you don't want to use. If you really want to have not
+   needed files on your disk, you can use @{"IGNORE_MODULES tooltype" link tooltypes} to disable not
+   needed modules.
 
 Q: Can I update TextEditor.mcc?
-A: Yes, now you can, as the code which was messing with internal structures of TextEditor.mcc has been removed.
+A: Yes, now you can, as the code which was messing with internal structures
+   of TextEditor.mcc has been removed.
 
-Q: Can I get KwaKwa contacts list window when I select KwaKwa in Expose after hidding all windows to screenbar?
-A: Yes. Go to the Expose preferences, setup Action for KwaKwa to "Run Rexx Commands if No Window Found" and set Rexx
-   commands to "WindowControl main show".
+Q: Can I get KwaKwa contacts list window when I select KwaKwa in Expose after
+   hidding all windows to screenbar?
+A: Yes. Go to the Expose preferences, setup Action for KwaKwa to "Run Rexx Commands
+   if No Window Found" and set Rexx commands to "WindowControl main show".
+
+Q: What's needed to see characters from outside the system code page?
+   You have to install font with unicode support. Font have to be installed using
+   @{b}both@{ub} SYS:Tools/FTManager and SYS:Tools/TTEManager.
 
 @endnode
 
 @node "history" "KwaKwa: History"
 @{b}Changelog:@{ub}
+
+@{i}@{b}Version 1.10 (08.04.2022):@{ub}@{ui}
+ o added option to configure space size between buttons in talk window
+   toolbar;
+ o added option to show status image on talk tab title;
+ o fixed problems with using mouse scroll in talk window;
+ o name of contact currently opened in talk window is shown on window's
+   title bar;
+ o fixed problems with avatars scaling;
+ o fixed memory leak when contact changed avatars;
+ o redesigned talk window preferences page to better use available space
+ o fixed problems with contacts names in history window;
+ o fixed problems with text input gadget in double mode;
+@{b} o added Unicode support; @{ub}
+ o added automatic history database conversion to Unicode (on first start);
+ o added option to save chat logs in UTF-8 encoding;
+@{b} o added option to choose which class should be used as text input field.
 
 @{i}@{b}Version 1.9 (11.03.2022):@{ub}@{ui}
  o build with GCC 11;
