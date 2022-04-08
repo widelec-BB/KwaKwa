@@ -181,73 +181,118 @@ static IPTR LongProcessWindowUpdateHistoryDatabase(Class *cl, Object *obj, struc
 }
 
 
-static LONG BackupDatabaseFile(LONG db_version, Object *gauge)
+static LONG CopyFile(CONST_STRPTR src, CONST_STRPTR destination, Object *gauge)
 {
-	STRPTR backup_name;
 	LONG result = -1;
+	BPTR db;
 	ENTER();
 
-	if((backup_name = FmtNew(HISTORY_DATABASE_PATH".v%ld.bak", db_version)))
+	if((db = Open(src, MODE_OLDFILE)))
 	{
-		BPTR db;
+		struct FileInfoBlock fib;
 
-		if((db = Open(HISTORY_DATABASE_PATH, MODE_OLDFILE)))
+		if(ExamineFH(db, &fib))
 		{
-			struct FileInfoBlock fib;
+			BPTR bak;
 
-			if(ExamineFH(db, &fib))
+			if((bak = Open(destination, MODE_NEWFILE)))
 			{
-				BPTR bak;
+				UBYTE buffer[4096];
+				LONG r, total = 0;
 
-				if((bak = Open(backup_name, MODE_NEWFILE)))
+				while(total < fib.fib_Size)
 				{
-					UBYTE buffer[4096];
-					LONG r, total = 0;
+					ULONG signals = SetSignal(0L, SIGBREAKF_CTRL_C);
 
-					while(total < fib.fib_Size)
-					{
-						ULONG signals = SetSignal(0L, SIGBREAKF_CTRL_C);
+					if(signals & SIGBREAKF_CTRL_C)
+						break;
 
-						if(signals & SIGBREAKF_CTRL_C)
-							break;
+					r = Read(db, buffer, sizeof(buffer));
+					if(r == 0)
+						break;
 
-						r = Read(db, buffer, sizeof(buffer));
-						if(r == 0)
-							break;
+					if(Write(bak, buffer, r) != r)
+						break;
 
-						if(Write(bak, buffer, r) != r)
-							break;
+					total += r;
 
-						total += r;
-
-						DoMethod(_app(gauge), MUIM_Application_PushMethod, (IPTR)gauge, 3,
-						 MUIM_Set, MUIA_Gauge_Current, (ULONG)((total / (DOUBLE)fib.fib_Size) * 100.));
-					}
-					if(total == fib.fib_Size)
-						result = 0;
-
-					Close(bak);
+					DoMethod(_app(gauge), MUIM_Application_PushMethod, (IPTR)gauge, 3,
+					 MUIM_Set, MUIA_Gauge_Current, (ULONG)((total / (DOUBLE)fib.fib_Size) * 100.));
 				}
+				if(total == fib.fib_Size)
+					result = 0;
 
-				if(result != 0)
-					DeleteFile(backup_name);
-
+				Close(bak);
 			}
-			Close(db);
+
+			if(result != 0)
+				DeleteFile(destination);
+
 		}
-		StrFree(backup_name);
+		Close(db);
 	}
 
 	LEAVE();
 	return result;
 }
 
-static LONG OpenHistoryDatabase(sqlite3 **db, sqlite3_stmt **stmts)
+static LONG BackupDatabaseFile(LONG db_version, Object *gauge, Object *status_message)
+{
+	LONG result;
+	UBYTE buffer[128];
+
+	DoMethod(_app(gauge), MUIM_Application_PushMethod, (IPTR)gauge, 3, MUIM_Set, MUIA_Gauge_Current, 0);
+	DoMethod(_app(status_message), MUIM_Application_PushMethod, (IPTR)status_message, 3,
+		MUIM_Set, MUIA_Text_Contents, (IPTR)GetString(MSG_LONG_PROCESS_WINDOW_STATUS_DATABASE_BACKUP));
+
+	FmtNPut(buffer, HISTORY_DATABASE_PATH".v%ld.bak", sizeof(buffer), db_version);
+
+	result = CopyFile(HISTORY_DATABASE_PATH, buffer, gauge);
+
+	if(result == 0)
+		DoMethod(_app(gauge), MUIM_Application_PushMethod, (IPTR)gauge, 3, MUIM_Set, MUIA_Gauge_Current, 100);
+
+	return result;
+}
+
+static LONG CreateDatabaseWorkingCopy(CONST_STRPTR path, Object *gauge, Object *status_message)
+{
+	LONG result;
+
+	DoMethod(_app(gauge), MUIM_Application_PushMethod, (IPTR)gauge, 3, MUIM_Set, MUIA_Gauge_Current, 0);
+	DoMethod(_app(status_message), MUIM_Application_PushMethod, (IPTR)status_message, 3,
+		MUIM_Set, MUIA_Text_Contents, (IPTR)GetString(MSG_LONG_PROCESS_WINDOW_STATUS_WORKING_COPY_CREATE));
+
+	result = CopyFile(HISTORY_DATABASE_PATH, path, gauge);
+
+	if(result == 0)
+		DoMethod(_app(gauge), MUIM_Application_PushMethod, (IPTR)gauge, 3, MUIM_Set, MUIA_Gauge_Current, 100);
+
+	return result;
+}
+
+static LONG CopyWorkingCopyToDestination(CONST_STRPTR path, Object *gauge, Object *status_message)
+{
+	LONG result;
+
+	DoMethod(_app(gauge), MUIM_Application_PushMethod, (IPTR)gauge, 3, MUIM_Set, MUIA_Gauge_Current, 0);
+	DoMethod(_app(status_message), MUIM_Application_PushMethod, (IPTR)status_message, 3,
+		MUIM_Set, MUIA_Text_Contents, (IPTR)GetString(MSG_LONG_PROCESS_WINDOW_STATUS_WORKING_COPY_MOVE));
+
+	result = CopyFile(path, HISTORY_DATABASE_PATH, gauge);
+
+	if(result == 0)
+		DoMethod(_app(gauge), MUIM_Application_PushMethod, (IPTR)gauge, 3, MUIM_Set, MUIA_Gauge_Current, 100);
+
+	return result;
+}
+
+static LONG OpenHistoryDatabase(CONST_STRPTR path, sqlite3 **db, sqlite3_stmt **stmts)
 {
 	LONG rc, i;
 	ENTER();
 
-	if((rc = sqlite3_open_v2(HISTORY_DATABASE_PATH, db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL)) == SQLITE_OK)
+	if((rc = sqlite3_open_v2(path, db, SQLITE_OPEN_READWRITE, NULL)) == SQLITE_OK)
 	{
 		for(i = 0; i < SQL_STMT_NO; i++)
 		{
@@ -267,6 +312,8 @@ static LONG OpenHistoryDatabase(sqlite3 **db, sqlite3_stmt **stmts)
 				return 0;
 		}
 	}
+	else
+		tprintf("fAILED TO OPEN: %ls %ld\n", path, rc);
 
 	LEAVE();
 	return -1;
@@ -419,41 +466,67 @@ static IPTR LongProcessWindowProcess(Class *cl, Object *obj, struct MUIP_Process
 	{
 		case TASK_UPDATE_HISTORY_DATABASE:
 		{
-			LONG db_version;
-			sqlite3 *db;
-			sqlite3_stmt *stmts[SQL_STMT_NO];
+			BPTR cache_dir_lock;
 
-			DoMethod(_app(d->lpwd_Gauge), MUIM_Application_PushMethod, (IPTR)d->lpwd_Gauge, 3, MUIM_Set, MUIA_Gauge_Current, 0);
-			DoMethod(_app(d->lpwd_StatusMessage), MUIM_Application_PushMethod, (IPTR)d->lpwd_StatusMessage, 3, 
-				MUIM_Set, MUIA_Text_Contents, (IPTR)GetString(MSG_LONG_PROCESS_WINDOW_STATUS_DATABASE_BACKUP));
-
-			if(BackupDatabaseFile(d->lpwd_CurrentDatabaseVersion, d->lpwd_Gauge) != 0)
-				break;
-
-			DoMethod(_app(d->lpwd_Gauge), MUIM_Application_PushMethod, (IPTR)d->lpwd_Gauge, 3, MUIM_Set, MUIA_Gauge_Current, 100);
-			DoMethod(_app(d->lpwd_StatusMessage), MUIM_Application_PushMethod, (IPTR)d->lpwd_StatusMessage, 3, 
-				MUIM_Set, MUIA_Text_Contents, (IPTR)NULL);
-
-			if((db_version = OpenHistoryDatabase(&db, stmts)) != -1)
+			if((cache_dir_lock = Lock(GUI_CACHE_DIR, EXCLUSIVE_LOCK)))
 			{
-				LONG i;
-
-				d->lpwd_Result = UpdateHistoryDatabase(obj, d->lpwd_Gauge, d->lpwd_StatusMessage, db_version, stmts);
-
-				for(i = 0; i < SQL_STMT_NO; i++)
-					if(stmts[i])
-						sqlite3_finalize(stmts[i]);
-
-				if(d->lpwd_Result == 0)
+				if(BackupDatabaseFile(d->lpwd_CurrentDatabaseVersion, d->lpwd_Gauge, d->lpwd_StatusMessage) == 0)
 				{
-					DoMethod(_app(obj), MUIM_Application_PushMethod, (IPTR)d->lpwd_Gauge, 3, MUIM_Set, MUIA_ShowMe, FALSE);
-					DoMethod(_app(obj), MUIM_Application_PushMethod, (IPTR)d->lpwd_BusyBar, 3, MUIM_Set, MUIA_ShowMe, TRUE);
-					DoMethod(_app(obj), MUIM_Application_PushMethod, (IPTR)d->lpwd_StatusMessage, 3, MUIM_Set, MUIA_Text_Contents, (IPTR)GetString(MSG_LONG_PROCESS_WINDOW_STATUS_DATABASE_VACUUM));
+					LONG uid = GetUniqueID();
+					UBYTE working_copy_path[128];
+					FmtNPut(working_copy_path, "T:kwakwa_db_convert_%ld", sizeof(working_copy_path), uid);
 
-					if(sqlite3_exec(db, "VACUUM", 0, 0, 0) != SQLITE_OK)
-						d->lpwd_Result = -1;
+					if(MakeDirAll(working_copy_path) != 0)
+					{
+						StrCat("/history.db", working_copy_path);
+
+						if(CreateDatabaseWorkingCopy(working_copy_path, d->lpwd_Gauge, d->lpwd_StatusMessage) == 0)
+						{
+							LONG db_version;
+							sqlite3 *db;
+							sqlite3_stmt *stmts[SQL_STMT_NO];
+
+							DoMethod(_app(d->lpwd_StatusMessage), MUIM_Application_PushMethod, (IPTR)d->lpwd_StatusMessage, 3,
+							 MUIM_Set, MUIA_Text_Contents, (IPTR)NULL);
+
+							if((db_version = OpenHistoryDatabase(working_copy_path, &db, stmts)) != -1)
+							{
+								LONG i;
+
+								d->lpwd_Result = UpdateHistoryDatabase(obj, d->lpwd_Gauge, d->lpwd_StatusMessage, db_version, stmts);
+
+								for(i = 0; i < SQL_STMT_NO; i++)
+									if(stmts[i])
+										sqlite3_finalize(stmts[i]);
+
+								if(d->lpwd_Result == 0)
+								{
+									DoMethod(_app(obj), MUIM_Application_PushMethod, (IPTR)d->lpwd_Gauge, 3, MUIM_Set, MUIA_ShowMe, FALSE);
+									DoMethod(_app(obj), MUIM_Application_PushMethod, (IPTR)d->lpwd_BusyBar, 3, MUIM_Set, MUIA_ShowMe, TRUE);
+									DoMethod(_app(obj), MUIM_Application_PushMethod, (IPTR)d->lpwd_StatusMessage, 3, MUIM_Set, MUIA_Text_Contents, (IPTR)GetString(MSG_LONG_PROCESS_WINDOW_STATUS_DATABASE_VACUUM));
+
+									if(sqlite3_exec(db, "VACUUM", 0, 0, 0) != SQLITE_OK)
+										d->lpwd_Result = -1;
+								}
+
+								sqlite3_close(db);
+
+								if(d->lpwd_Result == 0)
+								{
+									DoMethod(_app(obj), MUIM_Application_PushMethod, (IPTR)d->lpwd_BusyBar, 3, MUIM_Set, MUIA_ShowMe, FALSE);
+									DoMethod(_app(obj), MUIM_Application_PushMethod, (IPTR)d->lpwd_Gauge, 3, MUIM_Set, MUIA_ShowMe, TRUE);
+
+									if(CopyWorkingCopyToDestination(working_copy_path, d->lpwd_Gauge, d->lpwd_StatusMessage) != 0)
+										d->lpwd_Result = -1;
+								}
+								DeleteFile(working_copy_path);
+							}
+						}
+						FmtNPut(working_copy_path, "T:kwakwa_db_convert_%ld", sizeof(working_copy_path), uid);
+						DeleteFile(working_copy_path);
+					}
 				}
-				sqlite3_close(db);
+				UnLock(cache_dir_lock);
 			}
 		}
 		break;
