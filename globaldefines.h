@@ -30,7 +30,7 @@
 #define APP_BASE           "KWAKWA"
 #define APP_DESC           GetString(MSG_APPLICATION_DESCRIPTION)
 #define APP_VER_MAJOR      1
-#define APP_VER_MINOR      10
+#define APP_VER_MINOR      11
 #define APP_VER_NO         MACRO_TO_STRING(APP_VER_MAJOR)"."MACRO_TO_STRING(APP_VER_MINOR)
 #define APP_VER            "$VER: " APP_NAME " " APP_VER_NO " " APP_DATE " © " APP_CYEARS " BlaBla group"
 #define APP_SCREEN_TITLE   APP_NAME " " APP_VER_NO " " APP_DATE
