@@ -1853,7 +1853,7 @@ static IPTR ContactsListOpenLogFile(Class *cl, Object *obj, struct CLSP_OpenLogF
 
 	if((log_file_name = Utf8ToSystem(msg->log_file_name)))
 	{
-		UBYTE buffer[LOGS_UNICODE_DRAWER_LEN + StrLen(log_file_name)];
+		UBYTE buffer[255 + StrLen(log_file_name)];
 
 		FmtNPut((STRPTR)buffer, "%s/%ls", sizeof(buffer), msg->unicode ? LOGS_UNICODE_DRAWER : LOGS_DRAWER, msg->log_file_name);
 
