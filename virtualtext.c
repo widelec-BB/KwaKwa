@@ -35,15 +35,6 @@ static IPTR Layout(VOID);
 struct EmulLibEntry LayoutGate = {TRAP_LIB, 0, (VOID(*)(VOID))Layout};
 struct Hook LayoutHook = {{0, 0}, (HOOKFUNC)&LayoutGate, 0, 0};
 
-/* and once again we will hack MUI internals... beacuse "M" in MUI stands for "Magic"! ;-) */
-struct MUI_RGBcolor
-{
-	ULONG red;
-	ULONG green;
-	ULONG blue;
-};
-
-
 /* bit mask for MUIA_UserData for objects inserted to VitualText */
 /* objects attrs */
 #define VTG_FULL_WIDTH              (1 << 10) /* will automatically go to next line after insert that */
@@ -201,54 +192,37 @@ static IPTR VirtualTextSet(Class *cl, Object *obj, struct opSet *msg)
 static IPTR VirtualTextCreatePreparses(Class *cl, Object *obj)
 {
 	struct VirtualTextData *d = INST_DATA(cl, obj);
-	struct MUI_PenSpec *pen_spec;
-	LONG myPen, friendPen, headerPen, systemPen;
 	LONG myColor, friendColor, headerColor, systemColor;
-	struct MUI_RGBcolor *mark_rgb, *my_rgb_old, *friend_rgb_old, *systemmsg_old, *headline_old;
+	LONG mark_rgb, my_rgb_old, friend_rgb_old, systemmsg_old, headline_old;
 	UBYTE alpha;
 
-	pen_spec = (struct MUI_PenSpec*)xget(prefs_object(USD_PREFS_ML_MYCOLOR_POPPEN), MUIA_Pendisplay_Spec);
-	myPen = MUI_ObtainPen(muiRenderInfo(obj), pen_spec, 0);
-	myColor = MUIPEN(myPen);
+	myColor = xget(prefs_object(USD_PREFS_ML_MYCOLOR_POPPEN), MUIA_Pendisplay_XRGB);
+	friendColor = xget(prefs_object(USD_PREFS_ML_FRIENDCOLOR_POPPEN), MUIA_Pendisplay_XRGB);
+	headerColor = xget(prefs_object(USD_PREFS_TW_HEADLINE_COLOR), MUIA_Pendisplay_XRGB);
+	systemColor = xget(prefs_object(USD_PREFS_TW_SYSTEMMSG_COLOR), MUIA_Pendisplay_XRGB);
 
-	pen_spec = (struct MUI_PenSpec*)xget(prefs_object(USD_PREFS_ML_FRIENDCOLOR_POPPEN), MUIA_Pendisplay_Spec);
-	friendPen = MUI_ObtainPen(muiRenderInfo(obj), pen_spec, 0);
-	friendColor = MUIPEN(friendPen);
+	my_rgb_old = xget(prefs_object(USD_PREFS_ML_MYCOLOR_OLD_POPPEN), MUIA_Pendisplay_XRGB);
+	friend_rgb_old = xget(prefs_object(USD_PREFS_ML_FRIENDCOLOR_OLD_POPPEN), MUIA_Pendisplay_XRGB);
+	systemmsg_old = xget(prefs_object(USD_PREFS_TW_SYSTEMMSG_OLD_COLOR), MUIA_Pendisplay_XRGB);
+	headline_old = xget(prefs_object(USD_PREFS_TW_HEADLINE_OLD_COLOR), MUIA_Pendisplay_XRGB);
 
-	pen_spec = (struct MUI_PenSpec*)xget(prefs_object(USD_PREFS_TW_HEADLINE_COLOR), MUIA_Pendisplay_Spec);
-	headerPen = MUI_ObtainPen(muiRenderInfo(obj), pen_spec, 0);
-	headerColor = MUIPEN(headerPen);
-
-	pen_spec = (struct MUI_PenSpec*)xget(prefs_object(USD_PREFS_TW_SYSTEMMSG_COLOR), MUIA_Pendisplay_Spec);
-	systemPen = MUI_ObtainPen(muiRenderInfo(obj), pen_spec, 0);
-	systemColor = MUIPEN(systemPen);
-
-	MUI_ReleasePen(muiRenderInfo(obj), myPen);
-	MUI_ReleasePen(muiRenderInfo(obj), friendPen);
-	MUI_ReleasePen(muiRenderInfo(obj), headerPen);
-	MUI_ReleasePen(muiRenderInfo(obj), systemPen);
-
-	mark_rgb = (struct MUI_RGBcolor*)xget(prefs_object(USD_PREFS_TW_SELECTION_COLOR), MUIA_Pendisplay_RGBcolor);
-	my_rgb_old = (struct MUI_RGBcolor*)xget(prefs_object(USD_PREFS_ML_MYCOLOR_OLD_POPPEN), MUIA_Pendisplay_RGBcolor);
-	friend_rgb_old = (struct MUI_RGBcolor*)xget(prefs_object(USD_PREFS_ML_FRIENDCOLOR_OLD_POPPEN), MUIA_Pendisplay_RGBcolor);
-	systemmsg_old = (struct MUI_RGBcolor*)xget(prefs_object(USD_PREFS_TW_SYSTEMMSG_OLD_COLOR), MUIA_Pendisplay_RGBcolor);
-	headline_old = (struct MUI_RGBcolor*)xget(prefs_object(USD_PREFS_TW_HEADLINE_OLD_COLOR), MUIA_Pendisplay_RGBcolor);
-
-	FmtNPut((STRPTR)d->myPreparse, "\033P[%ld]", sizeof(d->myPreparse), myColor);
-	FmtNPut((STRPTR)d->friendPreparse, "\033P[%ld]", sizeof(d->friendPreparse), friendColor);
+	FmtNPut((STRPTR)d->myPreparse, "\033P[%06lX]", sizeof(d->myPreparse), myColor);
+	FmtNPut((STRPTR)d->friendPreparse, "\033P[%06lX]", sizeof(d->friendPreparse), friendColor);
 
 	alpha = (((DOUBLE)(100 - xget(prefs_object(USD_PREFS_OLD_MESSAGES_TRANSPARENCY), MUIA_Slider_Level))) / 100.) * 0xFF;
 
-	FmtNPut((STRPTR)d->myPreparseOld, "\033P[%02X%02X%02X%02X]", sizeof(d->myPreparseOld), alpha, (UBYTE)(my_rgb_old->red >> 24), (UBYTE)(my_rgb_old->green >> 24), (UBYTE)(my_rgb_old->blue >> 24));
-	FmtNPut((STRPTR)d->friendPreparseOld, "\033P[%02X%02X%02X%02X]", sizeof(d->friendPreparseOld), alpha, (UBYTE)(friend_rgb_old->red >> 24), (UBYTE)(friend_rgb_old->green >> 24), (UBYTE)(friend_rgb_old->blue >> 24));
-	FmtNPut((STRPTR)d->preparse_header_l_old, "\033P[%02X%02X%02X%02X]", sizeof(d->preparse_header_l_old), alpha, (UBYTE)(headline_old->red >> 24), (UBYTE)(headline_old->green >> 24), (UBYTE)(headline_old->blue >> 24));
-	FmtNPut((STRPTR)d->preparse_header_r_old, "\033P[%02X%02X%02X%02X]", sizeof(d->preparse_header_r_old), alpha, (UBYTE)(headline_old->red >> 24), (UBYTE)(headline_old->green >> 24), (UBYTE)(headline_old->blue >> 24));
-	FmtNPut((STRPTR)d->preparse_system_old, "\033P[%02X%02X%02X%02X]", sizeof(d->preparse_system_old), alpha, (UBYTE)(systemmsg_old->red >> 24), (UBYTE)(systemmsg_old->green >> 24), (UBYTE)(systemmsg_old->blue >> 24));
+	FmtNPut((STRPTR)d->myPreparseOld, "\033P[%02X%06lX]", sizeof(d->myPreparseOld), alpha, my_rgb_old);
+	FmtNPut((STRPTR)d->friendPreparseOld, "\033P[%02X%06lX]", sizeof(d->friendPreparseOld), alpha, friend_rgb_old);
+	FmtNPut((STRPTR)d->preparse_header_l_old, "\033P[%02X%06lX]", sizeof(d->preparse_header_l_old), alpha, headline_old);
+	FmtNPut((STRPTR)d->preparse_header_r_old, "\033P[%02X%06lX]", sizeof(d->preparse_header_r_old), alpha, headline_old);
+	FmtNPut((STRPTR)d->preparse_system_old, "\033P[%02X%06lX]", sizeof(d->preparse_system_old), alpha, systemmsg_old);
 
-	FmtNPut((STRPTR)d->preparse_header_l, "\033P[%ld]", sizeof(d->preparse_header_l), headerColor);
-	FmtNPut((STRPTR)d->preparse_header_r, "\033P[%ld]", sizeof(d->preparse_header_r), headerColor);
-	FmtNPut((STRPTR)d->preparse_system, "\033P[%ld]", sizeof(d->preparse_system), systemColor);
-	FmtNPut((STRPTR)d->selectBackground, "2:%08X,%08X,%08X", sizeof(d->selectBackground), mark_rgb->red, mark_rgb->green, mark_rgb->blue);
+	FmtNPut((STRPTR)d->preparse_header_l, "\033P[%06lX]", sizeof(d->preparse_header_l), headerColor);
+	FmtNPut((STRPTR)d->preparse_header_r, "\033P[%06lX]", sizeof(d->preparse_header_r), headerColor);
+	FmtNPut((STRPTR)d->preparse_system, "\033P[%06lX]", sizeof(d->preparse_system), systemColor);
+
+	mark_rgb = xget(prefs_object(USD_PREFS_TW_SELECTION_COLOR), MUIA_Pendisplay_XRGB);
+	FmtNPut((STRPTR)d->selectBackground, "2:%08lX,%08lX,%08lX", sizeof(d->selectBackground), (mark_rgb & 0x00FF0000) << 8, (mark_rgb & 0x0000FF00) << 16, (mark_rgb & 0x000000FF) << 24);
 
 	StrCat("\33l", (STRPTR)d->preparse_header_l_old);
 	StrCat("\33r", (STRPTR)d->preparse_header_r_old);
