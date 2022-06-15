@@ -19,6 +19,7 @@
 #include <devices/rawkeycodes.h>
 #include <libraries/gadtools.h>
 #include <proto/cybergraphics.h>
+#include <syslimits.h> // for PATH_MAX
 
 #include "globaldefines.h"
 #include "locale.h"
@@ -1847,25 +1848,27 @@ static IPTR ContactsListRemoveEntry(Class *cl, Object *obj, struct CLSP_RemoveEn
 
 static IPTR ContactsListOpenLogFile(Class *cl, Object *obj, struct CLSP_OpenLogFile *msg)
 {
+	UBYTE buffer[PATH_MAX];
 	BOOL result = FALSE;
 	BPTR lock;
 	STRPTR log_file_name;
 
-	if((log_file_name = Utf8ToSystem(msg->log_file_name)))
+	FmtNPut((STRPTR)buffer, "%s/%ls", sizeof(buffer), LOGS_UNICODE_DRAWER, msg->log_file_name);
+
+	if(!msg->unicode)
 	{
-		UBYTE buffer[255 + StrLen(log_file_name)];
-
-		FmtNPut((STRPTR)buffer, "%s/%ls", sizeof(buffer), msg->unicode ? LOGS_UNICODE_DRAWER : LOGS_DRAWER, msg->log_file_name);
-
-		if((lock = Lock(buffer, ACCESS_READ)))
+		if((log_file_name = Utf8ToSystem(msg->log_file_name)))
 		{
-			if(NameFromLock(lock, buffer, sizeof(buffer)))
-			{
-				result = OpenWorkbenchObjectA(buffer, NULL);
-			}
-			UnLock(lock);
+			FmtNPut((STRPTR)buffer, "%s/%ls", sizeof(buffer), LOGS_DRAWER, log_file_name);
+			StrFree(log_file_name);
 		}
-		StrFree(log_file_name);
+	}
+
+	if((lock = Lock(buffer, ACCESS_READ)))
+	{
+		if(NameFromLock(lock, buffer, sizeof(buffer)))
+			result = OpenWorkbenchObjectA(buffer, NULL);
+		UnLock(lock);
 	}
 
 	return(IPTR)result;
